@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import AnimatedSectionCard from "../../../../components/common/AnimatedSectionCard";
 import SaveFooter from "../../../../layouts/SaveFooter";
 import AppFormField from "../../../../components/common/AppFormField";
+import { useEffect } from "react";
 
 export type PersonalFormType = {
   firstName: string;
@@ -34,7 +35,7 @@ const PersonalDetails = ({
   onBack,
   onSubmit,
 }: Props) => {
-  const { control, handleSubmit } = useForm<PersonalFormType>({
+  const { control, handleSubmit, reset } = useForm<PersonalFormType>({
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -48,6 +49,22 @@ const PersonalDetails = ({
     },
   });
 
+  useEffect(() => {
+    reset({
+      firstName: "",
+      lastName: "",
+      jobTitle: "",
+      dateOfBirth: "",
+      gender: "",
+      maritalStatus: "",
+      nationality: "",
+      photoUrl: "",
+      ...defaultValues,
+    });
+  }, [defaultValues, reset]);
+
+  console.log("defaultValues", defaultValues);
+
   return (
     <AnimatedSectionCard
       title="Personal Information"
@@ -58,15 +75,27 @@ const PersonalDetails = ({
         <Stack spacing={3}>
           <Grid container spacing={2.5}>
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="firstName" control={control} label="First Name" />
+              <AppFormField
+                name="firstName"
+                control={control}
+                label="First Name"
+              />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="lastName" control={control} label="Last Name" />
+              <AppFormField
+                name="lastName"
+                control={control}
+                label="Last Name"
+              />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="jobTitle" control={control} label="Job Title" />
+              <AppFormField
+                name="jobTitle"
+                control={control}
+                label="Job Title"
+              />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
@@ -106,11 +135,20 @@ const PersonalDetails = ({
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="nationality" control={control} label="Nationality" />
+              <AppFormField
+                name="nationality"
+                control={control}
+                label="Nationality"
+              />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="photoUrl" control={control} label="Photo URL" type="url" />
+              <AppFormField
+                name="photoUrl"
+                control={control}
+                label="Photo URL"
+                type="url"
+              />
             </Grid>
           </Grid>
 

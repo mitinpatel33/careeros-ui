@@ -88,7 +88,7 @@ const ProfileItemList = <T,>({
             <Typography color="text.secondary">No records added yet.</Typography>
           )}
 
-          {items.map((item, index) => (
+          {items?.map((item, index) => (
             <motion.div
               key={(item as any).id ?? index}
               initial={{ opacity: 0, y: 14 }}

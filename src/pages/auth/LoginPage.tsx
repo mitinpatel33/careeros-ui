@@ -17,6 +17,7 @@ import { loginSuccess } from "../../store/auth/authSlice";
 import { useLoginMutation } from "../../services/authApi";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../hooks/useLogin";
+import { appToast } from "../../common/toast/AppToast";
 
 const LoginPage = () => {
   const [login, { isLoading }] = useLoginMutation();
@@ -37,9 +38,9 @@ const LoginPage = () => {
     try {
       const response = await login(data).unwrap();
 
-      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("token", response?.data);
       localStorage.setItem("user", JSON.stringify(response.data));
-
+      console.log("response", response);
       dispatch(loginSuccess(response.data));
 
       if (response.data.role === "Candidate") {
@@ -49,8 +50,11 @@ const LoginPage = () => {
       } else {
         navigate("/admin");
       }
-    } catch (error) {
-      console.log(error);
+
+      appToast.success(response.message);
+    } catch (error: any) {
+      console.log("error", error);
+      appToast.error(error.data.message);
     }
   };
 

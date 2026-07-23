@@ -4,7 +4,7 @@ export const api = createApi({
   reducerPath: "api",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5234/api",
+    baseUrl: "http://localhost:5000/api",
 
     prepareHeaders: (headers) => {
 

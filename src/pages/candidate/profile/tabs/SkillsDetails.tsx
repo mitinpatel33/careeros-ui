@@ -2,11 +2,11 @@ import { Psychology } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
 
 export type ProfileSkill = {
-  id?: string;
+  _id?: string;                // the API’s identifier
   skillName: string;
-  skillLevel?: string;
-  experienceYears: number;
-  displayOrder?: number;
+  proficiency?: string;        // was skillLevel
+  experienceInYears: number;   // was experienceYears
+  displayOrder?: number;  
 };
 
 type Props = {
@@ -26,13 +26,13 @@ const SkillsDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
       loading={loading}
       defaultItem={{
         skillName: "",
-        skillLevel: "",
-        experienceYears: 0,
+        proficiency: "Beginner",       // match the API field name
+        experienceInYears: 0,
       }}
       fields={[
         { name: "skillName", label: "Skill Name" },
         {
-          name: "skillLevel",
+          name: "proficiency",         // was "skillLevel"
           label: "Skill Level",
           type: "select",
           options: [
@@ -42,10 +42,10 @@ const SkillsDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
             { label: "Expert", value: "Expert" },
           ],
         },
-        { name: "experienceYears", label: "Experience Years", type: "number" },
+        { name: "experienceInYears", label: "Experience Years", type: "number" },
       ]}
       getTitle={(x) => x.skillName}
-      getSubtitle={(x) => `${x.skillLevel || "Beginner"} • ${x.experienceYears} years`}
+      getSubtitle={(x) => `${x.proficiency || "Beginner"} • ${x.experienceInYears} years`}
       onChange={onChange}
       onSaveStep={onSaveStep}
     />

@@ -65,7 +65,7 @@ const ProfileStepCards = ({
   activeStep,
   completedSteps,
   completion,
-  fullName = "Mitin Patel",
+  fullName = "N/A",
   jobTitle = "Your Job Title",
   onStepChange,
 }: Props) => {

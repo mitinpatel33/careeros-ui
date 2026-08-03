@@ -161,8 +161,8 @@ const ProfilePage = () => {
   const isError = isFormError || isListError;
   const errorMessage = isError
     ? (formError as any)?.data?.message ||
-      (listError as any)?.data?.message ||
-      "Failed to load data"
+    (listError as any)?.data?.message ||
+    "Failed to load data"
     : null;
 
   // If there's an error loading the section, show a retry or fallback
@@ -315,6 +315,8 @@ const ProfilePage = () => {
               completion={completionData?.data?.completionPercentage ?? 0}
               fullName={candidate.fullName}
               jobTitle={formData?.data?.jobTitle}
+              photoURL={formData?.data?.photoUrl ||
+                formData?.data?.photoURL || ""}
               onStepChange={setActiveStep}
               completedSteps={[]}
             />

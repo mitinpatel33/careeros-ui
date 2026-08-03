@@ -9,6 +9,7 @@ import {
   RadioGroup,
   TextField,
 } from "@mui/material";
+import type { ReactNode } from "react";
 import {
   Controller,
   type Control,
@@ -26,17 +27,20 @@ type Props<T extends FieldValues> = {
   control: Control<T>;
   label: string;
   type?:
-    | "text"
-    | "number"
-    | "date"
-    | "select"
-    | "radio"
-    | "checkbox"
-    | "textarea"
-    | "url"
-    | "email";
+  | "text"
+  | "number"
+  | "date"
+  | "select"
+  | "radio"
+  | "checkbox"
+  | "textarea"
+  | "url"
+  | "email";
   options?: Option[];
   rows?: number;
+  disabled?: boolean;
+  onValueChange?: (value: unknown) => void;
+  endAdornment?: ReactNode;
 };
 
 const AppFormField = <T extends FieldValues>({
@@ -46,6 +50,9 @@ const AppFormField = <T extends FieldValues>({
   type = "text",
   options = [],
   rows = 3,
+  disabled = false,
+  onValueChange,
+  endAdornment,
 }: Props<T>) => {
   return (
     <Controller
@@ -55,14 +62,20 @@ const AppFormField = <T extends FieldValues>({
         const error = !!fieldState.error;
         const helperText = fieldState.error?.message;
 
+        const handleChange = (value: unknown) => {
+          field.onChange(value);
+          onValueChange?.(value);
+        };
+
         if (type === "checkbox") {
           return (
-            <FormControl error={error}>
+            <FormControl error={error} disabled={disabled}>
               <FormControlLabel
                 control={
                   <Checkbox
                     checked={!!field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
+                    disabled={disabled}
+                    onChange={(e) => handleChange(e.target.checked)}
                   />
                 }
                 label={label}
@@ -74,18 +87,19 @@ const AppFormField = <T extends FieldValues>({
 
         if (type === "radio") {
           return (
-            <FormControl error={error}>
+            <FormControl error={error} disabled={disabled}>
               <FormLabel>{label}</FormLabel>
               <RadioGroup
                 row
                 value={field.value ?? ""}
-                onChange={(e) => field.onChange(e.target.value)}
+                onChange={(e) => handleChange(e.target.value)}
               >
                 {options.map((x) => (
                   <FormControlLabel
                     key={String(x.value)}
                     value={x.value}
                     control={<Radio />}
+                    disabled={disabled}
                     label={x.label}
                   />
                 ))}
@@ -98,6 +112,7 @@ const AppFormField = <T extends FieldValues>({
         return (
           <TextField
             {...field}
+            onChange={(e) => handleChange(e.target.value)}
             fullWidth
             label={label}
             type={type === "textarea" ? "text" : type}
@@ -106,8 +121,10 @@ const AppFormField = <T extends FieldValues>({
             rows={type === "textarea" ? rows : undefined}
             error={error}
             helperText={helperText}
+            disabled={disabled}
             slotProps={{
               inputLabel: type === "date" ? { shrink: true } : undefined,
+              input: endAdornment ? { endAdornment } : undefined,
             }}
             value={field.value ?? ""}
           >

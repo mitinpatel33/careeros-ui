@@ -43,6 +43,7 @@ type Props = {
   completion: number;
   fullName?: string;
   jobTitle?: string;
+  photoURL?: string;
   onStepChange: (step: ProfileStepKey) => void;
 };
 
@@ -67,6 +68,7 @@ const ProfileStepCards = ({
   completion,
   fullName = "N/A",
   jobTitle = "Your Job Title",
+  photoURL,
   onStepChange,
 }: Props) => {
   const initials = fullName
@@ -86,6 +88,7 @@ const ProfileStepCards = ({
       <Stack sx={{ alignItems: "center" }} spacing={2}>
         <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.96 }}>
           <Avatar
+            src={photoURL || undefined} // Add src prop with photoURL
             sx={{
               width: { xs: 82, sm: 110 },
               height: { xs: 82, sm: 110 },
@@ -95,7 +98,7 @@ const ProfileStepCards = ({
               boxShadow: "0 15px 35px rgba(0,0,0,.12)",
             }}
           >
-            {initials}
+            {!photoURL && initials} {/* Only show initials if no photo */}
           </Avatar>
         </motion.div>
 
@@ -108,8 +111,8 @@ const ProfileStepCards = ({
 
         <Box sx={{ width: "100%", mt: 1 }}>
           <Stack direction="row" sx={{ mb: 1, justifyContent: "space-between" }}>
-            <Typography sx={{fontWeight: 900}}>Completion</Typography>
-            <Typography sx={{fontWeight: 900}}>{completion}%</Typography>
+            <Typography sx={{ fontWeight: 900 }}>Completion</Typography>
+            <Typography sx={{ fontWeight: 900 }}>{completion}%</Typography>
           </Stack>
 
           <LinearProgress

@@ -17,11 +17,21 @@ export type ProfileEducation = {
 type Props = {
   items: ProfileEducation[];
   loading?: boolean;
-  onChange: (items: ProfileEducation[]) => void;
-  onSaveStep: () => void;
+  onSave: (items: ProfileEducation[]) => Promise<void>;
 };
 
-const EducationDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
+const EducationDetails = ({ items, loading, onSave }: Props) => {
+  const fields: any[] = [
+    { name: "instituteName", label: "Institute Name" },
+    { name: "degree", label: "Degree" },
+    { name: "fieldOfStudy", label: "Field Of Study" },
+    { name: "startDate", label: "Start Date", type: "date" },
+    { name: "endDate", label: "End Date", type: "date" },
+    { name: "percentage", label: "Percentage", type: "number" },
+    { name: "grade", label: "Grade" },
+    { name: "description", label: "Description", type: "textarea", rows: 4 },
+  ];
+
   return (
     <ProfileCrudStep<ProfileEducation>
       title="Education"
@@ -39,20 +49,10 @@ const EducationDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
         grade: "",
         description: "",
       }}
-      fields={[
-        { name: "instituteName", label: "Institute Name" },
-        { name: "degree", label: "Degree" },
-        { name: "fieldOfStudy", label: "Field Of Study" },
-        { name: "startDate", label: "Start Date", type: "date" },
-        { name: "endDate", label: "End Date", type: "date" },
-        { name: "percentage", label: "Percentage", type: "number" },
-        { name: "grade", label: "Grade" },
-        { name: "description", label: "Description", type: "textarea", rows: 4 },
-      ]}
+      fields={fields}
       getTitle={(x) => x.degree}
       getSubtitle={(x) => `${x.instituteName} • ${x.fieldOfStudy}`}
-      onChange={onChange}
-      onSaveStep={onSaveStep}
+      onSave={onSave}
     />
   );
 };

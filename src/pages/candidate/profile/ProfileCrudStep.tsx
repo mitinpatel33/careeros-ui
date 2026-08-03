@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   Dialog,
@@ -11,7 +11,6 @@ import { useForm } from "react-hook-form";
 import ProfileItemList from "./ProfileItemList";
 import AppFormField from "../../../components/common/AppFormField";
 
-
 export type FieldConfig<T> = {
   name: keyof T;
   label: string;
@@ -20,8 +19,10 @@ export type FieldConfig<T> = {
   options?: { label: string; value: string | boolean }[];
 };
 
+// BaseItem now supports both 'id' and '_id'
 type BaseItem = {
   id?: string;
+  _id?: string;               // added
   displayOrder?: number;
 };
 
@@ -35,8 +36,8 @@ type Props<T extends BaseItem> = {
   loading?: boolean;
   getTitle: (item: T) => string;
   getSubtitle?: (item: T) => string;
-  onChange: (items: T[]) => void;
-  onSaveStep: () => void;
+  onSave: (items: T[]) => Promise<void>;
+  onDeleteItem?: (item: T) => Promise<void>; // optional immediate delete
 };
 
 const ProfileCrudStep = <T extends BaseItem>({
@@ -49,15 +50,21 @@ const ProfileCrudStep = <T extends BaseItem>({
   loading,
   getTitle,
   getSubtitle,
-  onChange,
-  onSaveStep,
+  onSave,
+  onDeleteItem,
 }: Props<T>) => {
+  const [localItems, setLocalItems] = useState<T[]>(items);
+  const [saving, setSaving] = useState(false);
   const [open, setOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<T | null>(null);
 
   const { control, handleSubmit, reset } = useForm<T>({
     defaultValues: defaultItem as any,
   });
+
+  useEffect(() => {
+    setLocalItems(items);
+  }, [items]);
 
   const openAdd = () => {
     setEditingItem(null);
@@ -71,25 +78,56 @@ const ProfileCrudStep = <T extends BaseItem>({
     setOpen(true);
   };
 
+  // Helper to get the item's ID (either id or _id)
+  const getItemId = (item: T): string | undefined => item.id || item._id;
+
   const saveItem = (values: T) => {
-    if (editingItem?.id) {
-      onChange(
-        items.map((x) =>
-          x.id === editingItem.id ? { ...x, ...values, id: editingItem.id } : x
-        )
+    const editingId = editingItem ? getItemId(editingItem) : undefined;
+    if (editingId) {
+      // Update existing item
+      setLocalItems(
+        localItems.map((x) => {
+          const currentId = getItemId(x);
+          return currentId === editingId ? { ...x, ...values, id: currentId } : x;
+        })
       );
     } else {
-      onChange([
-        ...items,
+      // Add new item
+      setLocalItems([
+        ...localItems,
         {
           ...values,
           id: crypto.randomUUID(),
-          displayOrder: items.length + 1,
+          displayOrder: localItems.length + 1,
         },
       ]);
     }
-
     setOpen(false);
+  };
+
+  const handleDelete = async (item: T) => {
+    if (onDeleteItem) {
+      // Immediate delete via API
+      await onDeleteItem(item);
+      // Parent will refetch and update items, which triggers useEffect
+    } else {
+      // Batch delete: remove from local state
+      const idToDelete = getItemId(item);
+      if (idToDelete) {
+        setLocalItems(localItems.filter((x) => getItemId(x) !== idToDelete));
+      }
+    }
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave(localItems);
+    } catch (error) {
+      // error handled by parent
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -98,21 +136,21 @@ const ProfileCrudStep = <T extends BaseItem>({
         title={title}
         subtitle={subtitle}
         icon={icon}
-        items={items}
+        items={localItems}
         getTitle={getTitle}
         getSubtitle={getSubtitle}
         onAdd={openAdd}
         onEdit={openEdit}
-        onDelete={(item: any) => onChange(items.filter((x) => x.id !== item.id))}
+        onDelete={handleDelete}
+        onSave={handleSave}
         loading={loading}
-        onSaveStep={onSaveStep}
+        saving={saving}
       />
 
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: 900 }}>
           {editingItem ? `Edit ${title}` : `Add ${title}`}
         </DialogTitle>
-
         <form onSubmit={handleSubmit(saveItem)}>
           <DialogContent>
             <Grid container spacing={2} sx={{ mt: 0.5 }}>
@@ -130,7 +168,6 @@ const ProfileCrudStep = <T extends BaseItem>({
               ))}
             </Grid>
           </DialogContent>
-
           <DialogActions sx={{ p: 2.5 }}>
             <Button onClick={() => setOpen(false)}>Cancel</Button>
             <Button variant="contained" type="submit">

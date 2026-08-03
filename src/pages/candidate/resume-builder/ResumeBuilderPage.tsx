@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import type {
@@ -9,7 +9,6 @@ import type {
   ResumeDesignSettings,
 } from "../../../types/candidate/resume.types";
 import { defaultResumeSettings } from "../../../types/candidate/resume.types";
-import { resumeApi } from "../../../services/resumeApi";
 import SectionSelector from "../../../components/common/SectionSelector";
 import ResumeRenderer from "../../../components/common/ResumeRenderer";
 import EditRoundedIcon from "@mui/icons-material/EditRounded";
@@ -19,8 +18,23 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ActionIconButton from "../../../components/common/ActionIconButton";
 import TemplateDrawer from "./components/TemplateDrawer";
 import ResumeSettingsDrawer from "./components/ResumeSettingsDrawer";
+import { useGetProfileSectionsQuery } from "../../../services/candidateprofileApi";
 
 const ResumeBuilderPage = () => {
+  const sectionKeyMap: Record<string, string> = {
+    personal: "personal",
+    contact: "contact",
+    summary: "summary",
+    skills: "skills",
+    experience: "experiences", // UI "experience" → backend "experiences"
+    education: "educations", // UI "education" → backend "educations"
+    projects: "projects",
+    certificates: "certificates",
+    achievements: "achievements",
+    languages: "languages",
+    social: "social",
+  };
+
   const printRef = useRef<HTMLDivElement>(null);
 
   const [selectedSections, setSelectedSections] = useState<ResumeSectionKey[]>([
@@ -35,15 +49,15 @@ const ResumeBuilderPage = () => {
 
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
   const [selectedTemplate, setSelectedTemplate] =
-    useState<ResumeTemplateId>("atsClassic");
+    useState<ResumeTemplateId>("classicElegant");
   const [themeColor, setThemeColor] = useState<ResumeThemeColor>("blue");
-  const [loading, setLoading] = useState(false);
 
   const [templateOpen, setTemplateOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [resumeSettings, setResumeSettings] = useState<ResumeDesignSettings>(
     defaultResumeSettings,
   );
+  const [shouldFetch, setShouldFetch] = useState(false);
 
   const handlePrint = useReactToPrint({
     contentRef: printRef,
@@ -83,16 +97,31 @@ const ResumeBuilderPage = () => {
   `,
   });
 
-  const handleSubmitSections = async () => {
-    setLoading(true);
+  const includeString = selectedSections
+    .map((key) => sectionKeyMap[key])
+    .join(",");
 
-    const data = await resumeApi.getResumeBySelectedSections({
-      // userId: "LOGGED_IN_USER_ID",
-      sections: selectedSections,
-    });
+  const {
+    data: sectionsData,
+    isLoading,
+    refetch,
+  } = useGetProfileSectionsQuery(includeString, {
+    skip: !shouldFetch,
+  });
 
-    setResumeData(data);
-    setLoading(false);
+  useEffect(() => {
+    debugger
+    if (sectionsData) {
+      setResumeData(sectionsData?.data);
+      setShouldFetch(false); // reset if needed
+    }
+  }, [sectionsData]);
+
+  const handleSubmitSections = () => {
+    if (selectedSections.length === 0) return;
+    setShouldFetch(true);
+    // If the query already ran with the same includeString, refetch to force fresh data
+    // refetch();
   };
 
   if (!resumeData) {
@@ -115,7 +144,7 @@ const ResumeBuilderPage = () => {
 
           <SectionSelector
             selectedSections={selectedSections}
-            loading={loading}
+            loading={selectedSections.length === 0 || isLoading}
             onChange={setSelectedSections}
             onSubmit={handleSubmitSections}
           />
@@ -180,18 +209,21 @@ const ResumeBuilderPage = () => {
               title="Edit Sections"
               icon={EditRoundedIcon}
               onClick={() => setResumeData(null)}
+              disabled={false}
             />
 
             <ActionIconButton
               title="Templates"
               icon={StyleRoundedIcon}
               onClick={() => setTemplateOpen(true)}
+              disabled={false}
             />
 
             <ActionIconButton
               title="Settings"
               icon={SettingsOutlinedIcon}
               onClick={() => setSettingsOpen(true)}
+              disabled={false}
             />
 
             <ActionIconButton
@@ -199,6 +231,7 @@ const ResumeBuilderPage = () => {
               icon={DownloadRoundedIcon}
               onClick={handlePrint}
               variant="filled"
+              disabled={false}
             />
           </Stack>
         </Stack>

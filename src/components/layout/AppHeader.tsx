@@ -8,10 +8,11 @@ import {
   Typography,
 } from "@mui/material";
 
-import { Menu, Notifications } from "@mui/icons-material";
+import { Logout, Menu, Notifications } from "@mui/icons-material";
 
 import type { PortalType } from "./sidebarMenus";
 import { useNavigate } from "react-router-dom";
+import { useLogoutMutation } from "../../services/authApi";
 
 const drawerWidth = 260;
 
@@ -40,6 +41,36 @@ const avatarText = {
 
 const AppHeader = ({ portal, onMenuClick }: Props) => {
   const navigate = useNavigate();
+
+  const [logout, { isLoading }] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      // retrieve refreshToken from localStorage (or from Redux)
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        // if no token, just redirect to login
+        localStorage.removeItem("token");
+        localStorage.removeItem("refreshToken");
+        navigate("/login");
+        return;
+      }
+
+      await logout({ refreshToken }).unwrap();
+      // success: clear tokens and redirect
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      // If using Redux, dispatch logout action here
+      navigate("/login");
+    } catch (error) {
+      // handle error (e.g., show snackbar)
+      console.error("Logout failed:", error);
+      // still clear local tokens to avoid getting stuck
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      navigate("/login");
+    }
+  };
 
   return (
     <AppBar
@@ -105,6 +136,14 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
           >
             {avatarText[portal]}
           </Avatar>
+
+          <IconButton
+            onClick={handleLogout}
+            disabled={isLoading}
+            // color="inherit"
+          >
+            <Logout />
+          </IconButton>
         </Stack>
       </Toolbar>
     </AppBar>

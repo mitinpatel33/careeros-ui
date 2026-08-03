@@ -1,24 +1,45 @@
-import { Box, Grid, Stack, Typography } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import {
+  Box,
+  Grid,
+  Stack,
+  Typography,
+  CircularProgress,
+  Button,
+} from "@mui/material";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  lazy,
+  Suspense,
+} from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
 import ProfileStepCards, { type ProfileStepKey } from "./ProfileStepCards";
 import AppSnackbar from "../../../components/common/AppSnackbar";
+import {
+  useGetCompletionQuery,
+  useGetProfileCollectionQuery,
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "../../../services/candidateprofileApi";
+import { useProfileSaver } from "../../../hooks/useProfileSaver";
 
-import PersonalDetails from "./tabs/PersonalDetails";
-import SummaryDetails from "./tabs/SummaryDetails";
-import ContactDetails from "./tabs/ContactDetails";
-import SocialDetails from "./tabs/SocialDetails";
-import SettingsDetails from "./tabs/SettingsDetails";
-
-import SkillsDetails from "./tabs/SkillsDetails";
-import EducationDetails from "./tabs/EducationDetails";
-import ExperienceDetails from "./tabs/ExperienceDetails";
-import ProjectsDetails from "./tabs/ProjectsDetails";
-import CertificatesDetails from "./tabs/CertificatesDetails";
-import AchievementsDetails from "./tabs/AchievementsDetails";
-import LanguagesDetails from "./tabs/LanguagesDetails";
+// Lazy load tab components for better initial load
+const PersonalDetails = lazy(() => import("./tabs/PersonalDetails"));
+const SummaryDetails = lazy(() => import("./tabs/SummaryDetails"));
+const ContactDetails = lazy(() => import("./tabs/ContactDetails"));
+const SocialDetails = lazy(() => import("./tabs/SocialDetails"));
+const SkillsDetails = lazy(() => import("./tabs/SkillsDetails"));
+const EducationDetails = lazy(() => import("./tabs/EducationDetails"));
+const ExperienceDetails = lazy(() => import("./tabs/ExperienceDetails"));
+const ProjectsDetails = lazy(() => import("./tabs/ProjectsDetails"));
+const CertificatesDetails = lazy(() => import("./tabs/CertificatesDetails"));
+const AchievementsDetails = lazy(() => import("./tabs/AchievementsDetails"));
+const LanguagesDetails = lazy(() => import("./tabs/LanguagesDetails"));
+const PublishSettings = lazy(() => import("./tabs/PublishSettings"));
 
 const steps = [
   { key: "personal", title: "Personal", type: "form" },
@@ -35,184 +56,233 @@ const steps = [
   { key: "settings", title: "Settings", type: "form" },
 ] as const;
 
-type ListStepKey =
+type ListStepKey = Extract<
+  ProfileStepKey,
   | "skills"
   | "educations"
   | "experiences"
   | "projects"
   | "certificates"
   | "achievements"
-  | "languages";
+  | "languages"
+>;
 
-const emptyLists: Record<ListStepKey, any[]> = {
-  skills: [],
-  educations: [],
-  experiences: [],
-  projects: [],
-  certificates: [],
-  achievements: [],
-  languages: [],
-};
+// Loading fallback for lazy tabs
+const TabLoader = () => (
+  <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+    <CircularProgress />
+  </Box>
+);
 
 const ProfilePage = () => {
   const location = useLocation();
-
   const [activeStep, setActiveStep] = useState<ProfileStepKey>(
-    location.state?.step ?? "personal"
+    location.state?.step ?? "personal",
   );
 
-  const [completedSteps, setCompletedSteps] = useState<ProfileStepKey[]>([]);
-  const [lists, setLists] = useState(emptyLists);
+  // Snackbar state
+  const [snackbar, setSnackbar] = useState<{
+    message: string;
+    severity: "success" | "error";
+  } | null>(null);
 
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
-  const [saving, setSaving] = useState(false);
+  // Get user from localStorage (memoized)
+  const candidate = useMemo(() => {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : { fullName: "" };
+  }, []);
 
-  const activeIndex = steps.findIndex((x) => x.key === activeStep);
-  const currentStep = steps[activeIndex];
-
-  const completion = useMemo(
-    () => Math.round((completedSteps.length / steps.length) * 100),
-    [completedSteps]
+  // Determine step type
+  const currentStep = useMemo(
+    () => steps.find((s) => s.key === activeStep)!,
+    [activeStep],
   );
+  const isFormStep = currentStep.type === "form";
+  const isListStep = currentStep.type === "list";
 
-  useEffect(() => {
-    if (location.state?.step) {
-      setActiveStep(location.state.step);
-    }
-  }, [location.state]);
+  // RTK Query hooks
+  const { data: completionData, isLoading: isCompletionLoading } =
+    useGetCompletionQuery();
+  console.log('completionData', completionData)
+  // Fetch form data – only if active step is form
+  const {
+    data: formData,
+    isLoading: isFormLoading,
+    isError: isFormError,
+    error: formError,
+  } = useGetProfileQuery(activeStep, { skip: !isFormStep });
 
-  const goNext = () => {
+  // Fetch list data – only if active step is list
+  const {
+    data: listData,
+    isLoading: isListLoading,
+    isError: isListError,
+    error: listError,
+  } = useGetProfileCollectionQuery(activeStep as ListStepKey, {
+    skip: !isListStep,
+  });
+
+  // Mutation hooks
+  const [updateProfile, { isLoading: isUpdateLoading }] =
+    useUpdateProfileMutation();
+
+  // Custom save hook (handles both form and list)
+  const { saveStep } = useProfileSaver({
+    onSuccess: (step, title) => {
+      setSnackbar({
+        message: `${title} saved successfully ✨`,
+        severity: "success",
+      });
+    },
+    onError: (step, title) => {
+      setSnackbar({ message: `Failed to save ${title}`, severity: "error" });
+    },
+    onNavigateNext: () => {
+      const next = steps[activeIndex + 1];
+      if (next) setActiveStep(next.key);
+    },
+  });
+
+  // Navigation helpers (memoized)
+  const activeIndex = steps.findIndex((s) => s.key === activeStep);
+
+  const goNext = useCallback(() => {
     const next = steps[activeIndex + 1];
     if (next) setActiveStep(next.key);
-  };
+  }, [activeIndex]);
 
-  const goBack = () => {
+  const goBack = useCallback(() => {
     const prev = steps[activeIndex - 1];
     if (prev) setActiveStep(prev.key);
-  };
+  }, [activeIndex]);
 
-  const markComplete = (step: ProfileStepKey) => {
-    setCompletedSteps((prev) =>
-      prev.includes(step) ? prev : [...prev, step]
+  // Combine loading/error states for active step
+  const isLoading = isFormLoading || isListLoading || isUpdateLoading;
+  const isError = isFormError || isListError;
+  const errorMessage = isError
+    ? (formError as any)?.data?.message ||
+      (listError as any)?.data?.message ||
+      "Failed to load data"
+    : null;
+
+  // If there's an error loading the section, show a retry or fallback
+  if (isError && !isLoading) {
+    return (
+      <Box sx={{ p: 4, textAlign: "center" }}>
+        <Typography color="error">{errorMessage}</Typography>
+        <Button
+          onClick={() => window.location.reload()}
+          variant="contained"
+          sx={{ mt: 2 }}
+        >
+          Retry
+        </Button>
+      </Box>
     );
-  };
+  }
 
-  const saveStep = async (step: ProfileStepKey, values?: any) => {
-    try {
-      setSaving(true);
-
-      console.log("Saving step:", step, values);
-
-      // Step-wise API call here
-      // await updateProfileSection({ section: step, data: values }).unwrap();
-
-      markComplete(step);
-      setSuccessMessage(`${currentStep.title} saved successfully ✨`);
-
-      setTimeout(goNext, 400);
-    } catch {
-      setErrorMessage(`${currentStep.title} save failed`);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const updateList = (
-    step: ListStepKey,
-    action: "add" | "edit" | "delete",
-    item?: any
-  ) => {
-    setLists((prev) => {
-      const current = prev[step] ?? [];
-
-      if (action === "add") {
-        return {
-          ...prev,
-          [step]: [
-            ...current,
-            {
-              id: crypto.randomUUID(),
-              title: "New Item",
-              displayOrder: current.length + 1,
-            },
-          ],
-        };
-      }
-
-      if (action === "delete") {
-        return {
-          ...prev,
-          [step]: current.filter((x) => x.id !== item.id),
-        };
-      }
-
-      return prev;
-    });
-  };
-
+  // Common props for all form tabs
   const formProps = {
-    loading: saving,
+    loading: isUpdateLoading,
     isFirst: activeIndex === 0,
     isLast: activeIndex === steps.length - 1,
     onBack: goBack,
   };
 
+  // Form components map – will be lazy loaded
   const formComponents: Partial<Record<ProfileStepKey, React.ReactNode>> = {
     personal: (
       <PersonalDetails
         {...formProps}
-        onSubmit={(values: any) => saveStep("personal", values)}
+        defaultValues={formData?.data}
+        onSubmit={(values) => saveStep("personal", values)}
       />
     ),
     summary: (
       <SummaryDetails
         {...formProps}
-        onSubmit={(values: any) => saveStep("summary", values)}
+        defaultValues={formData?.data}
+        onSubmit={(values) => saveStep("summary", values)}
       />
     ),
     contact: (
       <ContactDetails
         {...formProps}
-        onSubmit={(values: any) => saveStep("contact", values)}
+        defaultValues={formData?.data}
+        onSubmit={(values) => saveStep("contact", values)}
       />
     ),
     social: (
       <SocialDetails
         {...formProps}
-        onSubmit={(values: any) => saveStep("social", values)}
+        defaultValues={formData?.data}
+        onSubmit={(values) => saveStep("social", values)}
       />
     ),
     settings: (
-      <SettingsDetails
+      <PublishSettings
         {...formProps}
-        onSubmit={(values: any) => saveStep("settings", values)}
+        defaultValues={formData?.data}
+        onSubmit={(values) => saveStep("settings", values)}
       />
     ),
   };
 
-  const listProps = (step: ListStepKey) => ({
-    items: lists[step],
-    onAdd: () => updateList(step, "add"),
-    onEdit: (item: any) => console.log("Edit:", step, item),
-    onDelete: (item: any) => updateList(step, "delete", item),
-  });
-
+  // List components – items are directly from RTK Query result
   const listComponents: Record<ListStepKey, React.ReactNode> = {
-    skills: <SkillsDetails {...listProps("skills")} />,
-    educations: <EducationDetails {...listProps("educations")} />,
-    experiences: <ExperienceDetails {...listProps("experiences")} />,
-    projects: <ProjectsDetails {...listProps("projects")} />,
-    certificates: <CertificatesDetails {...listProps("certificates")} />,
-    achievements: <AchievementsDetails {...listProps("achievements")} />,
-    languages: <LanguagesDetails {...listProps("languages")} />,
+    skills: (
+      <SkillsDetails
+        items={listData?.data || []}
+        loading={isListLoading}
+        onSave={(items) => saveStep("skills", items)}
+      />
+    ),
+    educations: (
+      <EducationDetails
+        items={listData?.data || []}
+        loading={isListLoading}
+        onSave={(items) => saveStep("educations", items)}
+      />
+    ),
+    experiences: (
+      <ExperienceDetails
+        items={listData?.data || []}
+        loading={isListLoading}
+        onSave={(items) => saveStep("experiences", items)}
+      />
+    ),
+    projects: (
+      <ProjectsDetails
+        items={listData?.data || []}
+        loading={isListLoading}
+        onSave={(items) => saveStep("projects", items)}
+      />
+    ),
+    certificates: (
+      <CertificatesDetails
+        items={listData?.data || []}
+        loading={isListLoading}
+        onSave={(items) => saveStep("certificates", items)}
+      />
+    ),
+    achievements: (
+      <AchievementsDetails
+        items={listData?.data || []}
+        loading={isListLoading}
+        onSave={(items) => saveStep("achievements", items)}
+      />
+    ),
+    languages: (
+      <LanguagesDetails
+        items={listData?.data || []}
+        loading={isListLoading}
+        onSave={(items) => saveStep("languages", items)}
+      />
+    ),
   };
 
   const renderActiveStep = () => {
-    if (currentStep.type === "form") {
-      return formComponents[activeStep];
-    }
-
+    if (isFormStep) return formComponents[activeStep];
     return listComponents[activeStep as ListStepKey];
   };
 
@@ -233,7 +303,6 @@ const ProfilePage = () => {
           <Typography sx={{ fontSize: { xs: 30, md: 42 }, fontWeight: 900 }}>
             Profile Setup ✨
           </Typography>
-
           <Typography color="text.secondary">
             Save each profile section separately with smooth animations.
           </Typography>
@@ -243,11 +312,11 @@ const ProfilePage = () => {
           <Grid size={{ xs: 12, md: 4 }}>
             <ProfileStepCards
               activeStep={activeStep}
-              completedSteps={completedSteps}
-              completion={completion}
-              fullName="Mitin Patel"
-              jobTitle="Full Stack Developer"
+              completion={completionData?.data?.completionPercentage ?? 0}
+              fullName={candidate.fullName}
+              jobTitle={formData?.data?.jobTitle}
               onStepChange={setActiveStep}
+              completedSteps={[]}
             />
           </Grid>
 
@@ -260,7 +329,13 @@ const ProfilePage = () => {
                 exit={{ opacity: 0, x: -30, scale: 0.98 }}
                 transition={{ duration: 0.35, ease: "easeOut" }}
               >
-                {renderActiveStep()}
+                <Suspense fallback={<TabLoader />}>
+                  {isLoading && !formData && !listData ? (
+                    <TabLoader />
+                  ) : (
+                    renderActiveStep()
+                  )}
+                </Suspense>
               </motion.div>
             </AnimatePresence>
           </Grid>
@@ -268,10 +343,12 @@ const ProfilePage = () => {
       </motion.div>
 
       <AppSnackbar
-        successMessage={successMessage}
-        errorMessage={errorMessage}
-        onCloseSuccess={() => setSuccessMessage("")}
-        onCloseError={() => setErrorMessage("")}
+        successMessage={
+          snackbar?.severity === "success" ? snackbar.message : ""
+        }
+        errorMessage={snackbar?.severity === "error" ? snackbar.message : ""}
+        onCloseSuccess={() => setSnackbar(null)}
+        onCloseError={() => setSnackbar(null)}
       />
     </Box>
   );

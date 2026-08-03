@@ -1,6 +1,5 @@
 import { Work } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
-import type { DialogField } from "./ProfileItemDialog";
 
 export type ProfileExperience = {
   id?: string;
@@ -18,12 +17,11 @@ export type ProfileExperience = {
 type Props = {
   items: ProfileExperience[];
   loading?: boolean;
-  onChange: (items: ProfileExperience[]) => void;
-  onSaveStep: () => void;
+  onSave: (items: ProfileExperience[]) => Promise<void>;
 };
 
-const ExperienceDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
-  const fields: DialogField<ProfileExperience>[] = [
+const ExperienceDetails = ({ items, loading, onSave }: Props) => {
+  const fields: any[] = [
     { name: "companyName", label: "Company Name" },
     { name: "designation", label: "Designation" },
     { name: "employmentType", label: "Employment Type" },
@@ -31,7 +29,7 @@ const ExperienceDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
     { name: "startDate", label: "Start Date", type: "date" },
     { name: "endDate", label: "End Date", type: "date" },
     { name: "isCurrentCompany", label: "Current Company", type: "checkbox" },
-    { name: "description", label: "Description", multiline: true, rows: 4 },
+    { name: "description", label: "Description", type: "textarea", rows: 4 },
   ];
 
   return (
@@ -40,8 +38,8 @@ const ExperienceDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
       subtitle="Work experience and roles"
       icon={<Work />}
       items={items}
-      // @ts-ignore: ProfileCrudStep props currently do not expose emptyItem in typings.
-      emptyItem={{
+      loading={loading}
+      defaultItem={{
         companyName: "",
         designation: "",
         employmentType: "",
@@ -52,13 +50,11 @@ const ExperienceDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
         description: "",
       }}
       fields={fields}
-      loading={loading}
       getTitle={(item) => item.designation}
       getSubtitle={(item) => {
         return `${item.companyName} • ${item.startDate} - ${item.endDate || "Present"}`;
       }}
-      onChange={onChange}
-      onSaveStep={onSaveStep}
+      onSave={onSave}
     />
   );
 };

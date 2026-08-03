@@ -19,8 +19,9 @@ type Props<T> = {
   onAdd: () => void;
   onEdit: (item: T) => void;
   onDelete: (item: T) => void;
-  onSaveStep: () => void;
+  onSave: () => void;
   loading?: boolean;
+  saving?: boolean;
 };
 
 const ProfileItemList = <T,>({
@@ -33,8 +34,9 @@ const ProfileItemList = <T,>({
   onAdd,
   onEdit,
   onDelete,
-  onSaveStep,
+  onSave,
   loading = false,
+  saving = false,
 }: Props<T>) => {
   return (
     <Card
@@ -64,7 +66,6 @@ const ProfileItemList = <T,>({
             >
               {icon}
             </Box>
-
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 900 }}>
                 {title}
@@ -84,17 +85,22 @@ const ProfileItemList = <T,>({
         </Stack>
 
         <Stack spacing={1.5}>
-          {items.length === 0 && (
-            <Typography color="text.secondary">No records added yet.</Typography>
+          {loading && items.length === 0 && (
+            <Typography color="text.secondary">Loading...</Typography>
+          )}
+          {!loading && items.length === 0 && (
+            <Typography color="text.secondary">
+              No records added yet.
+            </Typography>
           )}
 
-          {items.map((item, index) => (
+          {items?.map((item, index) => (
             <motion.div
-              key={(item as any).id ?? index}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <Box
+                key={(item as any).id || (item as any)._id || index}
                 sx={{
                   p: 2,
                   borderRadius: 3,
@@ -110,7 +116,6 @@ const ProfileItemList = <T,>({
                   <Typography sx={{ fontWeight: 900 }}>
                     {getTitle(item)}
                   </Typography>
-
                   {getSubtitle && (
                     <Typography color="text.secondary" sx={{ fontSize: 14 }}>
                       {getSubtitle(item)}
@@ -122,7 +127,6 @@ const ProfileItemList = <T,>({
                   <IconButton onClick={() => onEdit(item)}>
                     <Edit />
                   </IconButton>
-
                   <IconButton color="error" onClick={() => onDelete(item)}>
                     <Delete />
                   </IconButton>
@@ -136,8 +140,8 @@ const ProfileItemList = <T,>({
           <Button
             variant="contained"
             startIcon={<Save />}
-            disabled={loading}
-            onClick={onSaveStep}
+            disabled={saving || loading}
+            onClick={onSave}
             sx={{
               borderRadius: 3,
               textTransform: "none",
@@ -145,7 +149,7 @@ const ProfileItemList = <T,>({
               px: 4,
             }}
           >
-            {loading ? "Saving..." : "Save & Continue"}
+            {saving ? "Saving..." : "Save & Continue"}
           </Button>
         </Stack>
       </Stack>

@@ -3,6 +3,19 @@ import ResumeBody from "../components/ResumeBody";
 import type { TemplateRenderProps } from "../../../types/resumeTemplate.types";
 
 const SidebarTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+  const { personal, contact, skills, languages } = data;
+
+  const fullName = personal
+    ? `${personal?.firstName || ""} ${personal?.lastName || ""}`.trim()
+    : "";
+
+  // Build location string from the new contact fields
+  const location = contact
+    ? [contact.address, contact.city, contact.state, contact.pincode]
+        .filter(Boolean)
+        .join(", ")
+    : "";
+
   return (
     <Paper
       elevation={0}
@@ -21,45 +34,56 @@ const SidebarTemplate = ({ data, config, settings }: TemplateRenderProps) => {
         fontSize: settings?.fontSize ?? 12,
       }}
     >
+      {/* Sidebar */}
       <Box sx={{ bgcolor: config.primaryColor, color: "#fff", p: 3 }}>
         <Typography variant="h4" sx={{ fontWeight: 900 }}>
-          {data.personal?.fullName}
+          {fullName}
         </Typography>
 
         <Typography sx={{ mt: 1 }}>{data.personal?.jobTitle}</Typography>
 
         <Box sx={{ mt: 3 }}>
           <SidebarTitle title="Contact" />
-          <Typography sx={{ fontSize: 13 }}>{data.contact?.email}</Typography>
-          <Typography sx={{ fontSize: 13 }}>{data.contact?.phone}</Typography>
-          <Typography sx={{ fontSize: 13 }}>
-            {data.personal?.location}
-          </Typography>
+          <Typography sx={{ fontSize: 13 }}>{contact?.email}</Typography>
+          {/* Changed from phone to mobile to match new schema */}
+          <Typography sx={{ fontSize: 13 }}>{contact?.mobile}</Typography>
+          <Typography sx={{ fontSize: 13 }}>{location}</Typography>
         </Box>
 
-        {data.skills?.length ? (
+        {skills && skills.length > 0 && (
           <Box sx={{ mt: 3 }}>
             <SidebarTitle title="Skills" />
-            {data.skills.map((skill: any) => (
-              <Typography key={skill} sx={{ fontSize: 13 }}>
-                • {skill}
+            {skills.map((skill, index) => (
+              <Typography key={index} sx={{ fontSize: 13 }}>
+                • {skill.skillName}
+                {skill.proficiency ? ` (${skill.proficiency})` : ""}
+                {skill.experienceInYears
+                  ? ` - ${skill.experienceInYears} yr${
+                      skill.experienceInYears > 1 ? "s" : ""
+                    }`
+                  : ""}
               </Typography>
             ))}
           </Box>
-        ) : null}
+        )}
 
-        {data.languages?.length ? (
+        {/* Languages – updated to handle the new object structure */}
+        {languages && languages.length > 0 && (
           <Box sx={{ mt: 3 }}>
             <SidebarTitle title="Languages" />
-            {data.languages.map((lang: any) => (
-              <Typography key={lang} sx={{ fontSize: 13 }}>
-                • {lang}
+            {languages.map((lang, index) => (
+              <Typography key={index} sx={{ fontSize: 13 }}>
+                • {lang.languageName}
+                {lang.proficiencyLevel
+                  ? ` (${lang.proficiencyLevel})`
+                  : ""}
               </Typography>
             ))}
           </Box>
-        ) : null}
+        )}
       </Box>
 
+      {/* Main content area */}
       <Box sx={{ p: 4 }}>
         <ResumeBody data={data} config={config} hideSidebarData />
       </Box>

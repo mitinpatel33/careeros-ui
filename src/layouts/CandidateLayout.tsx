@@ -18,27 +18,29 @@ import {
   Dashboard,
   Description,
   Person,
-  UploadFile,
-  Palette,
-  Analytics,
-  Settings,
   Menu,
   Notifications,
+  Logout,
 } from "@mui/icons-material";
 
 import { useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useLogoutMutation } from "../services/authApi";
 
 const drawerWidth = 270;
 
 const menu = [
   { label: "Dashboard", path: "/candidate/dashboard", icon: <Dashboard /> },
   { label: "Profile", path: "/candidate/profile", icon: <Person /> },
-  { label: "Resume Builder", path: "/candidate/resume-builder", icon: <Description /> },
-  { label: "Resume Upload", path: "/candidate/resume-upload", icon: <UploadFile /> },
-  { label: "Resume Themes", path: "/candidate/resume-themes", icon: <Palette /> },
-  { label: "Analytics", path: "/candidate/analytics", icon: <Analytics /> },
-  { label: "Settings", path: "/candidate/settings", icon: <Settings /> },
+  {
+    label: "Resume Builder",
+    path: "/candidate/resume-builder",
+    icon: <Description />,
+  },
+  // { label: "Resume Upload", path: "/candidate/resume-upload", icon: <UploadFile /> },
+  // { label: "Resume Themes", path: "/candidate/resume-themes", icon: <Palette /> },
+  // { label: "Analytics", path: "/candidate/analytics", icon: <Analytics /> },
+  // { label: "Settings", path: "/candidate/settings", icon: <Settings /> },
 ];
 
 const CandidateLayout = () => {
@@ -46,6 +48,36 @@ const CandidateLayout = () => {
   const isMobile = useMediaQuery("(max-width:900px)");
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [logout, { isLoading }] = useLogoutMutation();
+
+  const handleLogout = async () => {
+    try {
+      // retrieve refreshToken from localStorage (or from Redux)
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        // if no token, just redirect to login
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
+        return;
+      }
+
+      await logout({ refreshToken }).unwrap();
+      // success: clear tokens and redirect
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      // If using Redux, dispatch logout action here
+      navigate("/login");
+    } catch (error) {
+      // handle error (e.g., show snackbar)
+      console.error("Logout failed:", error);
+      // still clear local tokens to avoid getting stuck
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      navigate("/login");
+    }
+  };
 
   const sidebar = (
     <Box
@@ -87,7 +119,9 @@ const CandidateLayout = () => {
 
               <ListItemText
                 primary={
-                  <Typography sx={{ fontWeight: active ? 900 : 600, fontSize: 14 }}>
+                  <Typography
+                    sx={{ fontWeight: active ? 900 : 600, fontSize: 14 }}
+                  >
                     {item.label}
                   </Typography>
                 }
@@ -134,9 +168,20 @@ const CandidateLayout = () => {
               <Notifications />
             </IconButton>
 
-            <Avatar sx={{ bgcolor: "primary.main" }} onClick={() => navigate("/candidate/profile")}>
+            <Avatar
+              sx={{ bgcolor: "primary.main" }}
+              onClick={() => navigate("/candidate/profile")}
+            >
               M
             </Avatar>
+
+            <IconButton
+              onClick={handleLogout}
+              disabled={isLoading}
+              color="inherit"
+            >
+              <Logout />
+            </IconButton>
           </Stack>
         </Toolbar>
       </AppBar>

@@ -1,55 +1,119 @@
-import type { CandidateProfileRequest, CandidateProfileResponse, CompletionResponse, PublishProfileResponse } from "../types/candidateProfile.types";
 import { api } from "./api";
-
 
 export const profileApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    getProfile: builder.query<CandidateProfileResponse, void>({
-      query: () => ({
-        url: "/candidate/profile",
+    getProfile: builder.query<any, string>({
+      query: (section) => ({
+        url: `/candidate/profile/${section}`,
         method: "GET",
       }),
       providesTags: ["Candidate"],
     }),
 
-    updateProfile: builder.mutation<
-      CandidateProfileResponse,
-      CandidateProfileRequest
-    >({
-      query: (body) => ({
-        url: "/candidate/profile",
+    updateProfile: builder.mutation<any, { section: string; data: any }>({
+      query: ({ section, data }) => ({
+        url: `/candidate/profile/${section}`,
         method: "PUT",
-        body,
+        body: data,
       }),
       invalidatesTags: ["Candidate"],
     }),
 
-    publishProfile: builder.mutation<
-      PublishProfileResponse,
-      void
-    >({
+    getCompletion: builder.query<any, void>({
       query: () => ({
-        url: "/candidate/publish",
-        method: "POST",
-      }),
-      invalidatesTags: ["Candidate"],
-    }),
-
-    getCompletion: builder.query<
-      CompletionResponse,
-      void
-    >({
-      query: () => ({
-        url: "/profile/completion",
+        url: "/candidate/profile/completion",
+        method: "GET",
       }),
       providesTags: ["Candidate"],
     }),
+
+    saveProfileCollection: builder.mutation<
+      any,
+      {
+        section: string;
+        data: any;
+        id?: string;
+      }
+    >({
+      query: ({ section, data, id }) => ({
+        url: id
+          ? `/candidate/profile/${section}/${id}`
+          : `/candidate/profile/${section}`,
+
+        method: id ? "PUT" : "POST",
+
+        body: data,
+      }),
+
+      invalidatesTags: ["Candidate"],
+    }),
+
+    getProfileCollection: builder.query<any[], string>({
+      query: (section) => ({
+        url: `/candidate/profile/${section}`,
+        method: "GET",
+      }),
+
+      providesTags: ["Candidate"],
+    }),
+
+    deleteProfileSection: builder.mutation<any, string>({
+      query: (section) => ({
+        url: `/candidate/profile/${section}`,
+        method: "DELETE",
+      }),
+
+      invalidatesTags: ["Candidate"],
+    }),
+
+    deleteProfileCollection: builder.mutation<
+      any,
+      {
+        section: string;
+        id: string;
+      }
+    >({
+      query: ({ section, id }) => ({
+        url: `/candidate/profile/${section}/${id}`,
+        method: "DELETE",
+      }),
+
+      invalidatesTags: ["Candidate"],
+    }),
+
+    checkSlug: builder.query<{ available: boolean }, string>({
+      query: (slug) => `/candidate/profile/check-slug?slug=${slug}`,
+    }),
+
+    publishProfile: builder.mutation<{ url: string }, { slug: string }>({
+      query: ({ slug }) => ({
+        url: '/candidate/profile/publish',
+        method: 'POST',
+        body: { slug },
+      }),
+      invalidatesTags: ['Candidate'],
+    }),
+
+    getProfileSections: builder.query<Record<string, any>, string>({
+      query: (include) => ({
+        url: `/candidate/profile/sections?include=${include}`,
+        method: "GET",
+      }),
+      providesTags: ["Candidate"],
+    }),
+
   }),
 });
 
 export const {
   useGetProfileQuery,
   useUpdateProfileMutation,
-  usePublishProfileMutation,
+  useSaveProfileCollectionMutation,
   useGetCompletionQuery,
+  useGetProfileCollectionQuery,
+  useDeleteProfileCollectionMutation,
+  useDeleteProfileSectionMutation,
+  useCheckSlugQuery,
+  usePublishProfileMutation,
+  useGetProfileSectionsQuery
 } = profileApi;

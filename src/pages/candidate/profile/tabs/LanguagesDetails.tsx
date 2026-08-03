@@ -11,34 +11,30 @@ export type ProfileLanguage = {
 type Props = {
   items: ProfileLanguage[];
   loading?: boolean;
-  onChange: (items: ProfileLanguage[]) => void;
-  onSaveStep: () => void;
+  onSave: (items: ProfileLanguage[]) => Promise<void>;
 };
 
-const LanguagesDetails = ({ items, loading, onChange, onSaveStep }: Props) => {
+const LanguagesDetails = ({ items, loading, onSave }: Props) => {
   const fields: any[] = [
     { name: "languageName", label: "Language Name" },
     { name: "proficiencyLevel", label: "Proficiency Level" },
   ];
 
-  const Crud: any = ProfileCrudStep;
-
   return (
-    <Crud
+    <ProfileCrudStep<ProfileLanguage>
       title="Languages"
       subtitle="Languages you know"
       icon={<Translate />}
       items={items}
-      emptyItem={{
+      loading={loading}
+      defaultItem={{
         languageName: "",
         proficiencyLevel: "",
       }}
       fields={fields}
-      loading={loading}
-      getTitle={(x: any) => (x as ProfileLanguage).languageName}
-      getSubtitle={(x: any) => (x as ProfileLanguage).proficiencyLevel}
-      onChange={(items: any) => onChange(items as ProfileLanguage[])}
-      onSaveStep={onSaveStep}
+      getTitle={(x) => x.languageName}
+      getSubtitle={(x) => x.proficiencyLevel}
+      onSave={onSave}
     />
   );
 };

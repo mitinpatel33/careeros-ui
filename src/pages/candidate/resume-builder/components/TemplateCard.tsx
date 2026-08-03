@@ -10,6 +10,8 @@ type Props = {
 };
 
 const TemplateCard = ({ template, selected, onClick }: Props) => {
+  const isModernGradient = String(template.id) === "modernGradient";
+
   return (
     <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }}>
       <Paper
@@ -52,7 +54,7 @@ const TemplateCard = ({ template, selected, onClick }: Props) => {
               flexShrink: 0,
               borderRadius: 2.5,
               background:
-                template.id === "modernGradient"
+                isModernGradient
                   ? "linear-gradient(135deg,#2563eb,#9333ea)"
                   : template.primaryColor,
               p: 1.1,
@@ -83,7 +85,11 @@ const TemplateCard = ({ template, selected, onClick }: Props) => {
               {template.name}
             </Typography>
 
-            <Stack direction="row" spacing={0.7} sx={{ my: 0.6, flexWrap: "wrap" }} >
+            <Stack
+              direction="row"
+              spacing={0.7}
+              sx={{ my: 0.6, flexWrap: "wrap" }}
+            >
               <Chip
                 size="small"
                 label={template.category}
@@ -113,7 +119,7 @@ const TemplateCard = ({ template, selected, onClick }: Props) => {
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: "vertical",
                 overflow: "hidden",
-                fontSize: 12
+                fontSize: 12,
               }}
             >
               {template.description}

@@ -12,6 +12,30 @@ const ResumeHeader = ({ data, config, settings }: Props) => {
   const isSolid = config.headerStyle === "solid";
   const isCenter = config.headerStyle === "center";
 
+  const { personal, contact } = data;
+
+  const fullName = personal
+    ? `${personal?.firstName || ""} ${personal?.lastName || ""}`.trim()
+    : "";
+
+  // Build location from available fields
+  const locationParts = [
+    contact?.address,
+    contact?.city,
+    contact?.state,
+    contact?.pincode,
+  ].filter(Boolean);
+  const location = locationParts.join(", ");
+
+  // Contact lines – only include what exists
+  const contactLines: string[] = [];
+  if (contact?.email) contactLines.push(contact.email);
+  if (contact?.mobile) contactLines.push(contact.mobile);
+  if (contact?.alternateMobile) contactLines.push(contact.alternateMobile);
+
+  // If you have linkedIn/github in your data structure, add them here
+  // For now, we assume they are not present.
+
   return (
     <Box
       sx={{
@@ -26,24 +50,26 @@ const ResumeHeader = ({ data, config, settings }: Props) => {
       }}
     >
       <Typography variant="h4" sx={{ fontWeight: 900 }}>
-        {data.personal?.fullName}
+        {fullName}
       </Typography>
 
-      <Typography sx={{ fontWeight: 700 }}>
-        {data.personal?.jobTitle}
-      </Typography>
+      {personal?.jobTitle && (
+        <Typography sx={{ fontWeight: 700 }}>
+          {personal.jobTitle}
+        </Typography>
+      )}
 
-      <Typography sx={{ fontSize: settings?.fontSize ?? 13, mt: 0.5 }}>
-        {data.personal?.location}
-      </Typography>
+      {location && (
+        <Typography sx={{ fontSize: settings?.fontSize ?? 13, mt: 0.5 }}>
+          {location}
+        </Typography>
+      )}
 
-      <Typography sx={{ fontSize: settings?.fontSize ?? 13, mt: 1 }}>
-        {data.contact?.email} {data.contact?.phone ? ` | ${data.contact.phone}` : ""}
-      </Typography>
-
-      <Typography sx={{ fontSize: settings?.fontSize ?? 13 }}>
-        {data.contact?.linkedIn} {data.contact?.github ? ` | ${data.contact.github}` : ""}
-      </Typography>
+      {contactLines.length > 0 && (
+        <Typography sx={{ fontSize: settings?.fontSize ?? 13, mt: 1 }}>
+          {contactLines.join(" | ")}
+        </Typography>
+      )}
     </Box>
   );
 };

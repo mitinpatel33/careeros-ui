@@ -3,6 +3,8 @@ import { api } from "./api";
 export type LoginRequest = {
   email: string;
   password: string;
+  token: string;
+  provider: string;
 };
 
 export type SignupRequest = {
@@ -32,7 +34,7 @@ export const authApi = api.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<AuthResponse, LoginRequest>({
       query: (body) => ({
-        url: "/login",
+        url: "/auth/login",
         method: "POST",
         body,
       }),
@@ -40,7 +42,18 @@ export const authApi = api.injectEndpoints({
 
     signup: builder.mutation<AuthResponse, SignupRequest>({
       query: (body) => ({
-        url: "/signup",
+        url: "/auth/signup",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    logout: builder.mutation<
+      { success: boolean; message: string },
+      { refreshToken: string }
+    >({
+      query: (body) => ({
+        url: "/auth/logout",
         method: "POST",
         body,
       }),
@@ -48,4 +61,4 @@ export const authApi = api.injectEndpoints({
   }),
 });
 
-export const { useLoginMutation, useSignupMutation } = authApi;
+export const { useLoginMutation, useSignupMutation, useLogoutMutation  } = authApi;

@@ -7,10 +7,21 @@ export type ResumeFontFamily =
   | "Lato";
 
 export type ResumeSpacing = "compact" | "normal" | "comfortable";
-export type SectionTitleStyle = "simple" | "line" | "pill" | "uppercase" | "filled";
+export type SectionTitleStyle =
+  | "simple"
+  | "line"
+  | "pill"
+  | "uppercase"
+  | "filled";
 export type HeaderAlign = "left" | "center" | "right";
 
-export type BulletStyle = "dot" | "square" | "dash" | "arrow" | "check" | "none";
+export type BulletStyle =
+  | "dot"
+  | "square"
+  | "dash"
+  | "arrow"
+  | "check"
+  | "none";
 export type TextAlignStyle = "left" | "center" | "right" | "justify";
 
 export type ResumeDesignSettings = {
@@ -125,37 +136,44 @@ export const defaultResumeSettings: ResumeDesignSettings = {
 };
 
 export type ResumeTemplateId =
-  | "atsClassic"
-  | "atsModern"
-  | "atsCompact"
-  | "blueProfessional"
-  | "blackExecutive"
+  | "classicBlueTemplate"
+  | "elegantClassicTemplate"
+  | "financialProfileTemplate"
+  | "classicElegant"
+  | "modernMinimal"
+  | "sidebarPhoto"
+  | "skillBars"
+  | "timeline"
+  | "creativeSplash"
+  | "darkMode"
+  | "infographic"
+  | "academic"
+  | "artistic"
+  | "futuristicGradient"
+  | "vintage"
+  | "minimalDots"
   | "corporate"
-  | "business"
-  | "modernBlue"
-  | "modernPurple"
-  | "modernGradient"
-  | "elegant"
-  | "creativeOne"
-  | "designer"
-  | "marketing"
-  | "minimal"
-  | "minimalDark"
-  | "clean"
-  | "sidebarBlue"
-  | "sidebarBlack"
-  | "sidebarPurple"
-  | "twoColumnOne"
-  | "splitResume";
+  | "vibrantGradient"
+  | "monochrome"
+  | "asymmetric"
+  | "cleanIcons"
+  | "navySidebarReferenceTemplate"
+  | "darkPatternSidebarTemplate"
+  | "maroonMinimalTemplate"
+  | "compactBlueTemplate"
+  | "creamCoralTemplate"
+  | "greenExecutiveTemplate"
+  | "oliveAttorneyTemplate"
+  | "mauveSidebarTemplate"
+  | "blackBlueBannerTemplate"
+  | "navyTimelineTemplate"
+  | "greenDiamondTemplate"
+  | "yellowNavyTimelineTemplate"
+  | "tealGoldRibbonTemplate";
 
-  export type ResumeThemeColor =
-  | "blue"
-  | "black"
-  | "green"
-  | "purple"
-  | "orange";
+export type ResumeThemeColor = "blue" | "black" | "green" | "purple" | "orange";
 
-  export type ResumeSectionKey =
+export type ResumeSectionKey =
   | "personal"
   | "contact"
   | "summary"
@@ -168,59 +186,107 @@ export type ResumeTemplateId =
   | "languages"
   | "references";
 
-  export type ResumeData = {
+export type ResumeData = {
+  // From candidatePersonalInfo schema
   personal?: {
-    fullName: string;
-    jobTitle: string;
-    location?: string;
+    firstName?: string;
+    lastName?: string;
+    jobTitle?: string;
+    dateOfBirth?: Date | string; // can be Date object or ISO string
+    gender?: string;
+    maritalStatus?: string;
+    nationality?: string;
+    photoUrl?: string;
   };
 
+  // From candidateContactInfo schema
   contact?: {
     email?: string;
-    phone?: string;
-    linkedIn?: string;
-    github?: string;
-    portfolio?: string;
+    mobile?: string;
+    alternateMobile?: string;
+    address?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    pincode?: string;
   };
 
-  summary?: string;
+  // From candidateSocialInfo schema
+  social?: {
+    linkedInUrl?: string;
+    gitHubUrl?: string;
+    portfolioUrl?: string;
+    websiteUrl?: string;
+  };
 
-  skills?: string[];
+  // From candidateSummary schema (can be merged into a string later)
+  summary?: {
+    professionalSummary?: string;
+    careerObjective?: string;
+  };
 
+  // From candidateSkill schema (array of objects, not just strings)
+  skills?: {
+    skillName: string;
+    proficiency?: "Beginner" | "Intermediate" | "Advanced" | "Expert";
+    experienceInYears?: number;
+  }[];
+
+  // From candidateExperience schema
   experience?: {
-    companyName: string;
-    designation: string;
-    duration: string;
-    description: string;
+    companyName?: string;
+    designation?: string;
+    employmentType?: string;
+    location?: string;
+    startDate?: Date | string;
+    endDate?: Date | string;
+    isCurrentCompany?: boolean;
+    description?: string;
   }[];
 
+  // From candidateEducation schema
   education?: {
-    degree: string;
-    university: string;
-    year: string;
+    instituteName?: string;
+    degree?: string;
+    fieldOfStudy?: string;
+    startDate?: Date | string;
+    endDate?: Date | string;
+    percentage?: number;
     grade?: string;
+    description?: string;
   }[];
 
+  // From candidateProject schema
   projects?: {
-    title: string;
-    techStack: string;
-    description: string;
+    projectName?: string;
+    role?: string;
+    description?: string;
+    technologies?: string[];
+    projectUrl?: string;
   }[];
 
-  certifications?: string[];
+  // From candidateCertificate schema
+  certifications?: {
+    certificateName?: string;
+    issuedBy?: string;
+    issuedDate?: Date | string;
+    credentialId?: string;
+    credentialUrl?: string;
+  }[];
 
-  achievements?: string[];
+  // From candidateAchievement schema
+  achievements?: {
+    title?: string;
+    description?: string;
+    achievementDate?: Date | string;
+  }[];
 
-  languages?: string[];
-
-  references?: {
-    name: string;
-    company: string;
-    email?: string;
-    phone?: string;
+  // From candidateLanguage schema
+  languages?: {
+    languageName?: string;
+    proficiencyLevel?: "Basic" | "Intermediate" | "Professional" | "Native";
   }[];
 };
-
 
 export type ResumeSectionRequest = {
   userId?: string;

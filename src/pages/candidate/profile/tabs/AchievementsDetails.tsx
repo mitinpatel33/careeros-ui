@@ -1,6 +1,5 @@
 import { EmojiEvents } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
-import type { DialogField } from "./ProfileItemDialog";
 
 export type ProfileAchievement = {
   id?: string;
@@ -13,27 +12,15 @@ export type ProfileAchievement = {
 type Props = {
   items: ProfileAchievement[];
   loading?: boolean;
-  onChange: (items: ProfileAchievement[]) => void;
-  onSaveStep: () => void;
+  onSave: (items: ProfileAchievement[]) => Promise<void>;
 };
 
-const AchievementsDetails = ({
-  items,
-  loading,
-  onChange,
-  onSaveStep,
-}: Props) => {
-  const fields: DialogField<ProfileAchievement>[] = [
+const AchievementsDetails = ({ items, loading, onSave }: Props) => {
+  const fields: any[] = [
     { name: "title", label: "Achievement Title" },
     { name: "achievementDate", label: "Achievement Date", type: "date" },
-    { name: "description", label: "Description", multiline: true, rows: 4 },
+    { name: "description", label: "Description", type: "textarea", rows: 4 },
   ];
-
-  const defaultItem: ProfileAchievement = {
-    title: "",
-    description: "",
-    achievementDate: "",
-  };
 
   return (
     <ProfileCrudStep<ProfileAchievement>
@@ -41,13 +28,16 @@ const AchievementsDetails = ({
       subtitle="Awards and highlights"
       icon={<EmojiEvents />}
       items={items}
-      defaultItem={defaultItem}
-      fields={fields}
       loading={loading}
+      defaultItem={{
+        title: "",
+        description: "",
+        achievementDate: "",
+      }}
+      fields={fields}
       getTitle={(x) => x.title}
       getSubtitle={(x) => x.description || ""}
-      onChange={onChange}
-      onSaveStep={onSaveStep}
+      onSave={onSave}
     />
   );
 };

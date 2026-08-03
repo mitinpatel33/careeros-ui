@@ -39,26 +39,26 @@ export const sidebarMenus = {
       path: "/candidate/resume-builder",
       icon: <Description />,
     },
-    {
-      label: "Resume Upload",
-      path: "/candidate/resume-upload",
-      icon: <UploadFile />,
-    },
-    {
-      label: "Resume Themes",
-      path: "/candidate/resume-themes",
-      icon: <Palette />,
-    },
-    {
-      label: "Analytics",
-      path: "/candidate/analytics",
-      icon: <Analytics />,
-    },
-    {
-      label: "Settings",
-      path: "/candidate/settings",
-      icon: <Settings />,
-    },
+    // {
+    //   label: "Resume Upload",
+    //   path: "/candidate/resume-upload",
+    //   icon: <UploadFile />,
+    // },
+    // {
+    //   label: "Resume Themes",
+    //   path: "/candidate/resume-themes",
+    //   icon: <Palette />,
+    // },
+    // {
+    //   label: "Analytics",
+    //   path: "/candidate/analytics",
+    //   icon: <Analytics />,
+    // },
+    // {
+    //   label: "Settings",
+    //   path: "/candidate/settings",
+    //   icon: <Settings />,
+    // },
   ],
 
   company: [

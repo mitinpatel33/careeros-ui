@@ -11,123 +11,161 @@ type Props = {
 };
 
 const ResumeBody = ({ data, config, hideSidebarData = false, settings }: Props) => {
+  // Helper to format date string (assumes ISO date)
+  const formatDate = (dateStr?: string) => {
+    if (!dateStr) return "";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  };
+
+  // Build duration string from start/end dates
+  const getDuration = (start?: string, end?: string, isCurrent?: boolean) => {
+    const startFormatted = formatDate(start);
+    const endFormatted = isCurrent ? "Present" : formatDate(end);
+    if (!startFormatted && !endFormatted) return "";
+    return `${startFormatted} – ${endFormatted}`;
+  };
+
   return (
     <>
+      {/* Summary */}
       {data.summary && (
-        <ResumeSection title="Summary" config={config}>
-          <Typography sx={{ fontSize: settings?.fontSize ?? 14 }}>
-            {data.summary}
-          </Typography>
+        <ResumeSection sectionKey="summary" title="Summary" config={config}>
+          {data.summary.careerObjective && (
+            <Typography sx={{ fontSize: settings?.fontSize ?? 14, mb: 1 }}>
+              {data.summary.careerObjective}
+            </Typography>
+          )}
+          {data.summary.professionalSummary && (
+            <Typography sx={{ fontSize: settings?.fontSize ?? 14 }}>
+              {data.summary.professionalSummary}
+            </Typography>
+          )}
         </ResumeSection>
       )}
 
+      {/* Skills – now an array of objects */}
       {!hideSidebarData && data.skills?.length ? (
-        <ResumeSection title="Skills" config={config}>
+        <ResumeSection title="Skills" config={config} sectionKey="skills">
           <Stack direction="row" sx={{ gap: 1, flexWrap: "wrap" }}>
-            {data.skills.map((skill) => (
-              <Chip key={skill} label={skill} size="small" />
+            {data.skills.map((skill: any) => (
+              <Chip
+                key={skill._id || skill.skillName}
+                label={`${skill.skillName}${skill.proficiency ? ` (${skill.proficiency})` : ""}`}
+                size="small"
+              />
             ))}
           </Stack>
         </ResumeSection>
       ) : null}
 
+      {/* Experience – use 'experiences' */}
       {data.experience?.length ? (
-        <ResumeSection title="Experience" config={config}>
-          {data.experience.map((item) => (
-            <Box key={item.companyName} sx={{ mb: 1.8 }}>
+        <ResumeSection title="Experience" config={config} sectionKey="experience">
+          {data.experience.map((item: any) => (
+            <Box key={item._id || item.companyName} sx={{ mb: 1.8 }}>
               <Typography sx={{ fontWeight: 900 }}>
-                {item.designation} - {item.companyName}
+                {item.designation} – {item.companyName}
               </Typography>
               <Typography sx={{ fontSize: 12, color: "text.secondary" }}>
-                {item.duration}
+                {getDuration(item.startDate, item.endDate, item.isCurrentCompany)}
+                {item.location ? ` | ${item.location}` : ""}
               </Typography>
-              <Typography sx={{ fontSize: settings?.fontSize ?? 14 }}>
-                {item.description}
-              </Typography>
+              {item.description && (
+                <Typography sx={{ fontSize: settings?.fontSize ?? 14, mt: 0.5 }}>
+                  {item.description}
+                </Typography>
+              )}
             </Box>
           ))}
         </ResumeSection>
       ) : null}
 
+      {/* Education – use 'educations' */}
       {data.education?.length ? (
-        <ResumeSection title="Education" config={config}>
-          {data.education.map((item) => (
-            <Box key={item.degree} sx={{ mb: 1.5 }}>
+        <ResumeSection title="Education" config={config} sectionKey="education">
+          {data.education.map((item: any) => (
+            <Box key={item._id || item.degree} sx={{ mb: 1.5 }}>
               <Typography sx={{ fontWeight: 900 }}>
-                {item.degree}
+                {item.degree} {item.fieldOfStudy ? `in ${item.fieldOfStudy}` : ""}
               </Typography>
               <Typography sx={{ fontSize: settings?.fontSize ?? 14 }}>
-                {item.university}
-              </Typography>
-              <Typography sx={{ fontSize: settings?.fontSize ?? 12 }}>
-                {item.year} {item.grade ? ` | ${item.grade}` : ""}
-              </Typography>
-            </Box>
-          ))}
-        </ResumeSection>
-      ) : null}
-
-      {data.projects?.length ? (
-        <ResumeSection title="Projects" config={config}>
-          {data.projects.map((item) => (
-            <Box key={item.title} sx={{ mb: 1.8 }}>
-              <Typography sx={{ fontWeight: 900 }}>
-                {item.title}
+                {item.instituteName}
               </Typography>
               <Typography sx={{ fontSize: settings?.fontSize ?? 12, color: "text.secondary" }}>
-                {item.techStack}
+                {getDuration(item.startDate, item.endDate)}
+                {item.percentage ? ` | ${item.percentage}%` : ""}
+                {item.grade ? ` | ${item.grade}` : ""}
               </Typography>
-              <Typography sx={{ fontSize: settings?.fontSize ?? 14 }}>
-                {item.description}
-              </Typography>
+              {item.description && (
+                <Typography sx={{ fontSize: settings?.fontSize ?? 14 }}>
+                  {item.description}
+                </Typography>
+              )}
             </Box>
           ))}
         </ResumeSection>
       ) : null}
 
+      {/* Projects – fields: projectName, role, technologies, description, projectUrl */}
+      {data.projects?.length ? (
+        <ResumeSection title="Projects" config={config} sectionKey="projects">
+          {data.projects.map((item: any) => (
+            <Box key={item._id || item.projectName} sx={{ mb: 1.8 }}>
+              <Typography sx={{ fontWeight: 900 }}>
+                {item.projectName}
+                {item.role ? ` – ${item.role}` : ""}
+              </Typography>
+              {item.technologies?.length && (
+                <Typography sx={{ fontSize: settings?.fontSize ?? 12, color: "text.secondary" }}>
+                  {item.technologies.join(", ")}
+                </Typography>
+              )}
+              {item.description && (
+                <Typography sx={{ fontSize: settings?.fontSize ?? 14, mt: 0.5 }}>
+                  {item.description}
+                </Typography>
+              )}
+              {item.projectUrl && (
+                <Typography sx={{ fontSize: settings?.fontSize ?? 12, color: "primary.main" }}>
+                  <a href={item.projectUrl} target="_blank" rel="noopener noreferrer">
+                    {item.projectUrl}
+                  </a>
+                </Typography>
+              )}
+            </Box>
+          ))}
+        </ResumeSection>
+      ) : null}
+
+      {/* Certifications – keep as is if present */}
       {data.certifications?.length ? (
-        <ResumeSection title="Certifications" config={config}>
-          {data.certifications.map((item) => (
-            <Typography key={item} sx={{ fontSize: settings?.fontSize ?? 14 }}>
-              • {item}
+        <ResumeSection title="Certifications" config={config} sectionKey="certifications">
+          {data.certifications.map((item: any, idx: number) => (
+            <Typography key={idx} sx={{ fontSize: settings?.fontSize ?? 14 }}>
+              • {typeof item === "string" ? item : item.name || item}
             </Typography>
           ))}
         </ResumeSection>
       ) : null}
 
-      {data.achievements?.length ? (
-        <ResumeSection title="Achievements" config={config}>
-          {data.achievements.map((item) => (
-            <Typography key={item} sx={{ fontSize: settings?.fontSize ?? 14 }}>
-              • {item}
+      {/* Achievements – keep as is */}
+      {data?.achievements?.length ? (
+        <ResumeSection title="Achievements" config={config} sectionKey="achievements">
+          {data?.achievements.map((item: any, idx: number) => (
+            <Typography key={idx} sx={{ fontSize: settings?.fontSize ?? 14 }}>
+              • {typeof item === "string" ? item : item?.title || item}
             </Typography>
           ))}
         </ResumeSection>
       ) : null}
 
-      {data.languages?.length ? (
-        <ResumeSection title="Languages" config={config}>
+      {/* Languages – array of strings */}
+      {data?.languages?.length ? (
+        <ResumeSection title="Languages" config={config} sectionKey="languages">
           <Typography sx={{ fontSize: settings?.fontSize ?? 14 }}>
             {data.languages.join(", ")}
           </Typography>
-        </ResumeSection>
-      ) : null}
-
-      {data.references?.length ? (
-        <ResumeSection title="References" config={config}>
-          {data.references.map((item) => (
-            <Box key={item.email ?? item.name} sx={{ mb: 1 }}>
-              <Typography sx={{ fontWeight: 800 }}>
-                {item.name}
-              </Typography>
-              <Typography sx={{ fontSize: settings?.fontSize ?? 13 }}>
-                {item.company}
-              </Typography>
-              <Typography sx={{ fontSize: settings?.fontSize ?? 13 }}>
-                {item.email}
-              </Typography>
-            </Box>
-          ))}
         </ResumeSection>
       ) : null}
     </>

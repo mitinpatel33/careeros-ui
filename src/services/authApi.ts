@@ -3,6 +3,8 @@ import { api } from "./api";
 export type LoginRequest = {
   email: string;
   password: string;
+  token: string;
+  provider: string;
 };
 
 export type SignupRequest = {
@@ -45,7 +47,18 @@ export const authApi = api.injectEndpoints({
         body,
       }),
     }),
+
+    logout: builder.mutation<
+      { success: boolean; message: string },
+      { refreshToken: string }
+    >({
+      query: (body) => ({
+        url: "/auth/logout",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useSignupMutation } = authApi;
+export const { useLoginMutation, useSignupMutation, useLogoutMutation  } = authApi;

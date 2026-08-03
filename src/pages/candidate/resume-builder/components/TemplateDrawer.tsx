@@ -141,7 +141,9 @@ const TemplateDrawer = ({
                 border: "1px dashed #cbd5e1",
               }}
             >
-              <Typography sx={{ fontWeight: 900 }}>No template found</Typography>
+              <Typography sx={{ fontWeight: 900 }}>
+                No template found
+              </Typography>
               <Typography sx={{ fontSize: 13, color: "text.secondary" }}>
                 Try another search or category.
               </Typography>

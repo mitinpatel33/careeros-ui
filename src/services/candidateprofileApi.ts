@@ -94,6 +94,14 @@ export const profileApi = api.injectEndpoints({
       invalidatesTags: ['Candidate'],
     }),
 
+    getProfileSections: builder.query<Record<string, any>, string>({
+      query: (include) => ({
+        url: `/candidate/profile/sections?include=${include}`,
+        method: "GET",
+      }),
+      providesTags: ["Candidate"],
+    }),
+
   }),
 });
 
@@ -107,4 +115,5 @@ export const {
   useDeleteProfileSectionMutation,
   useCheckSlugQuery,
   usePublishProfileMutation,
+  useGetProfileSectionsQuery
 } = profileApi;

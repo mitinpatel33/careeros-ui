@@ -87,31 +87,31 @@ const LoginPage = () => {
 
   // ---------- Google Login ----------
   const googleLogin = useGoogleLogin({
-  onSuccess: async (tokenResponse) => {
-    setSocialLoading(true);
-    try {
-      // tokenResponse.access_token is the OAuth access token
-      const response = await login({
-        token: tokenResponse.access_token,
-        provider: "google",
-        email: "",
-        password: ""
-      }).unwrap();
+    onSuccess: async (tokenResponse) => {
+      setSocialLoading(true);
+      try {
+        // tokenResponse.access_token is the OAuth access token
+        const response = await login({
+          token: tokenResponse.access_token,
+          provider: "google",
+          email: "",
+          password: ""
+        }).unwrap();
 
-      handleLoginSuccess(response.data, response.message);
-    } catch (error: any) {
-      appToast.error(error.data?.message || "Google login failed");
-    } finally {
-      setSocialLoading(false);
-    }
-  },
-  onError: () => {
-    appToast.error("Google login failed");
-  },
-});
+        handleLoginSuccess(response.data, response.message);
+      } catch (error: any) {
+        appToast.error(error.data?.message || "Google login failed");
+      } finally {
+        setSocialLoading(false);
+      }
+    },
+    onError: () => {
+      appToast.error("Google login failed");
+    },
+  });
 
-// Then your button's onClick just calls this function
-const handleGoogleLogin = () => googleLogin();
+  // Then your button's onClick just calls this function
+  const handleGoogleLogin = () => googleLogin();
 
   // ---------- Facebook Login ----------
   const handleFacebookLogin = async () => {
@@ -147,7 +147,7 @@ const handleGoogleLogin = () => googleLogin();
         justifyContent: "center",
         alignItems: "center",
         px: 2,
-        py: 4,
+        py: 3,
         overflow: "hidden",
       }}
     >
@@ -236,6 +236,12 @@ const handleGoogleLogin = () => googleLogin();
                   control={control}
                   label="Password"
                   fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#EAF2FF", // Same background everywhere
+                      borderRadius: 3,
+                    },
+                  }}
                 />
 
                 <Box
@@ -304,10 +310,10 @@ const handleGoogleLogin = () => googleLogin();
                 icon={GoogleIcon}
                 aria-label="Continue with Google"
                 sx={{
-                  // border: 1,
-                  // borderColor: "grey.300",
-                  // bgcolor: "white",
-                  // "&:hover": { bgcolor: "grey.100" },
+                  border: 1,
+                  borderColor: "grey.300",
+                  bgcolor: "white",
+                  "&:hover": { bgcolor: "grey.100" },
                 }}
               />
               <ActionIconButton

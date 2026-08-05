@@ -113,7 +113,7 @@ const PersonalDetails = memo(({ defaultValues, loading, isFirst, isLast, onBack,
                 render={({ field: { value, onChange } }) => (
                   <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
                     <Box sx={{ position: "relative" }}>
-                      <Avatar src={value || undefined} sx={{ width: 84, height: 84 }}>
+                      <Avatar src={value || undefined} sx={{ width: 84, height: 84, border: "2px solid", borderColor: "divider" }}>
                         {!value && <Person sx={{ fontSize: 40 }} />}
                       </Avatar>
                       {value && (

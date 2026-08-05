@@ -1,11 +1,7 @@
 import { useState } from "react";
-
 import { type Control, type FieldValues, type Path } from "react-hook-form";
-
 import { IconButton, InputAdornment, type TextFieldProps } from "@mui/material";
-
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
 import AppTextField from "./AppTextField";
 
 interface PasswordFieldProps<T extends FieldValues> extends Omit<

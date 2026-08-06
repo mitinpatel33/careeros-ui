@@ -1,5 +1,9 @@
 import { Psychology } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
+import {
+  useGetProficiencyLevelsQuery,
+  useGetSkillOptionsQuery,
+} from "../../../../services/candidateLookupApi";
 
 export type ProfileSkill = {
   _id?: string;
@@ -16,6 +20,9 @@ type Props = {
 };
 
 const SkillsDetails = ({ items, loading, onSave }: Props) => {
+  const { data: proficiencyOptions = [] } = useGetProficiencyLevelsQuery();
+  const { data: skillOptions = [] } = useGetSkillOptionsQuery();
+
   return (
     <ProfileCrudStep<ProfileSkill>
       title="Skills"
@@ -29,17 +36,17 @@ const SkillsDetails = ({ items, loading, onSave }: Props) => {
         experienceInYears: 0,
       }}
       fields={[
-        { name: "skillName", label: "Skill Name" },
+        {
+          name: "skillName",
+          label: "Skill Name",
+          type: "select",
+          options: skillOptions,
+        },
         {
           name: "proficiency",
           label: "Skill Level",
           type: "select",
-          options: [
-            { label: "Beginner", value: "Beginner" },
-            { label: "Intermediate", value: "Intermediate" },
-            { label: "Advanced", value: "Advanced" },
-            { label: "Expert", value: "Expert" },
-          ],
+          options: proficiencyOptions,
         },
         { name: "experienceInYears", label: "Experience Years", type: "number" },
       ]}

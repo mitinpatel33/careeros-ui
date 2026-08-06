@@ -1,5 +1,6 @@
 import { School } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
+import { useGetDegreesQuery } from "../../../../services/candidateLookupApi";
 
 export type ProfileEducation = {
   id?: string;
@@ -21,9 +22,16 @@ type Props = {
 };
 
 const EducationDetails = ({ items, loading, onSave }: Props) => {
+  const { data: degreeOptions = [] } = useGetDegreesQuery();
+
   const fields: any[] = [
     { name: "instituteName", label: "Institute Name" },
-    { name: "degree", label: "Degree" },
+    {
+      name: "degree",
+      label: "Degree",
+      type: "select",
+      options: degreeOptions,
+    },
     { name: "fieldOfStudy", label: "Field Of Study" },
     { name: "startDate", label: "Start Date", type: "date" },
     { name: "endDate", label: "End Date", type: "date" },

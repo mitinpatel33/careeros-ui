@@ -1,5 +1,6 @@
 import { Work } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
+import { useGetEmploymentTypesQuery } from "../../../../services/candidateLookupApi";
 
 export type ProfileExperience = {
   id?: string;
@@ -21,10 +22,17 @@ type Props = {
 };
 
 const ExperienceDetails = ({ items, loading, onSave }: Props) => {
+  const { data: employmentTypeOptions = [] } = useGetEmploymentTypesQuery();
+
   const fields: any[] = [
     { name: "companyName", label: "Company Name" },
     { name: "designation", label: "Designation" },
-    { name: "employmentType", label: "Employment Type" },
+    {
+      name: "employmentType",
+      label: "Employment Type",
+      type: "select",
+      options: employmentTypeOptions,
+    },
     { name: "location", label: "Location" },
     { name: "startDate", label: "Start Date", type: "date" },
     { name: "endDate", label: "End Date", type: "date" },

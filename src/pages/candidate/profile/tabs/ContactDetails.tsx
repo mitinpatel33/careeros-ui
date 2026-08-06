@@ -8,6 +8,7 @@ import { Country, State, City } from "country-state-city";
 import AnimatedSectionCard from "../../../../components/common/AnimatedSectionCard";
 import AppFormField from "../../../../components/common/AppFormField";
 import SaveFooter from "../../../../layouts/SaveFooter";
+import { useGetRealTimeCountriesQuery } from "../../../../services/thirdPartyApi";
 
 const contactSchema = z.object({
   email: z.string().email("Invalid email").min(1, "Email is required"),
@@ -33,6 +34,8 @@ type Props = {
 
 const ContactDetails = memo(
   ({ defaultValues, loading, isFirst, isLast, onBack, onSubmit }: Props) => {
+    const { data: realTimeCountries = [] } = useGetRealTimeCountriesQuery();
+
     const { control, handleSubmit, watch, resetField } =
       useForm<ContactFormType>({
         resolver: zodResolver(contactSchema),
@@ -53,8 +56,19 @@ const ContactDetails = memo(
     const selectedCountryName = watch("country");
     const selectedStateName = watch("state");
 
-    // All countries
-    const countryOptions = useMemo(() => Country.getAllCountries(), []);
+    // All countries merged with static ISO fallback mapping
+    const countryOptions = useMemo(() => {
+      const staticCountries = Country.getAllCountries();
+      if (realTimeCountries.length === 0) return staticCountries;
+      
+      return realTimeCountries.map((rtc) => {
+        const match = staticCountries.find((sc) => sc.name === rtc.label);
+        return {
+          name: rtc.label,
+          isoCode: match?.isoCode || rtc.code || "",
+        };
+      });
+    }, [realTimeCountries]);
 
     // Resolve the ISO code from the stored country NAME
     const selectedCountryIso = useMemo(

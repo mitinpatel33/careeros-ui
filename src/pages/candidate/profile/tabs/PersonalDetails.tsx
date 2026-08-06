@@ -8,6 +8,11 @@ import { memo, useEffect, useRef } from "react";
 import AnimatedSectionCard from "../../../../components/common/AnimatedSectionCard";
 import SaveFooter from "../../../../layouts/SaveFooter";
 import AppFormField from "../../../../components/common/AppFormField";
+import {
+  useGetGendersQuery,
+  useGetMaritalStatusesQuery,
+} from "../../../../services/candidateLookupApi";
+import { useGetRealTimeNationalitiesQuery } from "../../../../services/thirdPartyApi";
 
 const personalSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -44,6 +49,10 @@ const readFileAsDataUrl = (file: File): Promise<string> =>
   });
 
 const PersonalDetails = memo(({ defaultValues, loading, isFirst, isLast, onBack, onSubmit }: Props) => {
+  const { data: genderOptions = [] } = useGetGendersQuery();
+  const { data: maritalStatusOptions = [] } = useGetMaritalStatusesQuery();
+  const { data: nationalityOptions = [] } = useGetRealTimeNationalitiesQuery();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { control, handleSubmit, reset, formState: { errors }, setError, clearErrors } = useForm<PersonalFormType>({
     resolver: zodResolver(personalSchema),
@@ -134,7 +143,7 @@ const PersonalDetails = memo(({ defaultValues, loading, isFirst, isLast, onBack,
                         </IconButton>
                       )}
                     </Box>
-                    <Stack spacing={0.5} alignItems="center">
+                    <Stack spacing={0.5} sx={{ alignItems: "center" }}>
                       <IconButton
                         component="label"
                         color="primary"
@@ -190,11 +199,7 @@ const PersonalDetails = memo(({ defaultValues, loading, isFirst, isLast, onBack,
                 control={control}
                 label="Gender"
                 type="radio"
-                options={[
-                  { label: "Male", value: "Male" },
-                  { label: "Female", value: "Female" },
-                  { label: "Other", value: "Other" },
-                ]}
+                options={genderOptions}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
@@ -203,14 +208,17 @@ const PersonalDetails = memo(({ defaultValues, loading, isFirst, isLast, onBack,
                 control={control}
                 label="Marital Status"
                 type="select"
-                options={[
-                  { label: "Single", value: "Single" },
-                  { label: "Married", value: "Married" },
-                ]}
+                options={maritalStatusOptions}
               />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="nationality" control={control} label="Nationality" />
+              <AppFormField
+                name="nationality"
+                control={control}
+                label="Nationality"
+                type="select"
+                options={nationalityOptions}
+              />
             </Grid>
           </Grid>
           <SaveFooter isFirst={isFirst} isLast={isLast} loading={loading} onBack={onBack} />

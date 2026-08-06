@@ -133,6 +133,12 @@ const CompanyRegisterPage = () => {
                   control={control}
                   label="Password"
                   fullWidth
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      backgroundColor: "#EAF2FF", // Same background everywhere
+                      borderRadius: 3,
+                    },
+                  }}
                 />
 
                 <PasswordField<CompanyRegisterSchemaType>

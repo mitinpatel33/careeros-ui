@@ -5,143 +5,123 @@ export type DropdownOption = {
   value: string;
 };
 
+export interface SkillSuggestion {
+  title?: string;
+  preferredLabel?: { en?: string } | string;
+  uri: string;
+}
+
+const REST_COUNTRIES_API_KEY = "rc_live_ac49546ec9894eee82bbb585e19f5af0"; // ideally proxied via your backend, not exposed client-side
+
+interface RestCountryV5 {
+  names?: { common?: string };
+  demonyms?: { eng?: { m?: string; f?: string } };
+  codes?: { alpha_2?: string };
+}
+
 export const candidateLookupApi = api.injectEndpoints({
   endpoints: (builder) => ({
-    // Dynamic Gender options
-    getGenders: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/genders",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "Male", value: "Male" },
-          { label: "Female", value: "Female" },
-          { label: "Other", value: "Other" },
-          { label: "Prefer not to say", value: "Prefer not to say" },
-        ],
+    // Third-party API call for Nationalities / Countries
+    getNationalities: builder.query<DropdownOption[], void>({
+      queryFn: async (_arg, _api, _extra, baseQuery) => {
+        const allObjects: RestCountryV5[] = [];
+        const limit = 100; // free-plan max
+        let offset = 0;
+        let more = true;
+
+        while (more) {
+          const result = await baseQuery({
+            url: `https://api.restcountries.com/countries/v5?response_fields=names.common,demonyms,codes.alpha_2&limit=${limit}&offset=${offset}`,
+            headers: { Authorization: `Bearer ${REST_COUNTRIES_API_KEY}` },
+          });
+
+          if (result.error) return { error: result.error };
+
+          const payload = result.data as {
+            data: { objects: RestCountryV5[]; meta: { more: boolean } };
+          };
+
+          allObjects.push(...payload.data.objects);
+          more = payload.data.meta.more;
+          offset += limit;
+        }
+
+        const options = allObjects
+          .map((country) => {
+            const nationalityLabel =
+              country.demonyms?.eng?.m || country.names?.common || "";
+            return {
+              label: nationalityLabel,
+              value: country.codes?.alpha_2 || nationalityLabel,
+            };
+          })
+          .filter((item) => item.label !== "")
+          .sort((a, b) => a.label.localeCompare(b.label));
+
+        return { data: options };
+      },
     }),
 
-    // Dynamic Marital Status options
-    getMaritalStatuses: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/marital-status",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "Single", value: "Single" },
-          { label: "Married", value: "Married" },
-          { label: "Divorced", value: "Divorced" },
-          { label: "Widowed", value: "Widowed" },
-        ],
-    }),
-
-    // Dynamic Employment Type options
-    getEmploymentTypes: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/employment-types",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "Full-Time", value: "Full-Time" },
-          { label: "Part-Time", value: "Part-Time" },
-          { label: "Contract", value: "Contract" },
-          { label: "Freelance", value: "Freelance" },
-          { label: "Internship", value: "Internship" },
-          { label: "Remote", value: "Remote" },
-        ],
-    }),
-
-    // Dynamic Academic Degrees
     getDegrees: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/degrees",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "High School Diploma", value: "High School Diploma" },
-          { label: "Associate Degree", value: "Associate Degree" },
-          { label: "Bachelor of Science (B.S.)", value: "Bachelor of Science (B.S.)" },
-          { label: "Bachelor of Arts (B.A.)", value: "Bachelor of Arts (B.A.)" },
-          { label: "Bachelor of Technology (B.Tech)", value: "Bachelor of Technology (B.Tech)" },
-          { label: "Master of Science (M.S.)", value: "Master of Science (M.S.)" },
-          { label: "Master of Business Administration (MBA)", value: "Master of Business Administration (MBA)" },
-          { label: "Doctor of Philosophy (Ph.D.)", value: "Doctor of Philosophy (Ph.D.)" },
-        ],
+      query: () =>
+        "https://datausa.io/api/data?measures=SubgroupId&drilldowns=Degree",
+      transformResponse: (res: { data: Array<{ Degree: string }> }) => {
+        if (!res?.data || !Array.isArray(res.data)) return [];
+
+        // Remove duplicates and extract degree titles
+        const uniqueDegrees = Array.from(
+          new Set(res.data.map((item) => item.Degree)),
+        );
+
+        return uniqueDegrees.map((degree) => ({
+          label: degree,
+          value: degree,
+        }));
+      },
     }),
 
-    // Dynamic Skill Proficiency Levels
-    getProficiencyLevels: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/proficiency-levels",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "Beginner", value: "Beginner" },
-          { label: "Intermediate", value: "Intermediate" },
-          { label: "Advanced", value: "Advanced" },
-          { label: "Expert", value: "Expert" },
-          { label: "Native / Bilingual", value: "Native / Bilingual" },
-        ],
-    }),
+    // ─── Skills (ESCO API) ──────────────────────────────────────────────────────
+    getSkillOptions: builder.query<DropdownOption[], string>({
+      query: (search: string) => {
+        if (!search || search.trim().length < 2) {
+          return { url: "", skip: true };
+        }
+        return {
+          url: `suggest2?text=${encodeURIComponent(search.trim())}&language=en&type=skill`,
+        };
+      },
+      transformResponse: (res: {
+        _embedded?: { result?: SkillSuggestion[] };
+      }): DropdownOption[] => {
+        const items = res?._embedded?.result;
+        if (!Array.isArray(items)) return [];
 
-    // Dynamic Skill Suggestions
-    getSkillOptions: builder.query<DropdownOption[], string | void>({
-      query: (search) => `/candidate/lookups/skills${search ? `?q=${search}` : ""}`,
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "JavaScript", value: "JavaScript" },
-          { label: "TypeScript", value: "TypeScript" },
-          { label: "React", value: "React" },
-          { label: "Node.js", value: "Node.js" },
-          { label: "Python", value: "Python" },
-          { label: "Java", value: "Java" },
-          { label: "SQL", value: "SQL" },
-          { label: "Docker", value: "Docker" },
-          { label: "AWS", value: "AWS" },
-        ],
-    }),
+        return items.map((item) => {
+          // Extract a human‑readable label
+          let label = item.title || "";
+          if (!label) {
+            if (typeof item.preferredLabel === "string") {
+              label = item.preferredLabel;
+            } else if (item.preferredLabel?.en) {
+              label = item.preferredLabel.en;
+            }
+          }
+          const displayLabel = label || "Unnamed Skill";
 
-    // Dynamic Resume Template Categories
-    getTemplateCategories: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/template-categories",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "All Categories", value: "All" },
-          { label: "ATS Friendly", value: "ATS" },
-          { label: "Professional", value: "Professional" },
-          { label: "Modern", value: "Modern" },
-          { label: "Creative", value: "Creative" },
-          { label: "Minimal", value: "Minimal" },
-          { label: "Sidebar", value: "Sidebar" },
-          { label: "Two Column", value: "Two Column" },
-        ],
-    }),
-
-    // Dynamic Font Family Options
-    getFontOptions: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/font-families",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "Inter", value: "Inter" },
-          { label: "Roboto", value: "Roboto" },
-          { label: "Open Sans", value: "Open Sans" },
-          { label: "Lato", value: "Lato" },
-          { label: "Montserrat", value: "Montserrat" },
-          { label: "Poppins", value: "Poppins" },
-        ],
-    }),
-
-    // Dynamic Paper Size Options
-    getPaperSizes: builder.query<DropdownOption[], void>({
-      query: () => "/candidate/lookups/paper-sizes",
-      transformResponse: (res: any) =>
-        res?.data || [
-          { label: "A4 (210 x 297 mm)", value: "A4" },
-          { label: "Letter (8.5 x 11 in)", value: "Letter" },
-          { label: "Legal (8.5 x 14 in)", value: "Legal" },
-        ],
+          return {
+            label: displayLabel,
+            // ✅ FIX: store the skill name, not the URI
+            value: displayLabel,
+          };
+        });
+      },
+      keepUnusedDataFor: 300, // 5 minutes cache
     }),
   }),
 });
 
 export const {
-  useGetGendersQuery,
-  useGetMaritalStatusesQuery,
-  useGetEmploymentTypesQuery,
+  useGetNationalitiesQuery,
   useGetDegreesQuery,
-  useGetProficiencyLevelsQuery,
   useGetSkillOptionsQuery,
-  useGetTemplateCategoriesQuery,
-  useGetFontOptionsQuery,
-  useGetPaperSizesQuery,
 } = candidateLookupApi;

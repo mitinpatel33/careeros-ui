@@ -1,6 +1,5 @@
 import { MenuItem, Stack, TextField } from "@mui/material";
 import type { TemplateCategory } from "../../../../types/resumeTemplate.types";
-import { useGetTemplateCategoriesQuery } from "../../../../services/candidateLookupApi";
 
 type Props = {
   search: string;
@@ -15,9 +14,8 @@ const TemplateFilters = ({
   onSearchChange,
   onCategoryChange,
 }: Props) => {
-  const { data: dynamicCategories } = useGetTemplateCategoriesQuery();
 
-  const categories = dynamicCategories?.map((c) => c.value as "All" | TemplateCategory) || [
+  const categories =  [
     "All",
     "ATS",
     "Professional",

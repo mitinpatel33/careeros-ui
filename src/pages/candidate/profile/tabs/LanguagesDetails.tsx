@@ -1,5 +1,6 @@
 import { Translate } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
+import { useGetRealTimeLanguagesQuery } from "../../../../services/thirdPartyApi";
 
 export type ProfileLanguage = {
   id?: string;
@@ -15,9 +16,28 @@ type Props = {
 };
 
 const LanguagesDetails = ({ items, loading, onSave }: Props) => {
+  const { data: languageOptions = [] } = useGetRealTimeLanguagesQuery();
+  const proficiencyOptions = [
+    { label: "Beginner", value: "Beginner" },
+    { label: "Intermediate", value: "Intermediate" },
+    { label: "Advanced", value: "Advanced" },
+    { label: "Fluent", value: "Fluent" },
+    { label: "Native", value: "Native" },
+  ];
+
   const fields: any[] = [
-    { name: "languageName", label: "Language Name" },
-    { name: "proficiencyLevel", label: "Proficiency Level" },
+    {
+      name: "languageName",
+      label: "Language Name",
+      type: "select",
+      options: languageOptions,
+    },
+    {
+      name: "proficiencyLevel",
+      label: "Proficiency Level",
+      type: "select",
+      options: proficiencyOptions,
+    },
   ];
 
   return (

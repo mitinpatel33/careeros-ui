@@ -21,10 +21,38 @@ type Props = {
 };
 
 const ExperienceDetails = ({ items, loading, onSave }: Props) => {
+  const employmentTypeOptions: any[] = [
+    {
+      label: "Full-time",
+      value: "Full-time"
+    },
+    {
+      label: "Part-time",
+      value: "Part-time"
+    },
+    {
+      label: "Contract",
+      value: "Contract"
+    },
+    {
+      label: "Freelance",
+      value: "Freelance"
+    },
+    {
+      label: "Remote",
+      value: "Remote"
+    }
+  ];
+
   const fields: any[] = [
     { name: "companyName", label: "Company Name" },
     { name: "designation", label: "Designation" },
-    { name: "employmentType", label: "Employment Type" },
+    {
+      name: "employmentType",
+      label: "Employment Type",
+      type: "select",
+      options: employmentTypeOptions,
+    },
     { name: "location", label: "Location" },
     { name: "startDate", label: "Start Date", type: "date" },
     { name: "endDate", label: "End Date", type: "date" },

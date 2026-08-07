@@ -8,23 +8,24 @@ type Props = {
   onCategoryChange: (value: "All" | TemplateCategory) => void;
 };
 
-const categories: ("All" | TemplateCategory)[] = [
-  "All",
-  "ATS",
-  "Professional",
-  "Modern",
-  "Creative",
-  "Minimal",
-  "Sidebar",
-  "Two Column",
-];
-
 const TemplateFilters = ({
   search,
   category,
   onSearchChange,
   onCategoryChange,
 }: Props) => {
+
+  const categories =  [
+    "All",
+    "ATS",
+    "Professional",
+    "Modern",
+    "Creative",
+    "Minimal",
+    "Sidebar",
+    "Two Column",
+  ];
+
   return (
     <Stack direction="row" spacing={1.2}>
       <TextField

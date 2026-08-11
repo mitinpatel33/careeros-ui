@@ -10,11 +10,6 @@ import { useGetCompanyProfileQuery, useSaveCompanyProfileMutation, useUploadComp
 import AppSnackbar from "../../../components/common/AppSnackbar";
 import AppFormField from "../../../components/common/AppFormField";
 
-// Constants
-const ALLOWED_LOGO_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_LOGO_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
-const MAX_LOGO_SIZE_MB = 5;
-
 // Zod Schema for validation (without logo)
 const companyProfileSchema = z.object({
   companyName: z.string().min(1, "Company name is required"),
@@ -49,6 +44,11 @@ type CompanyProfileData = {
   logoUrl?: string;
   verificationStatus?: string;
 };
+
+// Constants
+const ALLOWED_LOGO_TYPES = ["image/jpeg", "image/png", "image/webp"];
+const MAX_LOGO_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+const MAX_LOGO_SIZE_MB = 5;
 
 const VERIFICATION_META: Record<
   string,

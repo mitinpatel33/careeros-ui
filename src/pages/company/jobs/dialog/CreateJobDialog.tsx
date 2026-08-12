@@ -6,57 +6,81 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  MenuItem,
   Stack,
-  TextField,
   Typography,
 } from "@mui/material";
-
 import { Close, Work } from "@mui/icons-material";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import AppFormField from "../../../../components/common/AppFormField";
 import type { JobItem } from "../../../../types/company.types";
 import { jobSchema, type JobFormType } from "../../../../validation/job.validation";
-
 
 type Props = {
   open: boolean;
   editJob: JobItem | null;
   onClose: () => void;
-  onSave: (job: JobItem) => void;
+  onSave: (jobData: Partial<JobItem>) => Promise<void>;
+  isSubmitting?: boolean;
 };
 
 const defaultValues: JobFormType = {
-  title: "",
+  jobTitle: "",
   department: "",
-  employmentType: "",
+  jobDescription: "",
+  jobType: "Full-time",
+  workplaceType: "On-site",
   experience: "",
   location: "",
-  workMode: "",
-  salaryMin: "",
-  salaryMax: "",
-  positions: "",
+  minimumSalary: 0,
+  maximumSalary: 0,
+  salaryCurrency: "",
+  salaryPeriod: "Yearly",
   skills: "",
-  description: "",
-  responsibilities: "",
   requirements: "",
-  benefits: "",
+  responsibilities: "",
+  status: "Active",
+  applicationDeadline: "",
 };
+
+const JOB_TYPE_OPTIONS = [
+  { label: "Full Time", value: "Full-time" },
+  { label: "Part Time", value: "Part-time" },
+  { label: "Contract", value: "Contract" },
+  { label: "Internship", value: "Internship" },
+  { label: "Remote", value: "Remote" },
+  { label: "Freelance", value: "Freelance" },
+];
+
+const WORKPLACE_TYPE_OPTIONS = [
+  { label: "On-site", value: "On-site" },
+  { label: "Hybrid", value: "Hybrid" },
+  { label: "Remote", value: "Remote" },
+];
+
+const SALARY_PERIOD_OPTIONS = [
+  { label: "Yearly", value: "Yearly" },
+  { label: "Monthly", value: "Monthly" },
+  { label: "Hourly", value: "Hourly" },
+];
+
+const STATUS_OPTIONS = [
+  { label: "Active", value: "Active" },
+  { label: "Draft", value: "Draft" },
+  { label: "Closed", value: "Closed" },
+  { label: "Archived", value: "Archived" },
+];
 
 const CreateJobDialog = ({
   open,
   editJob,
   onClose,
   onSave,
+  isSubmitting = false,
 }: Props) => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<JobFormType>({
-    resolver: zodResolver(jobSchema),
+  const { control, handleSubmit, reset } = useForm<JobFormType>({
+    resolver: zodResolver(jobSchema) as Resolver<JobFormType>,
     defaultValues,
     mode: "onSubmit",
   });
@@ -64,54 +88,57 @@ const CreateJobDialog = ({
   useEffect(() => {
     if (editJob) {
       reset({
-        title: editJob.title,
-        department: editJob.department,
-        employmentType: editJob.employmentType,
-        experience: editJob.experience,
-        location: editJob.location,
-        workMode: editJob.workMode,
-        salaryMin: editJob.salaryMin,
-        salaryMax: editJob.salaryMax,
-        positions: editJob.positions,
-        skills: editJob.skills.join(", "),
-        description: editJob.description,
-        responsibilities: editJob.responsibilities,
-        requirements: editJob.requirements,
-        benefits: editJob.benefits || "",
+        jobTitle: editJob.jobTitle || "",
+        department: editJob.department || "",
+        jobDescription: editJob.jobDescription || "",
+        jobType: editJob.jobType || "Full-time",
+        workplaceType: editJob.workplaceType || "On-site",
+        experience: editJob.experience || "",
+        location: editJob.location || "",
+        minimumSalary: editJob.minimumSalary || 0,
+        maximumSalary: editJob.maximumSalary || 0,
+        salaryCurrency: editJob.salaryCurrency || "",
+        salaryPeriod: editJob.salaryPeriod || "Yearly",
+        skills: editJob.skills ? editJob.skills.join(", ") : "",
+        requirements: editJob.requirements ? editJob.requirements.join("\n") : "",
+        responsibilities: editJob.responsibilities ? editJob.responsibilities.join("\n") : "",
+        status: editJob.status || "Active",
+        applicationDeadline: editJob.applicationDeadline
+          ? new Date(editJob.applicationDeadline).toISOString().split("T")[0]
+          : "",
       });
     } else {
       reset(defaultValues);
     }
   }, [editJob, open, reset]);
 
-  const onSubmit = (data: JobFormType) => {
-    const payload: JobItem = {
-      id: editJob?.id || crypto.randomUUID(),
-      title: data.title,
+  const onSubmit = async (data: JobFormType) => {
+    const payload: Partial<JobItem> = {
+      jobTitle: data.jobTitle,
       department: data.department,
-      employmentType: data.employmentType,
+      jobDescription: data.jobDescription,
+      jobType: data.jobType,
+      workplaceType: data.workplaceType,
       experience: data.experience,
       location: data.location,
-      workMode: data.workMode,
-      salaryMin: data.salaryMin,
-      salaryMax: data.salaryMax,
-      positions: data.positions,
+      minimumSalary: Number(data.minimumSalary),
+      maximumSalary: Number(data.maximumSalary),
+      salaryCurrency: data.salaryCurrency,
+      salaryPeriod: data.salaryPeriod,
       skills: data.skills
-        .split(",")
-        .map((x: any) => x.trim())
-        .filter(Boolean),
-      description: data.description,
-      responsibilities: data.responsibilities,
-      requirements: data.requirements,
-      benefits: data.benefits || "",
-      status: editJob?.status || "Open",
-      applications: editJob?.applications || 0,
-      createdAt: editJob?.createdAt || new Date().toLocaleDateString(),
+        ? data.skills.split(",").map((x) => x.trim()).filter(Boolean)
+        : [],
+      requirements: data.requirements
+        ? data.requirements.split("\n").map((x) => x.trim()).filter(Boolean)
+        : [],
+      responsibilities: data.responsibilities
+        ? data.responsibilities.split("\n").map((x) => x.trim()).filter(Boolean)
+        : [],
+      status: data.status,
+      applicationDeadline: data.applicationDeadline ? data.applicationDeadline : undefined,
     };
 
-    onSave(payload);
-    reset(defaultValues);
-    onClose();
+    await onSave(payload);
   };
 
   const handleClose = () => {
@@ -140,11 +167,11 @@ const CreateJobDialog = ({
 
             <Box>
               <Typography variant="h5" sx={{ fontWeight: 900 }}>
-                {editJob ? "Edit Job" : "Create New Job"} 💼
+                {editJob ? "Edit Job Posting" : "Create New Job Posting"} 💼
               </Typography>
 
               <Typography color="text.secondary" sx={{ fontSize: 13 }}>
-                Add job details, required skills and publish openings.
+                Fill in job details, requirements and salary specs to publish.
               </Typography>
             </Box>
           </Stack>
@@ -156,184 +183,160 @@ const CreateJobDialog = ({
       </DialogTitle>
 
       <DialogContent sx={{ p: 3 }}>
-        <Box component="form" sx={{ p: 3 }} onSubmit={handleSubmit(onSubmit)} noValidate>
+        <Box component="form" sx={{ p: 1 }} onSubmit={handleSubmit(onSubmit)} noValidate>
           <Grid container spacing={2.5}>
             <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                fullWidth
+              <AppFormField
+                name="jobTitle"
+                control={control}
                 label="Job Title"
-                {...register("title")}
-                error={!!errors.title}
-                helperText={errors.title?.message}
               />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                fullWidth
+              <AppFormField
+                name="department"
+                control={control}
                 label="Department"
-                {...register("department")}
-                error={!!errors.department}
-                helperText={errors.department?.message}
               />
             </Grid>
 
             <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                select
-                fullWidth
-                label="Employment Type"
-                defaultValue=""
-                {...register("employmentType")}
-                error={!!errors.employmentType}
-                helperText={errors.employmentType?.message}
-              >
-                <MenuItem value="">Select Employment Type</MenuItem>
-                <MenuItem value="Full Time">Full Time</MenuItem>
-                <MenuItem value="Part Time">Part Time</MenuItem>
-                <MenuItem value="Contract">Contract</MenuItem>
-                <MenuItem value="Internship">Internship</MenuItem>
-              </TextField>
+              <AppFormField
+                name="jobType"
+                control={control}
+                label="Job Type"
+                type="select"
+                options={JOB_TYPE_OPTIONS}
+              />
             </Grid>
 
             <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                select
-                fullWidth
-                label="Work Mode"
-                defaultValue=""
-                {...register("workMode")}
-                error={!!errors.workMode}
-                helperText={errors.workMode?.message}
-              >
-                <MenuItem value="">Select Work Mode</MenuItem>
-                <MenuItem value="Onsite">Onsite</MenuItem>
-                <MenuItem value="Remote">Remote</MenuItem>
-                <MenuItem value="Hybrid">Hybrid</MenuItem>
-              </TextField>
+              <AppFormField
+                name="workplaceType"
+                control={control}
+                label="Workplace Type"
+                type="select"
+                options={WORKPLACE_TYPE_OPTIONS}
+              />
             </Grid>
 
             <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
+              <AppFormField
+                name="experience"
+                control={control}
                 label="Experience"
-                placeholder="3 - 5 Years"
-                {...register("experience")}
-                error={!!errors.experience}
-                helperText={errors.experience?.message}
               />
             </Grid>
 
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
+            <Grid size={{ xs: 12, md: 6 }}>
+              <AppFormField
+                name="location"
+                control={control}
                 label="Location"
-                {...register("location")}
-                error={!!errors.location}
-                helperText={errors.location?.message}
               />
             </Grid>
 
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
+            <Grid size={{ xs: 12, md: 6 }}>
+              <AppFormField
+                name="status"
+                control={control}
+                label="Status"
+                type="select"
+                options={STATUS_OPTIONS}
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 3 }}>
+              <AppFormField
+                name="minimumSalary"
+                control={control}
                 label="Minimum Salary"
-                placeholder="1000000"
-                {...register("salaryMin")}
-                error={!!errors.salaryMin}
-                helperText={errors.salaryMin?.message}
+                type="number"
               />
             </Grid>
 
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
+            <Grid size={{ xs: 12, md: 3 }}>
+              <AppFormField
+                name="maximumSalary"
+                control={control}
                 label="Maximum Salary"
-                placeholder="1800000"
-                {...register("salaryMax")}
-                error={!!errors.salaryMax}
-                helperText={errors.salaryMax?.message}
+                type="number"
               />
             </Grid>
 
-            <Grid size={{ xs: 12, md: 4 }}>
-              <TextField
-                fullWidth
-                label="Open Positions"
-                placeholder="4"
-                {...register("positions")}
-                error={!!errors.positions}
-                helperText={errors.positions?.message}
+            <Grid size={{ xs: 12, md: 3 }}>
+              <AppFormField
+                name="salaryCurrency"
+                control={control}
+                label="Currency"
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 3 }}>
+              <AppFormField
+                name="salaryPeriod"
+                control={control}
+                label="Salary Period"
+                type="select"
+                options={SALARY_PERIOD_OPTIONS}
               />
             </Grid>
 
             <Grid size={{ xs: 12, md: 8 }}>
-              <TextField
-                fullWidth
-                label="Required Skills"
-                placeholder="React, Node.js, TypeScript"
-                {...register("skills")}
-                error={!!errors.skills}
-                helperText={errors.skills?.message}
+              <AppFormField
+                name="skills"
+                control={control}
+                label="Required Skills (Comma separated)"
+              />
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 4 }}>
+              <AppFormField
+                name="applicationDeadline"
+                control={control}
+                label="Application Deadline"
+                type="date"
               />
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={4}
+              <AppFormField
+                name="jobDescription"
+                control={control}
                 label="Job Description"
-                {...register("description")}
-                error={!!errors.description}
-                helperText={errors.description?.message}
+                type="textarea"
+                rows={4}
               />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                fullWidth
-                multiline
+              <AppFormField
+                name="responsibilities"
+                control={control}
+                label="Responsibilities (One per line)"
+                type="textarea"
                 rows={4}
-                label="Responsibilities"
-                {...register("responsibilities")}
-                error={!!errors.responsibilities}
-                helperText={errors.responsibilities?.message}
               />
             </Grid>
 
             <Grid size={{ xs: 12, md: 6 }}>
-              <TextField
-                fullWidth
-                multiline
+              <AppFormField
+                name="requirements"
+                control={control}
+                label="Requirements (One per line)"
+                type="textarea"
                 rows={4}
-                label="Requirements"
-                {...register("requirements")}
-                error={!!errors.requirements}
-                helperText={errors.requirements?.message}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12 }}>
-              <TextField
-                fullWidth
-                multiline
-                rows={3}
-                label="Benefits"
-                {...register("benefits")}
-                error={!!errors.benefits}
-                helperText={errors.benefits?.message}
               />
             </Grid>
           </Grid>
 
           <Stack
             direction={{ xs: "column", sm: "row" }}
-            
             spacing={2}
             sx={{ mt: 3, justifyContent: "flex-end" }}
           >
-            <Button variant="outlined" onClick={handleClose}>
+            <Button variant="outlined" onClick={handleClose} disabled={isSubmitting}>
               Cancel
             </Button>
 

@@ -7,7 +7,6 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
 import type { JobItem } from "../../../types/company.types";
 
 type Props = {
@@ -37,58 +36,80 @@ const JobDetailsDrawer = ({ open, job, onClose, onEdit }: Props) => {
       <Stack spacing={2}>
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 900 }}>
-            {job.title}
+            {job.jobTitle}
           </Typography>
 
           <Typography color="text.secondary">
-            {job.department} • {job.employmentType} • {job.workMode}
+            {job.department || "General"} • {job.jobType} • {job.workplaceType}
           </Typography>
         </Box>
 
         <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
-          <Chip label={job.status} color={job.status === "Open" ? "success" : "default"} />
-          <Chip label={`${job.applications} Applications`} />
-          <Chip label={`${job.positions} Positions`} />
+          <Chip
+            label={job.status}
+            color={
+              job.status === "Active"
+                ? "success"
+                : job.status === "Closed"
+                ? "error"
+                : "default"
+            }
+          />
+          <Chip label={`${job.applicationsCount || 0} Applications`} />
+          <Chip label={`${job.viewsCount || 0} Views`} />
         </Stack>
 
         <Divider />
 
-        <Section title="Job Details">
-          <Typography>Location: {job.location}</Typography>
-          <Typography>Experience: {job.experience}</Typography>
+        <Section title="Job Overview">
+          <Typography>Location: {job.location || "Not specified"}</Typography>
+          <Typography>Experience: {job.experience || "N/A"}</Typography>
           <Typography>
-            Salary: ₹{job.salaryMin} - ₹{job.salaryMax}
+            Salary: {job.salaryCurrency || "$"} {job.minimumSalary?.toLocaleString() || 0} - {job.maximumSalary?.toLocaleString() || 0} / {job.salaryPeriod || "yr"}
           </Typography>
-          <Typography>Created: {job.createdAt}</Typography>
+          {job.applicationDeadline && (
+            <Typography>
+              Deadline: {new Date(job.applicationDeadline).toLocaleDateString()}
+            </Typography>
+          )}
+          {job.createdAt && (
+            <Typography>
+              Posted On: {new Date(job.createdAt).toLocaleDateString()}
+            </Typography>
+          )}
         </Section>
 
-        <Section title="Skills">
+        <Section title="Skills Required">
           <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
-            {job.skills.map((skill) => (
+            {job.skills?.map((skill) => (
               <Chip key={skill} label={skill} variant="outlined" />
             ))}
           </Stack>
         </Section>
 
-        <Section title="Description">
-          <Typography color="text.secondary">{job.description}</Typography>
-        </Section>
-
-        <Section title="Responsibilities">
-          <Typography color="text.secondary">{job.responsibilities}</Typography>
-        </Section>
-
-        <Section title="Requirements">
-          <Typography color="text.secondary">{job.requirements}</Typography>
-        </Section>
-
-        <Section title="Benefits">
-          <Typography color="text.secondary">
-            {job.benefits || "No benefits added"}
+        <Section title="Job Description">
+          <Typography color="text.secondary" sx={{ whitespace: "pre-line" }}>
+            {job.jobDescription}
           </Typography>
         </Section>
 
-        <Stack direction="row" spacing={2}>
+        {job.responsibilities && job.responsibilities.length > 0 && (
+          <Section title="Responsibilities">
+            {job.responsibilities.map((item, idx) => (
+              <Typography key={idx} color="text.secondary">• {item}</Typography>
+            ))}
+          </Section>
+        )}
+
+        {job.requirements && job.requirements.length > 0 && (
+          <Section title="Requirements">
+            {job.requirements.map((item, idx) => (
+              <Typography key={idx} color="text.secondary">• {item}</Typography>
+            ))}
+          </Section>
+        )}
+
+        <Stack direction="row" spacing={2} sx={{ pt: 2 }}>
           <Button fullWidth variant="outlined" onClick={onClose}>
             Close
           </Button>

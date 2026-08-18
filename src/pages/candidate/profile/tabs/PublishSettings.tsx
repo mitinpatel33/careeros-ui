@@ -231,20 +231,22 @@ const PublishSettings = ({
                       fullWidth
                       value={publishedUrl}
                       variant="outlined"
-                      InputProps={{
-                        readOnly: true,
-                        startAdornment: (
-                          <InputAdornment position="start"><Globe size={18} color="#16a34a" /></InputAdornment>
-                        ),
-                        endAdornment: (
-                          <InputAdornment position="end">
-                            <Tooltip title={copied ? "Copied!" : "Copy link"}>
-                              <IconButton onClick={handleCopy}>
-                                {copied ? <Check size={20} color="#16a34a" /> : <Copy size={20} />}
-                              </IconButton>
-                            </Tooltip>
-                          </InputAdornment>
-                        ),
+                      slotProps={{
+                        input: {
+                          readOnly: true,
+                          startAdornment: (
+                            <InputAdornment position="start"><Globe size={18} color="#16a34a" /></InputAdornment>
+                          ),
+                          endAdornment: (
+                            <InputAdornment position="end">
+                              <Tooltip title={copied ? "Copied!" : "Copy link"}>
+                                <IconButton onClick={handleCopy}>
+                                  {copied ? <Check size={20} color="#16a34a" /> : <Copy size={20} />}
+                                </IconButton>
+                              </Tooltip>
+                            </InputAdornment>
+                          ),
+                        },
                       }}
                       sx={{ "& .MuiOutlinedInput-root": { bgcolor: "white", borderRadius: 2 } }}
                     />
@@ -256,9 +258,9 @@ const PublishSettings = ({
                       <Button variant="contained" startIcon={<ExternalLink size={18} />} href={publishedUrl} target="_blank" rel="noopener noreferrer" fullWidth sx={{ textTransform: "none" }}>
                         View Live Resume
                       </Button>
-                      <Button variant="text" color="error" startIcon={<XCircle size={18} />} onClick={handleUnpublish} disabled={isUnpublishing} fullWidth>
+                      {/* <Button variant="text" color="error" startIcon={<XCircle size={18} />} onClick={handleUnpublish} disabled={isUnpublishing} fullWidth>
                         {isUnpublishing ? "Unpublishing..." : "Unpublish"}
-                      </Button>
+                      </Button> */}
                     </Stack>
                   </Stack>
                 </motion.div>

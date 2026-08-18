@@ -16,11 +16,9 @@ import {
   Star,
 } from "@mui/icons-material";
 
-import type { CandidateItem } from "../../../types/candidateProfile.types";
-
 type Props = {
-  candidate: CandidateItem;
-  onView: (candidate: CandidateItem) => void;
+  candidate: any;
+  onView: (candidate: any) => void;
   onShortlist: (id: string) => void;
   onSave: (id: string) => void;
 };
@@ -98,7 +96,7 @@ const CandidateCard = ({
         </Box>
 
         <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
-          {candidate.skills.slice(0, 5).map((skill) => (
+          {candidate.skills.slice(0, 5).map((skill: any) => (
             <Chip key={skill} label={skill} size="small" variant="outlined" />
           ))}
         </Stack>

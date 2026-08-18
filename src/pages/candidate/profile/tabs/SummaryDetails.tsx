@@ -60,11 +60,7 @@ const SummaryDetails = memo(
     );
 
     // Payload transformers for the specific endpoints
-    const generatePayload = (params: {
-      action: string;
-      fieldType: string;
-      context?: Record<string, unknown>;
-    }) => {
+    const generatePayload = () => {
       const { jobTitle, skills, experience } = aiContext || {};
       return {
         jobTitle: jobTitle || "Software Developer",

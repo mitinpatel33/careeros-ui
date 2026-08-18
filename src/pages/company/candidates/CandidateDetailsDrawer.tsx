@@ -16,11 +16,10 @@ import {
   Star,
 } from "@mui/icons-material";
 
-import type { CandidateItem } from "../../../types/candidateProfile.types";
 
 type Props = {
   open: boolean;
-  candidate: CandidateItem | null;
+  candidate: any | null;
   onClose: () => void;
   onShortlist: (id: string) => void;
 };
@@ -103,7 +102,7 @@ const CandidateDetailsDrawer = ({
 
         <Section title="Skills">
           <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
-            {candidate.skills.map((skill) => (
+            {candidate.skills.map((skill: any) => (
               <Chip key={skill} label={skill} variant="outlined" />
             ))}
           </Stack>
@@ -111,7 +110,7 @@ const CandidateDetailsDrawer = ({
 
         <Section title="AI Matched Skills">
           <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
-            {candidate.matchedSkills.map((skill) => (
+            {candidate.matchedSkills.map((skill: any) => (
               <Chip
                 key={skill}
                 label={skill}
@@ -124,7 +123,7 @@ const CandidateDetailsDrawer = ({
 
         <Section title="Missing Skills">
           <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap" }} useFlexGap>
-            {candidate.missingSkills.map((skill) => (
+            {candidate.missingSkills.map((skill: any) => (
               <Chip
                 key={skill}
                 label={skill}

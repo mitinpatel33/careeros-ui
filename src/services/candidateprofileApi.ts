@@ -87,21 +87,42 @@ export const profileApi = api.injectEndpoints({
 
     publishProfile: builder.mutation<{ url: string }, { slug: string }>({
       query: ({ slug }) => ({
-        url: '/candidate/profile/publish',
-        method: 'POST',
+        url: "/candidate/profile/publish",
+        method: "POST",
         body: { slug },
       }),
-      invalidatesTags: ['Candidate'],
+      invalidatesTags: ["Candidate"],
     }),
 
-    getProfileSections: builder.query<Record<string, any>, string>({
-      query: (include) => ({
-        url: `/candidate/profile/sections?include=${include}`,
+    getProfileSections: builder.query<{ success: boolean; data: any }, void>({
+      query: () => ({
+        url: `/candidate/profile/sections`,
         method: "GET",
       }),
       providesTags: ["Candidate"],
     }),
 
+    // Add these endpoints to your existing candidateProfileApi slice
+    getPublishedUrl: builder.query<
+      {
+        data: {
+          profileSlug: string;
+          publishedUrl: string;
+          isPublished: boolean;
+        };
+      },
+      void
+    >({
+      query: () => "/published-url",
+      providesTags: ["Candidate"],
+    }),
+    unpublishProfile: builder.mutation<{ success: boolean }, void>({
+      query: () => ({
+        url: "/unpublish",
+        method: "POST",
+      }),
+      invalidatesTags: ["Candidate"],
+    }),
   }),
 });
 
@@ -115,5 +136,5 @@ export const {
   useDeleteProfileSectionMutation,
   useCheckSlugQuery,
   usePublishProfileMutation,
-  useGetProfileSectionsQuery
+  useLazyGetProfileSectionsQuery,
 } = profileApi;

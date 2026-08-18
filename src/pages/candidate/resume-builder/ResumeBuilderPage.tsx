@@ -18,7 +18,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import ActionIconButton from "../../../components/common/ActionIconButton";
 import TemplateDrawer from "./components/TemplateDrawer";
 import ResumeSettingsDrawer from "./components/ResumeSettingsDrawer";
-import { useGetProfileSectionsQuery } from "../../../services/candidateprofileApi";
+import { useLazyGetProfileSectionsQuery } from "../../../services/candidateprofileApi";
 
 const ResumeBuilderPage = () => {
   const sectionKeyMap: Record<string, string> = {
@@ -101,21 +101,19 @@ const ResumeBuilderPage = () => {
     .map((key) => sectionKeyMap[key])
     .join(",");
 
-  const {
-    data: sectionsData,
-    isLoading,
-    refetch,
-  } = useGetProfileSectionsQuery(includeString, {
-    skip: !shouldFetch,
-  });
+  // const {
+  //   data: sectionsData,
+  //   isLoading,
+  //   refetch,
+  // } = useLazyGetProfileSectionsQuery();
 
-  useEffect(() => {
-    debugger
-    if (sectionsData) {
-      setResumeData(sectionsData?.data);
-      setShouldFetch(false); // reset if needed
-    }
-  }, [sectionsData]);
+  // useEffect(() => {
+  //   debugger
+  //   if (sectionsData) {
+  //     setResumeData(sectionsData?.data);
+  //     setShouldFetch(false); // reset if needed
+  //   }
+  // }, [sectionsData]);
 
   const handleSubmitSections = () => {
     if (selectedSections.length === 0) return;
@@ -144,7 +142,7 @@ const ResumeBuilderPage = () => {
 
           <SectionSelector
             selectedSections={selectedSections}
-            loading={selectedSections.length === 0 || isLoading}
+            loading={selectedSections.length === 0}
             onChange={setSelectedSections}
             onSubmit={handleSubmitSections}
           />

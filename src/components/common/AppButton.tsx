@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from "@mui/material";
+import { Button, CircularProgress, type SxProps, type Theme } from "@mui/material";
 
 interface AppButtonProps {
   children: React.ReactNode;
@@ -11,6 +11,7 @@ interface AppButtonProps {
   endIcon?: React.ReactNode;
   disabled?: boolean;
   onClick?: () => void;
+  sx?: SxProps<Theme>; // 1. Added sx prop definition
 }
 
 const AppButton = ({
@@ -24,6 +25,7 @@ const AppButton = ({
   endIcon,
   disabled,
   onClick,
+  sx, // 2. Received sx prop
 }: AppButtonProps) => {
   return (
     <Button
@@ -47,6 +49,8 @@ const AppButton = ({
         "&:hover": {
           transform: "translateY(-2px)",
         },
+        // 3. Merged incoming custom sx styles smoothly
+        ...(Array.isArray(sx) ? sx : [sx]),
       }}
     >
       {loading ? "Please Wait..." : children}

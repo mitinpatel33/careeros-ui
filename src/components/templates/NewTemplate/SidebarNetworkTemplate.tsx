@@ -24,12 +24,17 @@ interface Props {
 }
 
 // Helpers
-const formatDate = (dateStr?: string): string => {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-  return isNaN(date.getTime())
-    ? dateStr
-    : date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+type DateValue = string | Date | undefined;
+
+const formatDate = (dateVal?: DateValue): string => {
+  if (!dateVal) return "";
+
+  if (dateVal instanceof Date) {
+    return isNaN(dateVal.getTime()) ? "" : dateVal.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+  }
+
+  const date = new Date(dateVal);
+  return isNaN(date.getTime()) ? dateVal : date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
 };
 
 const cleanUrl = (url?: string): string =>
@@ -304,7 +309,7 @@ const SidebarNetworkTemplate = forwardRef<HTMLDivElement, Props>(
                             {edu.percentage ? `, CGPA: ${(edu.percentage / 10).toFixed(1)}` : ""}
                           </Typography>
                         </Box>
-                        <DateBadge startDate={edu.startDate} endDate={edu.endDate} />
+                        <DateBadge startDate={edu.startDate instanceof Date ? edu.startDate.toISOString() : edu.startDate} endDate={edu.endDate instanceof Date ? edu.endDate.toISOString() : edu.endDate} />
                       </Box>
                     </Box>
                   ))}
@@ -341,8 +346,8 @@ const SidebarNetworkTemplate = forwardRef<HTMLDivElement, Props>(
                             )}
                           </Box>
                           <DateBadge
-                            startDate={exp.startDate}
-                            endDate={exp.isCurrentCompany ? "Present" : exp.endDate}
+                            startDate={exp.startDate instanceof Date ? exp.startDate.toISOString().split('T')[0] : exp.startDate}
+                            endDate={exp.isCurrentCompany ? "Present" : (exp.endDate instanceof Date ? exp.endDate.toISOString().split('T')[0] : exp.endDate)}
                           />
                         </Box>
 
@@ -392,7 +397,7 @@ const SidebarNetworkTemplate = forwardRef<HTMLDivElement, Props>(
                     title="Awards"
                   />
                   <Box component="ul" sx={{ m: 0, pl: 2, color: TEXT_DARK, display: "flex", flexDirection: "column", gap: 0.4 }}>
-                    {data.achievements.map((ach, idx) => (
+                    {data.achievements.map((ach: any, idx) => (
                       <Typography component="li" key={idx} sx={{ fontSize: "10.5px" }}>
                         <strong>{ach.title}</strong>
                         {ach.achievementDate ? `, ${formatDate(ach.achievementDate)}` : ""}

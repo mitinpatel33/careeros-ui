@@ -20,7 +20,7 @@ const formatDuration = (
 };
 
 /* ---------- component ---------- */
-const TerminalTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const TerminalTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Choose the most relevant summary text

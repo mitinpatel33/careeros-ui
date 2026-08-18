@@ -16,7 +16,7 @@ const formatDate = (d?: Date | string) => {
 const formatRange = (
   start?: Date | string,
   end?: Date | string,
-  isCurrent?: boolean
+  isCurrent?: boolean,
 ) => {
   const startStr = formatDate(start);
   if (isCurrent || !end) return `${startStr} – Present`;
@@ -24,17 +24,10 @@ const formatRange = (
 };
 
 const TwoColumnTemplate = ({ data, config, settings }: TemplateRenderProps) => {
-  const { personal, contact } = data;
+  const { personal } = data;
 
   const fullName = personal
     ? `${personal?.firstName || ""} ${personal?.lastName || ""}`.trim()
-    : "";
-
-  // Location string from contact
-  const location = contact
-    ? [contact.address, contact.city, contact.state, contact.pincode]
-        .filter(Boolean)
-        .join(", ")
     : "";
 
   // Summary text – professional summary first, else career objective
@@ -77,7 +70,9 @@ const TwoColumnTemplate = ({ data, config, settings }: TemplateRenderProps) => {
       </Box>
 
       {/* Two‑column body */}
-      <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, p: 4 }}>
+      <Box
+        sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 4, p: 4 }}
+      >
         {/* Left Column */}
         <Box>
           {summaryText && (
@@ -112,7 +107,7 @@ const TwoColumnTemplate = ({ data, config, settings }: TemplateRenderProps) => {
                     {formatRange(
                       item.startDate,
                       item.endDate,
-                      item.isCurrentCompany
+                      item.isCurrentCompany,
                     )}
                   </Typography>
                   {item.description && (
@@ -163,7 +158,10 @@ const TwoColumnTemplate = ({ data, config, settings }: TemplateRenderProps) => {
               sectionKey="skills"
             >
               {data.skills.map((skill, idx) => (
-                <Typography key={idx} sx={{ fontSize: settings?.fontSize ?? 14 }}>
+                <Typography
+                  key={idx}
+                  sx={{ fontSize: settings?.fontSize ?? 14 }}
+                >
                   • {skill.skillName}
                   {skill.proficiency ? ` (${skill.proficiency})` : ""}
                 </Typography>
@@ -203,12 +201,13 @@ const TwoColumnTemplate = ({ data, config, settings }: TemplateRenderProps) => {
               sectionKey="certifications"
             >
               {data.certifications.map((item, idx) => (
-                <Typography key={idx} sx={{ fontSize: settings?.fontSize ?? 14 }}>
+                <Typography
+                  key={idx}
+                  sx={{ fontSize: settings?.fontSize ?? 14 }}
+                >
                   • {item.certificateName}
                   {item.issuedBy ? ` – ${item.issuedBy}` : ""}
-                  {item.issuedDate
-                    ? ` (${formatDate(item.issuedDate)})`
-                    : ""}
+                  {item.issuedDate ? ` (${formatDate(item.issuedDate)})` : ""}
                 </Typography>
               ))}
             </ResumeSection>
@@ -222,7 +221,10 @@ const TwoColumnTemplate = ({ data, config, settings }: TemplateRenderProps) => {
               sectionKey="achievements"
             >
               {data.achievements.map((item, idx) => (
-                <Typography key={idx} sx={{ fontSize: settings?.fontSize ?? 14 }}>
+                <Typography
+                  key={idx}
+                  sx={{ fontSize: settings?.fontSize ?? 14 }}
+                >
                   • {item.title}
                   {item.description ? ` – ${item.description}` : ""}
                 </Typography>
@@ -239,11 +241,12 @@ const TwoColumnTemplate = ({ data, config, settings }: TemplateRenderProps) => {
               sectionKey="languages"
             >
               {data.languages.map((lang, idx) => (
-                <Typography key={idx} sx={{ fontSize: settings?.fontSize ?? 14 }}>
+                <Typography
+                  key={idx}
+                  sx={{ fontSize: settings?.fontSize ?? 14 }}
+                >
                   • {lang.languageName}
-                  {lang.proficiencyLevel
-                    ? ` (${lang.proficiencyLevel})`
-                    : ""}
+                  {lang.proficiencyLevel ? ` (${lang.proficiencyLevel})` : ""}
                 </Typography>
               ))}
             </ResumeSection>

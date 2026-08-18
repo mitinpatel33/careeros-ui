@@ -12,6 +12,12 @@ type Props = {
 
 const ModernTemplate = ({ data, themeColor }: Props) => {
   const primary = getThemeColor(themeColor);
+  const summaryText =
+    typeof data.summary === "string"
+      ? data.summary
+      : data.summary?.professionalSummary ??
+        data.summary?.careerObjective ??
+        "";
 
   return (
     <Paper
@@ -29,22 +35,20 @@ const ModernTemplate = ({ data, themeColor }: Props) => {
           variant="h4"
           sx={{ fontWeight: 900, fontSize: { xs: 28, md: 38 } }}
         >
-          {data.personal?.fullName}
+          {data.personal?.firstName} + {" "} + {data.personal?.lastName}
         </Typography>
         <Typography>{data.personal?.jobTitle}</Typography>
         <Typography sx={{ fontSize: 14 }}>{data.contact?.email}</Typography>
       </Box>
 
       <Box sx={{ p: { xs: 2.5, md: 5 } }}>
-        {data.summary && (
-          <Block title="Profile" color={primary} text={data.summary} />
-        )}
+        {summaryText && <Block title="Profile" color={primary} text={summaryText} />}
 
         {data.skills?.length ? (
           <Box sx={{ mb: 3 }}>
             <Title title="Skills" color={primary} />
             <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
-              {data.skills.map((skill) => (
+              {data.skills.map((skill: any) => (
                 <Chip key={skill} label={skill} />
               ))}
             </Stack>
@@ -54,7 +58,7 @@ const ModernTemplate = ({ data, themeColor }: Props) => {
         {data.experience?.length ? (
           <Box sx={{ mb: 3 }}>
             <Title title="Experience" color={primary} />
-            {data.experience.map((item) => (
+            {data.experience.map((item: any) => (
               <Box key={item.companyName} sx={{ mb: 2 }}>
                 <Typography sx={{ fontWeight: 900 }}>
                   {item.designation} - {item.companyName}
@@ -71,7 +75,7 @@ const ModernTemplate = ({ data, themeColor }: Props) => {
         {data.education?.length ? (
           <Box sx={{ mb: 3 }}>
             <Title title="Education" color={primary} />
-            {data.education.map((item) => (
+            {data.education.map((item: any) => (
               <Box key={item.degree} sx={{ mb: 2 }}>
                 <Typography sx={{ fontWeight: 900 }}>{item.degree}</Typography>
                 <Typography>{item.university}</Typography>

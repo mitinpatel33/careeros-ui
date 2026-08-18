@@ -21,7 +21,7 @@ const formatDuration = (
   return `${start} – ${end}`;
 };
 
-const NewspaperTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const NewspaperTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   return (

@@ -25,7 +25,7 @@ const formatDuration = (
   return `${start} – ${end}`;
 };
 
-const ArtisticTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const ArtisticTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Choose a displayable website (portfolio > website > LinkedIn)

@@ -1,7 +1,6 @@
 // VibrantGradientTemplate.tsx
 import { Box, Typography, Paper } from "@mui/material";
 import type { TemplateRenderProps } from "../../../types/resumeTemplate.types";
-import type { ResumeData } from "../../../types/resumeData.types"; // import the new type
 
 // Helper to format date ranges like "Jan 2020 – Present" or "2020 – 2022"
 const formatDateRange = (
@@ -23,7 +22,7 @@ const formatDateRange = (
   return `${startStr} – ${endStr}`;
 };
 
-const VibrantGradientTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const VibrantGradientTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Pick a website from social links

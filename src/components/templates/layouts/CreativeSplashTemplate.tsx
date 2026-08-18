@@ -17,7 +17,7 @@ const dateRange = (
   return `${s} – ${fmtDate(end)}`;
 };
 
-const CreativeSplashTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const CreativeSplashTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Extract website from social info

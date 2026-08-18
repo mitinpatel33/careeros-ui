@@ -31,7 +31,7 @@ const proficiencyToSegments = (p?: string | number) => {
 
 const MauveSidebarTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
 
   return (

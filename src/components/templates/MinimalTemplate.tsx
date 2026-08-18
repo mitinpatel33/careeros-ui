@@ -28,7 +28,7 @@ const MinimalTemplate = ({ data, themeColor }: Props) => {
         variant="h3"
         sx={{ fontWeight: 300, fontSize: { xs: 34, md: 48 } }}
       >
-        {data.personal?.fullName}
+        {data.personal?.firstName} + {` `} + {data.personal?.lastName}
       </Typography>
 
       <Typography sx={{ mt: 1, color: primary }}>
@@ -38,7 +38,17 @@ const MinimalTemplate = ({ data, themeColor }: Props) => {
       <Divider sx={{ my: 3 }} />
 
       {data.summary && (
-        <Block title="About" body={data.summary} color={primary} />
+        <Block
+          title="About"
+          body={
+            typeof data.summary === "string"
+              ? data.summary
+              : data.summary.professionalSummary ||
+                data.summary.careerObjective ||
+                ""
+          }
+          color={primary}
+        />
       )}
 
       {data.skills?.length ? (
@@ -51,7 +61,7 @@ const MinimalTemplate = ({ data, themeColor }: Props) => {
             Projects
           </Typography>
 
-          {data.projects.map((project) => (
+          {data.projects.map((project: any) => (
             <Box key={project.title} sx={{ mb: 2 }}>
               <Typography sx={{ fontWeight: 900 }}>{project.title}</Typography>
               <Typography color="text.secondary">

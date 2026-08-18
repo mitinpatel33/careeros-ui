@@ -22,7 +22,7 @@ function formatEducationYear(start?: Date | string, end?: Date | string): string
   return `${s} – ${e}`;
 }
 
-const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const AsymmetricTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   return (
@@ -71,7 +71,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
         )}
 
         {/* Experience – now using schema fields */}
-        {data.experience?.length > 0 && (
+        {data.experience && data.experience?.length > 0 && (
           <Section title="Experience">
             {data.experience.map((exp, i) => (
               <Box key={i} sx={{ mb: 2 }}>
@@ -88,7 +88,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
         )}
 
         {/* Education – using instituteName and date range */}
-        {data.education?.length > 0 && (
+        {data.education && data.education?.length > 0 && (
           <Section title="Education">
             {data.education.map((edu, i) => (
               <Typography key={i}>
@@ -102,7 +102,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
         )}
 
         {/* Optional: Achievements */}
-        {data.achievements?.length > 0 && (
+        {data.achievements && data.achievements?.length > 0 && (
           <Section title="Achievements">
             {data.achievements.map((ach, i) => (
               <Typography key={i} sx={{ fontSize: "0.9em" }}>
@@ -123,7 +123,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
         }}
       >
         {/* Skills – display skillName (and optionally proficiency) */}
-        {data.skills?.length > 0 && (
+        {data.skills && data.skills?.length > 0 && (
           <>
             <Typography
               variant="h6"
@@ -132,7 +132,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
               Skills
             </Typography>
             <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5, mb: 3 }}>
-              {data.skills.map((skill, i) => (
+              {data.skills && data.skills.map((skill, i) => (
                 <Box
                   key={i}
                   sx={{
@@ -159,7 +159,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
         )}
 
         {/* Certifications – now objects */}
-        {data.certifications?.length > 0 && (
+        {data.certifications && data.certifications?.length > 0 && (
           <>
             <Typography
               variant="h6"
@@ -167,7 +167,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
             >
               Certifications
             </Typography>
-            {data.certifications.map((cert, i) => (
+            {data.certifications && data.certifications.map((cert, i) => (
               <Typography key={i} sx={{ fontSize: "0.9em", mb: 0.5 }}>
                 <strong>{cert.certificateName}</strong>
                 {cert.issuedBy && ` – ${cert.issuedBy}`}
@@ -177,7 +177,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
         )}
 
         {/* Languages (new) */}
-        {data.languages?.length > 0 && (
+        {data.languages && data.languages?.length > 0 && (
           <>
             <Typography
               variant="h6"
@@ -185,7 +185,7 @@ const AsymmetricTemplate = ({ data, config, settings }: TemplateRenderProps) => 
             >
               Languages
             </Typography>
-            {data.languages.map((lang, i) => (
+            {data.languages && data.languages.map((lang, i) => (
               <Typography key={i} sx={{ fontSize: "0.9em" }}>
                 {lang.languageName}{" "}
                 {lang.proficiencyLevel && `(${lang.proficiencyLevel})`}

@@ -52,7 +52,7 @@ const formatDuration = (
   return `${startStr} – ${formatDate(end)}`;
 };
 
-const SkillBarsTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const SkillBarsTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Map skills to bar data

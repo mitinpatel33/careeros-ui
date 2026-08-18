@@ -22,7 +22,7 @@ const formatRange = (
   return `${startStr} – ${formatDate(end)}`;
 };
 
-const SidebarPhotoTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const SidebarPhotoTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Summary – use professionalSummary, fallback to careerObjective

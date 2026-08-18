@@ -27,7 +27,7 @@ const formatRange = (start?: Date | string, end?: Date | string, isCurrent?: boo
 
 const YellowNavyTimelineTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
   const location = [data.contact?.city, data.contact?.state].filter(Boolean).join(", ");
 
@@ -62,7 +62,7 @@ const YellowNavyTimelineTemplate = ({ data, settings }: TemplateRenderProps) => 
             <SideRow icon={<PhoneIcon sx={{ fontSize: 15 }} />} label="Phone" text={data.contact?.mobile} />
             <SideRow icon={<EmailIcon sx={{ fontSize: 15 }} />} label="Email" text={data.contact?.email} />
             <SideRow icon={<PlaceIcon sx={{ fontSize: 15 }} />} label="Location" text={location} />
-            <SideRow icon={<LinkedInIcon sx={{ fontSize: 15 }} />} label="LinkedIn" text={data.contact?.linkedin} />
+            <SideRow icon={<LinkedInIcon sx={{ fontSize: 15 }} />} label="LinkedIn" text={data.social?.linkedInUrl} />
 
             {data.certifications && data.certifications.length > 0 && (
               <>

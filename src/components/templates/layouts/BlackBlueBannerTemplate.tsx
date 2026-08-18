@@ -19,7 +19,7 @@ const formatRange = (start?: Date | string, end?: Date | string, isCurrent?: boo
 const BlackBlueBannerTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
 
   return (
     <Paper
@@ -47,7 +47,7 @@ const BlackBlueBannerTemplate = ({ data, settings }: TemplateRenderProps) => {
         <Box sx={{ mb: 3 }}>
           <Row icon={<PhoneIcon sx={{ fontSize: 14 }} />} text={data.contact?.mobile} />
           <Row icon={<EmailIcon sx={{ fontSize: 14 }} />} text={data.contact?.email} />
-          <Row icon={<LanguageIcon sx={{ fontSize: 14 }} />} text={data.contact?.website} />
+          <Row icon={<LanguageIcon sx={{ fontSize: 14 }} />} text={data.social?.websiteUrl} />
           <Row icon={<PlaceIcon sx={{ fontSize: 14 }} />} text={[data.contact?.address, data.contact?.city].filter(Boolean).join(", ")} />
         </Box>
 

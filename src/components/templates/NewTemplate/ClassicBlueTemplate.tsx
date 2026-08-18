@@ -6,16 +6,10 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import LanguageIcon from "@mui/icons-material/Language";
 import ResumePage from "./ResumePage";
-import type { ResumeData } from "../../../types/candidate/resume.types";
-import { getNormalizedResumeData } from "../../../utils/resumeUtils";
 
 const ACCENT = "#2c5282"; // Classic deep blue color
 const LIGHT_BG = "#ebf8ff"; // Contact header background blue tint
 const TEXT_COLOR = "#2d3748";
-
-interface Props {
-  data: ResumeData;
-}
 
 const formatDate = (dateStr?: string) => {
   if (!dateStr) return "";

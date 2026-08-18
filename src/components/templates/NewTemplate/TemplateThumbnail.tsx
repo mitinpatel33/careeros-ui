@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { A4_HEIGHT_PX, A4_WIDTH_PX } from "./resume";
-import { SAMPLE_RESUME_DATA } from "./sampleResumeData";
 import type { TemplateRegistryEntry } from "./registry";
+import { SAMPLE_RESUME_DATA } from "../../../utils/sampleResumeData";
 
 interface TemplateThumbnailProps {
   entry: TemplateRegistryEntry;

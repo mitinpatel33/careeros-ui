@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
-import Lottie from "lottie-react";
+import { Lottie } from "lottie-react";
 
 import AnimatedSectionCard from "../../../../components/common/AnimatedSectionCard";
 import SaveFooter from "../../../../layouts/SaveFooter";
@@ -17,6 +17,7 @@ import {
   usePublishProfileMutation,
   useCheckSlugQuery,
 } from "../../../../services/candidateprofileApi";
+import successAnimationData from "../../../../assets/success.json";
 
 const DOMAIN = "http://localhost:5000/resume";
 
@@ -209,7 +210,7 @@ const PublishSettings = ({
                     
                     {/* Animated Lottie Banner Effect */}
                     <Box sx={{ position: "absolute", top: -20, right: -20, width: 120, height: 120, pointerEvents: "none" }}>
-                      <Lottie animationData={successAnimationData} loop={false} />
+                      <Lottie src={successAnimationData} loop={false} autoplay />
                     </Box>
 
                     <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>

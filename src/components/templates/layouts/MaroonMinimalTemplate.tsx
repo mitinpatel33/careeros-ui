@@ -5,9 +5,6 @@ import type { TemplateRenderProps } from "../../../types/resumeTemplate.types";
 const MAROON = "#7a1f3d";
 const DARK = "#1a1a1a";
 const MUTED = "#555";
-const DOT_FILLED = MAROON;
-const DOT_EMPTY = "#e2d5da";
-const TOTAL_DOTS = 5;
 
 const formatDate = (d?: Date | string) => {
   if (!d) return "";
@@ -95,10 +92,10 @@ const MaroonMinimalTemplate = ({ data, settings }: TemplateRenderProps) => {
         {/* right column */}
         <Box>
           {/* === Work History === */}
-          {data.experiences && data.experiences.length > 0 && (
+          {data.experience && data.experience.length > 0 && (
             <>
               <SectionHeading title="Work History" />
-              {data.experiences.map((exp: any, i: any) => (
+              {data.experience.map((exp: any, i: any) => (
                 <Box key={i} sx={{ mb: 2.5 }}>
                   <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: DARK }}>
                     {exp.designation}
@@ -111,7 +108,7 @@ const MaroonMinimalTemplate = ({ data, settings }: TemplateRenderProps) => {
                   </Typography>
                   {exp.description && (
                     <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
-                      {exp.description.split(/\n+/).filter(Boolean).map((line, j) => (
+                      {exp.description.split(/\n+/).filter(Boolean).map((line:any, j:any) => (
                         <Typography component="li" key={j} sx={{ fontSize: 11.5, color: MUTED }}>
                           {line}
                         </Typography>
@@ -153,10 +150,10 @@ const MaroonMinimalTemplate = ({ data, settings }: TemplateRenderProps) => {
           )}
 
           {/* === Education === */}
-          {data.educations && data.educations.length > 0 && (
+          {data.education && data.education.length > 0 && (
             <>
               <SectionHeading title="Education" />
-              {data.educations.map((edu, i) => (
+              {data.education.map((edu, i) => (
                 <Box key={i} sx={{ mb: 1.5 }}>
                   <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: DARK }}>
                     {edu.degree}

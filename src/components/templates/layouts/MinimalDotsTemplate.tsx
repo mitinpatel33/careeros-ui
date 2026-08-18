@@ -1,7 +1,6 @@
 // MinimalDotsTemplate.tsx
 import { Box, Typography, Paper } from "@mui/material";
 import type { TemplateRenderProps } from "../../../types/resumeTemplate.types";
-import type { ResumeData } from "../../../types/resumeData.types"; // adjust path as needed
 
 /**
  * Helper: formats a date range into a readable string
@@ -24,7 +23,7 @@ const formatDuration = (
   return `${start} – ${end}`;
 };
 
-const MinimalDotsTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const MinimalDotsTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   return (

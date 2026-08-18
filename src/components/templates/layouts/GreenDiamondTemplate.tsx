@@ -30,7 +30,7 @@ const proficiencyToPercent = (p?: string | number) => {
 };
 
 const GreenDiamondTemplate = ({ data, settings }: TemplateRenderProps) => {
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
 
   return (
@@ -101,7 +101,7 @@ const GreenDiamondTemplate = ({ data, settings }: TemplateRenderProps) => {
         <SideHeading title="Contact" />
         <Box sx={{ mb: 1 }}>
           {data.contact?.mobile && <Typography sx={{ fontSize: 11.5, color: MUTED }}>Phone: {data.contact.mobile}</Typography>}
-          {data.contact?.website && <Typography sx={{ fontSize: 11.5, color: MUTED }}>Website: {data.contact.website}</Typography>}
+          {data.social?.websiteUrl && <Typography sx={{ fontSize: 11.5, color: MUTED }}>Website: {data.social?.websiteUrl}</Typography>}
           {data.contact?.email && <Typography sx={{ fontSize: 11.5, color: MUTED }}>Email: {data.contact.email}</Typography>}
         </Box>
       </Box>

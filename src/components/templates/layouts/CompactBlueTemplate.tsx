@@ -20,7 +20,7 @@ const formatRange = (start?: Date | string, end?: Date | string, isCurrent?: boo
 const CompactBlueTemplate = ({ data, settings }: TemplateRenderProps) => {
   const firstName = data.personal?.firstName ?? "";
   const lastName = data.personal?.lastName ?? "";
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
   const jobTitle = data.personal?.jobTitle ?? "";
   const summary = data.summary?.professionalSummary || data.summary?.careerObjective || "";
 
@@ -135,10 +135,10 @@ const CompactBlueTemplate = ({ data, settings }: TemplateRenderProps) => {
         )}
 
         {/* Education */}
-        {data.educations && data.educations.length > 0 && (
+        {data.education && data.education.length > 0 && (
           <>
             <MainHeading title="EDUCATION" />
-            {data.educations.map((edu, i) => (
+            {data.education.map((edu, i) => (
               <Box key={i} sx={{ mb: 0.8 }}>
                 <Typography sx={{ fontSize: 8, fontWeight: 700, color: DARK }}>
                   {edu.degree}: {edu.fieldOfStudy}
@@ -157,10 +157,10 @@ const CompactBlueTemplate = ({ data, settings }: TemplateRenderProps) => {
         )}
 
         {/* EXPERIENCE - as shown in image */}
-        {data.experiences && data.experiences.length > 0 && (
+        {data.experience && data.experience.length > 0 && (
           <>
             <MainHeading title="EXPERIENCE" />
-            {data.experiences.map((exp, i) => (
+            {data.experience.map((exp, i) => (
               <Box key={i} sx={{ mb: 0.8 }}>
                 <Typography sx={{ fontSize: 8, fontWeight: 700, color: DARK }}>
                   {exp.designation}

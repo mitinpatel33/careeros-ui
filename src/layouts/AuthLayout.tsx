@@ -1,73 +1,112 @@
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { styled, keyframes } from "@mui/material/styles";
+import { motion } from "framer-motion";
 
-// ─── Keyframes ──────────────────────────────────────────
+const ConstellationBg = () => {
+  const nodes = Array.from({ length: 24 }).map((_, i) => ({
+    id: i,
+    x: Math.random() * 100,
+    y: Math.random() * 100,
+    size: Math.random() * 4 + 2,
+    duration: Math.random() * 10 + 10,
+    delay: Math.random() * 3,
+  }));
 
-// Floating motion for decorative shapes
-const float = keyframes`
-  0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.3; }
-  50% { transform: translateY(-30px) rotate(8deg) scale(1.1); opacity: 0.6; }
-  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.3; }
-`;
+  return (
+    <Box
+      sx={{
+        position: "absolute",
+        inset: 0,
+        overflow: "hidden",
+        pointerEvents: "none",
+        zIndex: 1,
+      }}
+    >
+      {/* Background Radial Glow */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: "80vw",
+          height: "80vh",
+          background:
+            "radial-gradient(ellipse at center, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.05) 50%, transparent 70%)",
+          filter: "blur(60px)",
+        }}
+      />
 
-// Animated gradient (shifts background position)
-const moveGradient = keyframes`
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-`;
+      {/* Connected Grid Rays */}
+      <Box
+        component="svg"
+        sx={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          opacity: 0.2,
+        }}
+      >
+        <line x1="10%" y1="20%" x2="40%" y2="70%" stroke="#60a5fa" strokeWidth="1" strokeDasharray="5,5" />
+        <line x1="80%" y1="15%" x2="60%" y2="80%" stroke="#a78bfa" strokeWidth="1" strokeDasharray="5,5" />
+        <line x1="30%" y1="85%" x2="70%" y2="25%" stroke="#38bdf8" strokeWidth="1" strokeDasharray="5,5" />
+      </Box>
 
-// ─── Styled Components ──────────────────────────────────
-
-// Main container – animated gradient
-const AnimatedBox = styled(Box)({
-  minHeight: "100vh",
-  background: "linear-gradient(135deg, #667eea, #764ba2)",
-  backgroundSize: "400% 400%",
-  animation: `${moveGradient} 12s ease infinite`,
-  position: "relative",
-  overflow: "hidden",
-});
-
-// Decorative floating shape
-const Shape = styled(Box)<{
-  size: string;
-  top: string;
-  left: string;
-  delay: string;
-  duration: number;
-}>(({ size, top, left, delay, duration }) => ({
-  position: "absolute",
-  borderRadius: "50%",
-  background: "rgba(255, 255, 255, 0.08)",
-  backdropFilter: "blur(6px)",
-  border: "1px solid rgba(255, 255, 255, 0.12)",
-  width: size,
-  height: size,
-  top,
-  left,
-  animation: `${float} ${duration}s ease-in-out infinite`,
-  animationDelay: delay,
-  pointerEvents: "none", // allow clicks to pass through
-}));
-
-// ─── Component ──────────────────────────────────────────
+      {/* Floating Nodes */}
+      {nodes.map((node) => (
+        <Box
+          key={node.id}
+          component={motion.div}
+          animate={{
+            x: [0, Math.random() * 40 - 20, 0],
+            y: [0, Math.random() * 40 - 20, 0],
+            opacity: [0.3, 0.8, 0.3],
+            scale: [1, 1.3, 1],
+          }}
+          transition={{
+            duration: node.duration,
+            repeat: Infinity,
+            delay: node.delay,
+            ease: "easeInOut",
+          }}
+          sx={{
+            position: "absolute",
+            left: `${node.x}%`,
+            top: `${node.y}%`,
+            width: node.size,
+            height: node.size,
+            borderRadius: "50%",
+            bgcolor: node.id % 2 === 0 ? "#60a5fa" : "#c084fc",
+            boxShadow:
+              node.id % 2 === 0
+                ? "0 0 10px #3b82f6, 0 0 20px #3b82f6"
+                : "0 0 10px #a855f7, 0 0 20px #a855f7",
+          }}
+        />
+      ))}
+    </Box>
+  );
+};
 
 const AuthLayout = () => {
   return (
-    <AnimatedBox>
-      {/* Floating shapes – adjust positions/sizes as you like */}
-      <Shape size="200px" top="8%" left="3%" delay="0s" duration={6} />
-      <Shape size="150px" top="65%" left="85%" delay="2s" duration={8} />
-      <Shape size="120px" top="25%" left="75%" delay="4s" duration={5} />
-      <Shape size="180px" top="75%" left="8%" delay="1s" duration={7} />
-      <Shape size="100px" top="15%" left="55%" delay="3s" duration={9} />
-      <Shape size="140px" top="45%" left="45%" delay="5s" duration={6.5} />
+    <Box
+      sx={{
+        minHeight: "100vh",
+        width: "100%",
+        position: "relative",
+        overflow: "hidden",
+        display: "grid",
+        placeItems: "center",
+        background: "linear-gradient(135deg, #030712 0%, #0b1120 50%, #170d2b 100%)",
+      }}
+    >
+      <ConstellationBg />
 
-      {/* Your page content (login/signup forms) */}
-      <Outlet />
-    </AnimatedBox>
+      <Box sx={{ position: "relative", zIndex: 2, width: "100%", display: "grid", placeItems: "center" }}>
+        <Outlet />
+      </Box>
+    </Box>
   );
 };
 

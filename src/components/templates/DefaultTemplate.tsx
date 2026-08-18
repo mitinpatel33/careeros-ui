@@ -27,24 +27,24 @@ const DefaultTemplate = ({ data, themeColor }: Props) => {
     >
       {data.personal && (
         <Box sx={{ textAlign: "center" }}>
-          <Typography
+          {/* <Typography
             variant="h4"
             sx={{ fontWeight: 900, fontSize: { xs: 28, md: 36 } }}
           >
-            {data.personal.fullName}
-          </Typography>
+            {data.persona}
+          </Typography> */}
           <Typography sx={{ fontWeight: 700 }}>
             {data.personal.jobTitle}
           </Typography>
-          <Typography color="text.secondary">
+          {/* <Typography color="text.secondary">
             {data.personal.location}
-          </Typography>
+          </Typography> */}
         </Box>
       )}
 
       {data.contact && (
         <Typography sx={{ mt: 1, textAlign: "center", fontSize: 14 }}>
-          {data.contact.email} | {data.contact.phone}
+          {data.contact.email} | {data.contact.mobile}
         </Typography>
       )}
 
@@ -52,14 +52,14 @@ const DefaultTemplate = ({ data, themeColor }: Props) => {
 
       {data.summary && (
         <Section title="Summary" color={primary}>
-          <Typography>{data.summary}</Typography>
+          <Typography>{data.summary.professionalSummary}</Typography>
         </Section>
       )}
 
       {data.skills?.length ? (
         <Section title="Skills" color={primary}>
           <Stack direction="row" sx={{ flexWrap: "wrap", gap: 1 }}>
-            {data.skills.map((skill) => (
+            {data.skills.map((skill: any) => (
               <Chip key={skill} label={skill} />
             ))}
           </Stack>
@@ -68,7 +68,7 @@ const DefaultTemplate = ({ data, themeColor }: Props) => {
 
       {data.experience?.length ? (
         <Section title="Experience" color={primary}>
-          {data.experience.map((item) => (
+          {data.experience.map((item: any) => (
             <Box key={item.companyName} sx={{ mb: 2 }}>
               <Typography sx={{ fontWeight: 900 }}>
                 {item.designation} - {item.companyName}
@@ -87,10 +87,10 @@ const DefaultTemplate = ({ data, themeColor }: Props) => {
           {data.education.map((item) => (
             <Box key={item.degree} sx={{ mb: 2 }}>
               <Typography sx={{ fontWeight: 900 }}>{item.degree}</Typography>
-              <Typography>{item.university}</Typography>
-              <Typography sx={{ fontSize: 13, color: "text.secondary" }}>
-                {item.year}
-              </Typography>
+              <Typography>{item.instituteName}</Typography>
+              {/* <Typography sx={{ fontSize: 13, color: "text.secondary" }}>
+                {item.}
+              </Typography> */}
             </Box>
           ))}
         </Section>
@@ -98,7 +98,7 @@ const DefaultTemplate = ({ data, themeColor }: Props) => {
 
       {data.projects?.length ? (
         <Section title="Projects" color={primary}>
-          {data.projects.map((item) => (
+          {data.projects.map((item: any) => (
             <Box key={item.title} sx={{ mb: 2 }}>
               <Typography sx={{ fontWeight: 900 }}>{item.title}</Typography>
               <Typography sx={{ fontSize: 13, color: "text.secondary" }}>

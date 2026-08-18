@@ -29,7 +29,6 @@ const formatRange = (
 
 const ElegantClassicTemplate = ({
   data,
-  config,
   settings,
 }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${
@@ -143,7 +142,7 @@ const ElegantClassicTemplate = ({
               icon={<PlaceIcon sx={{ fontSize: 16 }} />}
               text={[data.contact?.address, data.contact?.city].filter(Boolean).join(", ")}
             />
-            <ContactRow icon={<LanguageIcon sx={{ fontSize: 16 }} />} text={data.contact?.website} />
+            <ContactRow icon={<LanguageIcon sx={{ fontSize: 16 }} />} text={data.social?.websiteUrl} />
           </ColumnBlock>
 
           {/* Education */}

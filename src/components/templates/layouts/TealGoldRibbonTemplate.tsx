@@ -25,7 +25,7 @@ const formatRange = (start?: Date | string, end?: Date | string, isCurrent?: boo
 const TealGoldRibbonTemplate = ({ data, settings }: TemplateRenderProps) => {
   const firstName = data.personal?.firstName ?? "";
   const lastName = data.personal?.lastName ?? "";
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
   const location = [data.contact?.city, data.contact?.country ?? data.contact?.state].filter(Boolean).join(", ");
 
@@ -86,7 +86,7 @@ const TealGoldRibbonTemplate = ({ data, settings }: TemplateRenderProps) => {
           <SidebarRow icon={<PhoneIcon sx={{ fontSize: 15 }} />} text={data.contact?.mobile} />
           <SidebarRow icon={<EmailIcon sx={{ fontSize: 15 }} />} text={data.contact?.email} />
           <SidebarRow icon={<PlaceIcon sx={{ fontSize: 15 }} />} text={location} />
-          <SidebarRow icon={<LinkedInIcon sx={{ fontSize: 15 }} />} text={data.contact?.linkedin} />
+          <SidebarRow icon={<LinkedInIcon sx={{ fontSize: 15 }} />} text={data.social?.linkedInUrl} />
 
           {data.skills && data.skills.length > 0 && (
             <>

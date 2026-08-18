@@ -56,7 +56,7 @@ const OliveAttorneyTemplate = ({ data, settings }: TemplateRenderProps) => {
             {data.contact?.city && <Typography sx={{ fontSize: 12, color: MUTED, mb: 0.5 }}>{data.contact.city}</Typography>}
             {data.contact?.mobile && <Typography sx={{ fontSize: 12, color: MUTED, mb: 0.5 }}>{data.contact.mobile}</Typography>}
             {data.contact?.email && <Typography sx={{ fontSize: 12, color: MUTED, mb: 0.5 }}>{data.contact.email}</Typography>}
-            {data.contact?.website && <Typography sx={{ fontSize: 12, color: MUTED }}>{data.contact.website}</Typography>}
+            {data.social?.websiteUrl && <Typography sx={{ fontSize: 12, color: MUTED }}>{data.social?.websiteUrl}</Typography>}
           </Box>
 
           {data.education && data.education.length > 0 && (

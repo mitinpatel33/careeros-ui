@@ -85,7 +85,7 @@ const CreamCoralTemplate = ({ data, settings }: TemplateRenderProps) => {
                 {[data.contact?.address, data.contact?.city].filter(Boolean).join(", ")}
               </Typography>
             )}
-            {data.contact?.website && <Typography sx={{ fontSize: 11, color: MUTED }}>{data.contact.website}</Typography>}
+            {data.social?.websiteUrl && <Typography sx={{ fontSize: 11, color: MUTED }}>{data.social?.websiteUrl}</Typography>}
           </Box>
 
           {data.skills && data.skills.length > 0 && (

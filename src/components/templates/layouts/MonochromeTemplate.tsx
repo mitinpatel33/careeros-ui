@@ -24,7 +24,7 @@ const formatDateRange = (
 const getYear = (d?: Date | string) =>
   d ? new Date(d).getFullYear().toString() : "";
 
-const MonochromeTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const MonochromeTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName =
     `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
@@ -77,7 +77,7 @@ const MonochromeTemplate = ({ data, config, settings }: TemplateRenderProps) => 
       {summaryText && <Section title="Profile">{summaryText}</Section>}
 
       {/* Experience */}
-      {data.experience?.length > 0 && (
+      {data.experience && data.experience.length > 0 && (
         <Section title="Experience">
           {data.experience.map((exp, i) => {
             const duration = formatDateRange(
@@ -99,7 +99,7 @@ const MonochromeTemplate = ({ data, config, settings }: TemplateRenderProps) => 
       )}
 
       {/* Education */}
-      {data.education?.length > 0 && (
+      {data.education && data.education?.length > 0 && (
         <Section title="Education">
           {data.education.map((edu, i) => {
             const yearRange = `${getYear(edu.startDate)} – ${getYear(edu.endDate) || "Present"}`;
@@ -114,7 +114,7 @@ const MonochromeTemplate = ({ data, config, settings }: TemplateRenderProps) => 
       )}
 
       {/* Skills */}
-      {data.skills?.length > 0 && (
+      {data.skills && data.skills?.length > 0 && (
         <Section title="Skills">
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {data.skills.map((skill, i) => (

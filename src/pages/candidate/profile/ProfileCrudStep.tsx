@@ -14,15 +14,27 @@ import AppFormField from "../../../components/common/AppFormField";
 export type FieldConfig<T> = {
   name: keyof T;
   label: string;
-  type?: "text" | "number" | "date" | "select" | "radio" | "checkbox" | "textarea" | "url";
+  type?:
+    | "text"
+    | "number"
+    | "date"
+    | "select"
+    | "radio"
+    | "checkbox"
+    | "textarea"
+    | "url"
+    | "autocomplete"; // Added autocomplete
   rows?: number;
   options?: { label: string; value: string | boolean }[];
+  onSearch?: (term: string) => void; // Pass search callback
+  loading?: boolean;                 // Pass loading indicator
+  freeSolo?: boolean;               // Pass freeSolo setting
 };
 
-// BaseItem now supports both 'id' and '_id'
+// BaseItem supports both 'id' and '_id'
 type BaseItem = {
   id?: string;
-  _id?: string;               // added
+  _id?: string;
   displayOrder?: number;
 };
 
@@ -37,7 +49,7 @@ type Props<T extends BaseItem> = {
   getTitle: (item: T) => string;
   getSubtitle?: (item: T) => string;
   onSave: (items: T[]) => Promise<void>;
-  onDeleteItem?: (item: T) => Promise<void>; // optional immediate delete
+  onDeleteItem?: (item: T) => Promise<void>;
 };
 
 const ProfileCrudStep = <T extends BaseItem>({
@@ -78,13 +90,11 @@ const ProfileCrudStep = <T extends BaseItem>({
     setOpen(true);
   };
 
-  // Helper to get the item's ID (either id or _id)
   const getItemId = (item: T): string | undefined => item.id || item._id;
 
   const saveItem = (values: T) => {
     const editingId = editingItem ? getItemId(editingItem) : undefined;
     if (editingId) {
-      // Update existing item
       setLocalItems(
         localItems.map((x) => {
           const currentId = getItemId(x);
@@ -92,7 +102,6 @@ const ProfileCrudStep = <T extends BaseItem>({
         })
       );
     } else {
-      // Add new item
       setLocalItems([
         ...localItems,
         {
@@ -107,11 +116,8 @@ const ProfileCrudStep = <T extends BaseItem>({
 
   const handleDelete = async (item: T) => {
     if (onDeleteItem) {
-      // Immediate delete via API
       await onDeleteItem(item);
-      // Parent will refetch and update items, which triggers useEffect
     } else {
-      // Batch delete: remove from local state
       const idToDelete = getItemId(item);
       if (idToDelete) {
         setLocalItems(localItems.filter((x) => getItemId(x) !== idToDelete));
@@ -124,7 +130,7 @@ const ProfileCrudStep = <T extends BaseItem>({
     try {
       await onSave(localItems);
     } catch (error) {
-      // error handled by parent
+      // Handled by parent
     } finally {
       setSaving(false);
     }
@@ -163,6 +169,9 @@ const ProfileCrudStep = <T extends BaseItem>({
                     type={field.type}
                     rows={field.rows}
                     options={field.options}
+                    onSearch={field.onSearch}
+                    loading={field.loading}
+                    freeSolo={field.freeSolo}
                   />
                 </Grid>
               ))}

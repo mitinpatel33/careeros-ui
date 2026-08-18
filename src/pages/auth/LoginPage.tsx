@@ -1,13 +1,24 @@
-import { Box, Typography, Stack, Divider, Button, type SvgIconProps, SvgIcon } from "@mui/material";
-import { Google, Facebook } from "@mui/icons-material";
+import { useState } from "react";
+import {
+  Box,
+  Typography,
+  Stack,
+  Divider,
+  SvgIcon,
+  type SvgIconProps,
+} from "@mui/material";
+import { Facebook } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useGoogleLogin } from "@react-oauth/google";
 
 import AuthCard from "../../components/common/AuthCard";
 import AppButton from "../../components/common/AppButton";
 import AppTextField from "../../components/common/AppTextField";
 import PasswordField from "../../components/common/PasswordField";
+import ActionIconButton from "../../components/common/ActionIconButton";
 
 import {
   loginSchema,
@@ -15,14 +26,10 @@ import {
 } from "../../validation/auth.validation";
 import { loginSuccess } from "../../store/auth/authSlice";
 import { useLoginMutation } from "../../services/authApi";
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../../hooks/useLogin";
 import { appToast } from "../../common/toast/appToast";
-import { useState } from "react";
-import ActionIconButton from "../../components/common/ActionIconButton";
-import { useGoogleLogin } from "@react-oauth/google";
 
-const GoogleIcon = (props: SvgIconProps) => (
+const GoogleIcon = ((props: SvgIconProps) => (
   <SvgIcon {...props} viewBox="0 0 24 24">
     <path
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
@@ -41,63 +48,89 @@ const GoogleIcon = (props: SvgIconProps) => (
       fill="#EA4335"
     />
   </SvgIcon>
+)) as typeof SvgIcon;
+
+const AnimatedRocket = () => (
+  <Box
+    component={motion.span}
+    animate={{ y: [0, -8, 0], x: [0, 3, 0], rotate: [0, 5, 0] }}
+    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+    sx={{
+      display: "inline-block",
+      position: "relative",
+      filter: "drop-shadow(0 0 10px rgba(249, 115, 22, 0.6))",
+      ml: 1,
+    }}
+  >
+    🚀
+  </Box>
 );
+
+// Shared input field styling for clean dark mode typography
+const darkTextFieldSx = {
+  "& .MuiInputLabel-root": {
+    color: "rgba(255, 255, 255, 0.7)",
+    fontSize: "0.9rem",
+    "&.Mui-focused": { color: "#60a5fa" },
+  },
+  "& .MuiOutlinedInput-root": {
+    color: "#fff",
+    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    borderRadius: "12px",
+    fontSize: "0.95rem",
+    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.18)" },
+    "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.35)" },
+    "&.Mui-focused fieldset": { borderColor: "#3b82f6", borderWidth: "2px" },
+  },
+  "& .MuiSvgIcon-root": { color: "rgba(255, 255, 255, 0.7)" },
+};
 
 const LoginPage = () => {
   const [login, { isLoading }] = useLoginMutation();
   const [socialLoading, setSocialLoading] = useState(false);
-
   const dispatch = useAppDispatch();
-
   const navigate = useNavigate();
 
   const { control, handleSubmit } = useForm<LoginSchemaType>({
     resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
+    defaultValues: { email: "", password: "" },
   });
 
   const handleLoginSuccess = (userData: any, message: string) => {
-    localStorage.setItem("token", userData.token ?? userData); // adjust based on your response shape
+    localStorage.setItem("token", userData.token ?? userData);
     localStorage.setItem("user", JSON.stringify(userData));
     dispatch(loginSuccess(userData));
 
-    if (userData.role === "Candidate") {
-      navigate("/candidate");
-    } else if (userData.role === "Company") {
-      navigate("/company");
-    } else {
-      navigate("/admin");
-    }
+    if (userData.role === "Candidate") navigate("/candidate");
+    else if (userData.role === "Company") navigate("/company");
+    else navigate("/admin");
 
     appToast.success(message);
   };
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: LoginSchemaType) => {
     try {
-      const response = await login(data).unwrap();
+      const response = await login({
+        ...data,
+        token: "",
+        provider: "email",
+      }).unwrap();
       handleLoginSuccess(response.data, response.message);
     } catch (error: any) {
-      console.log("error", error);
       appToast.error(error.data?.message || "Login failed");
     }
   };
 
-  // ---------- Google Login ----------
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       setSocialLoading(true);
       try {
-        // tokenResponse.access_token is the OAuth access token
         const response = await login({
           token: tokenResponse.access_token,
           provider: "google",
           email: "",
-          password: ""
+          password: "",
         }).unwrap();
-
         handleLoginSuccess(response.data, response.message);
       } catch (error: any) {
         appToast.error(error.data?.message || "Google login failed");
@@ -105,28 +138,16 @@ const LoginPage = () => {
         setSocialLoading(false);
       }
     },
-    onError: () => {
-      appToast.error("Google login failed");
-    },
+    onError: () => appToast.error("Google login failed"),
   });
 
-  // Then your button's onClick just calls this function
-  const handleGoogleLogin = () => googleLogin();
-
-  // ---------- Facebook Login ----------
   const handleFacebookLogin = async () => {
     setSocialLoading(true);
     try {
-      // 1. Get Facebook access token (e.g., using FB.login() or react-facebook-login)
-      // const fbResponse = await new Promise((resolve) => FB.login(resolve));
-      // const token = fbResponse.authResponse.accessToken;
-
-      // 2. Send token to backend
       const response = await login({
-        token: "MOCK_FACEBOOK_TOKEN", // replace with real token
+        token: "MOCK_FACEBOOK_TOKEN",
         provider: "facebook",
       } as any).unwrap();
-
       handleLoginSuccess(response.data, response.message);
     } catch (error: any) {
       appToast.error(error.data?.message || "Facebook login failed");
@@ -139,225 +160,162 @@ const LoginPage = () => {
 
   return (
     <Box
-      sx={{
-        minHeight: "100vh",
-        width: "100%",
-        background: "linear-gradient(135deg,#667eea,#764ba2)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        px: 2,
-        py: 3,
-        overflow: "hidden",
-      }}
+      component={motion.div}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      sx={{ width: "100%", maxWidth: 440, px: 2, zIndex: 2 }}
     >
-      <motion.div
-        initial={{
-          opacity: 0,
-          y: 30,
-        }}
-        animate={{
-          opacity: 1,
-          y: 0,
-        }}
-        transition={{
-          duration: 0.5,
-        }}
-        style={{
-          width: "100%",
-          maxWidth: "450px",
+      <AuthCard
+        sx={{
+          p: { xs: 3, sm: 4 },
+          borderRadius: 6,
+          background: "rgba(255, 255, 255, 0.05)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(255, 255, 255, 0.12)",
+          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+          color: "#fff",
         }}
       >
-        <AuthCard
-          sx={{
-            width: "100%",
-            p: {
-              xs: 3,
-              sm: 4,
-            },
-            borderRadius: 4,
-            background: "rgba(255,255,255,0.95)",
-            backdropFilter: "blur(20px)",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
-          }}
-        >
-          <Stack
-            spacing={{
-              xs: 3,
-              sm: 4,
-            }}
-          >
-            {/* Header */}
-
-            <Box
+        <Stack spacing={3}>
+          <Box sx={{ textAlign: "center" }}>
+            <Typography
               sx={{
-                textAlign: "center",
+                fontWeight: 800,
+                fontSize: { xs: "1.75rem", sm: "2rem" },
+                color: "#fff",
+                letterSpacing: "-0.5px",
               }}
             >
-              <Typography
-                sx={{
-                  fontWeight: 700,
-                  fontSize: {
-                    xs: "2rem",
-                    sm: "2.5rem",
-                  },
-                }}
-              >
-                Resume Maker
-              </Typography>
+              Career OS <AnimatedRocket />
+            </Typography>
+            <Typography
+              sx={{
+                color: "rgba(255, 255, 255, 0.65)",
+                mt: 0.5,
+                fontSize: "0.875rem",
+              }}
+            >
+              Create Professional & Animated Resumes
+            </Typography>
+          </Box>
 
-              <Typography
-                color="text.secondary"
-                sx={{
-                  mt: 1,
-                  fontSize: {
-                    xs: "0.9rem",
-                    sm: "1rem",
-                  },
-                }}
-              >
-                Create Professional & Animated Resumes
-              </Typography>
-            </Box>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={2.5}>
+              <AppTextField<LoginSchemaType>
+                name="email"
+                control={control}
+                label="Email Address"
+                fullWidth
+                sx={darkTextFieldSx}
+              />
 
-            {/* Form */}
+              <PasswordField<LoginSchemaType>
+                name="password"
+                control={control}
+                label="Password"
+                fullWidth
+                sx={darkTextFieldSx}
+              />
 
-            <form onSubmit={handleSubmit(onSubmit)}>
-              <Stack spacing={3}>
-                <AppTextField<LoginSchemaType>
-                  name="email"
-                  control={control}
-                  label="Email Address"
-                  fullWidth
-                />
-
-                <PasswordField<LoginSchemaType>
-                  name="password"
-                  control={control}
-                  label="Password"
-                  fullWidth
+              <Box sx={{ textAlign: "right" }}>
+                <Typography
                   sx={{
-                    "& .MuiOutlinedInput-root": {
-                      backgroundColor: "#EAF2FF", // Same background everywhere
-                      borderRadius: 3,
-                    },
-                  }}
-                />
-
-                <Box
-                  sx={{
-                    textAlign: "right",
+                    cursor: "pointer",
+                    color: "#60a5fa",
+                    fontSize: "0.85rem",
+                    "&:hover": { textDecoration: "underline" },
                   }}
                 >
-                  <Typography
-                    sx={{
-                      cursor: "pointer",
-                      color: "primary.main",
-                      fontSize: "0.9rem",
-                    }}
-                  >
-                    Forgot Password?
-                  </Typography>
-                </Box>
-
-                <AppButton type="submit" loading={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
-                </AppButton>
-              </Stack>
-            </form>
-
-            {/* Divider */}
-
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Divider
-                sx={{
-                  flex: 1,
-                }}
-              />
-
-              <Typography
-                sx={{
-                  mx: 2,
-                  fontSize: "0.85rem",
-                  whiteSpace: "nowrap",
-                }}
-                color="text.secondary"
-              >
-                OR CONTINUE WITH
-              </Typography>
-
-              <Divider
-                sx={{
-                  flex: 1,
-                }}
-              />
-            </Box>
-            {/* Social Login */}
-            <Stack
-              direction="row"
-              sx={{ justifyContent: "center" }}
-              spacing={2}
-            >
-              <ActionIconButton
-                title={"Google"}
-                onClick={handleGoogleLogin}
-                disabled={isAnyLoading}
-                icon={GoogleIcon}
-                aria-label="Continue with Google"
-                sx={{
-                  border: 1,
-                  borderColor: "grey.300",
-                  bgcolor: "white",
-                  "&:hover": { bgcolor: "grey.100" },
-                }}
-              />
-              <ActionIconButton
-                title={"Facebook"}
-                onClick={handleFacebookLogin}
-                disabled={isAnyLoading}
-                icon={Facebook}
-                aria-label="Continue with Facebook"
-                sx={{
-                  bgcolor: "#1877F2",
-                  color: "white",
-                  "&:hover": { bgcolor: "#166FE5" }
-                }}
-              />
-            </Stack>
-
-            {/* Footer */}
-
-            <Typography
-              color="text.secondary"
-              sx={{
-                fontSize: {
-                  xs: "0.9rem",
-                  sm: "1rem",
-                },
-                textAlign: "center",
-              }}
-            >
-              Don't have an account?{" "}
-              <Box
-                component="span"
-                sx={{
-                  color: "primary.main",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-                onClick={() => navigate("/register")}
-              >
-                Sign Up
+                  Forgot Password?
+                </Typography>
               </Box>
+
+              <AppButton
+                type="submit"
+                loading={isLoading}
+                sx={{
+                  py: 1.3,
+                  borderRadius: 3,
+                  fontWeight: 700,
+                  fontSize: "0.95rem",
+                  bgcolor: "#3b82f6",
+                  "&:hover": { bgcolor: "#2563eb" },
+                }}
+              >
+                {isLoading ? "Logging in..." : "Login"}
+              </AppButton>
+            </Stack>
+          </form>
+
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Divider
+              sx={{ flex: 1, borderColor: "rgba(255, 255, 255, 0.15)" }}
+            />
+            <Typography
+              sx={{
+                mx: 2,
+                fontSize: "0.75rem",
+                color: "rgba(255,255,255,0.5)",
+                fontWeight: 700,
+                letterSpacing: "0.5px",
+              }}
+            >
+              OR CONTINUE WITH
             </Typography>
+            <Divider
+              sx={{ flex: 1, borderColor: "rgba(255, 255, 255, 0.15)" }}
+            />
+          </Box>
+
+          <Stack direction="row" spacing={2} sx={{ justifyContent: "center" }}>
+            <ActionIconButton
+              title="Google"
+              onClick={() => googleLogin()}
+              disabled={isAnyLoading}
+              icon={GoogleIcon}
+              sx={{
+                bgcolor: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.2)",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.18)" },
+              }}
+            />
+            <ActionIconButton
+              title="Facebook"
+              onClick={handleFacebookLogin}
+              disabled={isAnyLoading}
+              icon={Facebook}
+              sx={{
+                bgcolor: "#1877F2",
+                color: "#fff",
+                "&:hover": { bgcolor: "#166FE5" },
+              }}
+            />
           </Stack>
-        </AuthCard>
-      </motion.div>
+
+          <Typography
+            sx={{
+              color: "rgba(255, 255, 255, 0.7)",
+              fontSize: "0.875rem",
+              textAlign: "center",
+            }}
+          >
+            Don't have an account?{" "}
+            <Box
+              component="span"
+              onClick={() => navigate("/register")}
+              sx={{
+                color: "#60a5fa",
+                fontWeight: 700,
+                cursor: "pointer",
+                textDecoration: "underline",
+              }}
+            >
+              Sign Up
+            </Box>
+          </Typography>
+        </Stack>
+      </AuthCard>
     </Box>
   );
 };

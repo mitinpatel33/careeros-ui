@@ -150,7 +150,7 @@ const PersonalDetails = memo(
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={3}>
-            <Grid container spacing={2.5}>
+            <Grid container spacing={2.5} sx={{ alignItems: "flex-start" }}>
               <Grid size={{ xs: 12 }}>
                 <Controller
                   name="photoUrl"
@@ -279,6 +279,7 @@ const PersonalDetails = memo(
                   label="Marital Status"
                   type="select"
                   options={maritalStatusOptions}
+                  
                 />
               </Grid>
               {/* <Grid size={{ xs: 12, md: 6 }}>

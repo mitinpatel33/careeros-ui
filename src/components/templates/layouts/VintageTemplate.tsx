@@ -20,7 +20,7 @@ const formatDuration = (
 };
 
 /* ---------- component ---------- */
-const VintageTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const VintageTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Combine summary fields into a single string for display

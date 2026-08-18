@@ -29,7 +29,7 @@ const endpointNameMap: Record<string, keyof typeof aiApi.endpoints> = {
   "/ai/generate-summary": "generateSummary",
   "/ai/enhance-description": "enhanceDescription",
   "/ai/suggest-skills": "suggestSkills",
-  "/ai/suggest-social": "suggestSocial",        // fixed typo
+  "/ai/suggest-social": "suggectSocial",        // fixed typo
   "/ai/suggest-certificate": "suggestCertificates",
 };
 

@@ -22,7 +22,7 @@ const formatDuration = (
 };
 /* ------------------------------ */
 
-const TimelineTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const TimelineTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Summary – use whichever is available

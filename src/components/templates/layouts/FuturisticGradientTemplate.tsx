@@ -21,7 +21,7 @@ const formatDuration = (
 };
 
 // ----------------------------------------------------------------------
-const FuturisticGradientTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const FuturisticGradientTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Determine a website/social URL to display (pick one)

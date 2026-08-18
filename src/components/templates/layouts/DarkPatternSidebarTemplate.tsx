@@ -24,7 +24,7 @@ const formatRange = (start?: Date | string, end?: Date | string, isCurrent?: boo
 
 const DarkPatternSidebarTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
   const jobTitle = data.personal?.jobTitle || "";
 
@@ -73,10 +73,10 @@ const DarkPatternSidebarTemplate = ({ data, settings }: TemplateRenderProps) => 
         <SideRow icon={<EmailIcon sx={{ fontSize: 14 }} />} text={data.contact?.email} />
 
         {/* Education (correct key: educations) */}
-        {data.educations && data.educations.length > 0 && (
+        {data.education && data.education.length > 0 && (
           <>
             <SideHeading title="EDUCATION" />
-            {data.educations.map((edu, i) => (
+            {data.education.map((edu, i) => (
               <Box key={i} sx={{ mb: 1.5 }}>
                 <Typography sx={{ fontSize: 10.5, fontWeight: 700, color: "#eee" }}>
                   {edu.degree}{edu.fieldOfStudy ? ` | ${edu.fieldOfStudy}` : ""}
@@ -151,10 +151,10 @@ const DarkPatternSidebarTemplate = ({ data, settings }: TemplateRenderProps) => 
         )}
 
         {/* Work History (correct key: experiences) */}
-        {data.experiences && data.experiences.length > 0 && (
+        {data.experience && data.experience.length > 0 && (
           <>
             <MainHeading title="WORK HISTORY" />
-            {data.experiences.map((exp, i) => (
+            {data.experience.map((exp, i) => (
               <Box key={i} sx={{ mb: 2 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: DARK }}>
@@ -169,7 +169,7 @@ const DarkPatternSidebarTemplate = ({ data, settings }: TemplateRenderProps) => 
                 </Typography>
                 {exp.description && (
                   <Box component="ul" sx={{ m: 0, pl: 2.5, mt: 0.5 }}>
-                    {exp.description.split(/\n+/).filter(Boolean).map((line, j) => (
+                    {exp.description.split(/\n+/).filter(Boolean).map((line: any, j: any) => (
                       <Typography component="li" key={j} sx={{ fontSize: 11.5, color: MUTED }}>
                         {line}
                       </Typography>

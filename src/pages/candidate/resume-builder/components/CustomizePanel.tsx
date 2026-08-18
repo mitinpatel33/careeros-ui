@@ -354,7 +354,7 @@ const CustomizePanel = ({
                           borderRadius: 3,
                           p: 1.3,
                           background:
-                            template.id === "modernGradient"
+                            template.id === "futuristicGradient"
                               ? "linear-gradient(135deg,#2563eb,#9333ea)"
                               : template.primaryColor,
                         }}

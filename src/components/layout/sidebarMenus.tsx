@@ -2,7 +2,6 @@ import {
   Dashboard,
   Person,
   Description,
-  UploadFile,
   Palette,
   Analytics,
   Settings,

@@ -35,7 +35,7 @@ const NavySidebarReferenceTemplate = ({ data, settings }: TemplateRenderProps) =
   }
   if (data.contact?.mobile) contactLines.push(data.contact.mobile);
   if (data.contact?.email) contactLines.push(data.contact.email);
-  if (data.contact?.website) contactLines.push(data.contact.website);
+  if (data.social?.websiteUrl) contactLines.push(data.social?.websiteUrl);
 
   return (
     <Paper
@@ -142,12 +142,12 @@ const NavySidebarReferenceTemplate = ({ data, settings }: TemplateRenderProps) =
         <Divider sx={{ my: 2 }} />
 
         {/* Education */}
-        {data.educations && data.educations.length > 0 && (
+        {data.education && data.education.length > 0 && (
           <>
             <Typography sx={{ fontSize: 15, fontWeight: 700, color: MAIN_TEXT, mb: 1.5 }}>
               Education
             </Typography>
-            {data.educations.map((edu, i) => (
+            {data.education.map((edu, i) => (
               <Box key={i} sx={{ mb: 2 }}>
                 <Typography sx={{ fontSize: 13, fontWeight: 700, color: MAIN_TEXT }}>
                   {edu.degree}
@@ -156,7 +156,7 @@ const NavySidebarReferenceTemplate = ({ data, settings }: TemplateRenderProps) =
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <Typography sx={{ fontSize: 12, color: MUTED }}>
                     {edu.instituteName}
-                    {edu.location ? `, ${edu.location}` : ""}
+                    {/* {edu.location ? `, ${edu.location}` : ""} */}
                   </Typography>
                   <Typography sx={{ fontSize: 12, color: LIGHT_MUTED }}>
                     {edu.startDate && formatDate(edu.startDate)}
@@ -175,12 +175,12 @@ const NavySidebarReferenceTemplate = ({ data, settings }: TemplateRenderProps) =
         )}
 
         {/* Work History */}
-        {data.experiences && data.experiences.length > 0 && (
+        {data.experience && data.experience.length > 0 && (
           <>
             <Typography sx={{ fontSize: 15, fontWeight: 700, color: MAIN_TEXT, mb: 1.5 }}>
               Work History
             </Typography>
-            {data.experiences.map((exp, i) => (
+            {data.experience.map((exp, i) => (
               <Box key={i} sx={{ mb: 2.5 }}>
                 <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
                   <Typography sx={{ fontSize: 14, fontWeight: 700, color: MAIN_TEXT }}>
@@ -196,7 +196,7 @@ const NavySidebarReferenceTemplate = ({ data, settings }: TemplateRenderProps) =
                 </Typography>
                 {exp.description && (
                   <Box component="ul" sx={{ m: 0, pl: 2, listStyleType: "disc" }}>
-                    {exp.description.split(/\n+/).filter(Boolean).map((line, j) => (
+                    {exp.description.split(/\n+/).filter(Boolean).map((line: any, j: any) => (
                       <Typography component="li" key={j} sx={{ fontSize: 12, color: MUTED }}>
                         {line}
                       </Typography>

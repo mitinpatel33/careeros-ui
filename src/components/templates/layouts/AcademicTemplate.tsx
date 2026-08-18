@@ -22,7 +22,7 @@ const formatRange = (
   return `${startStr} – ${formatDate(end)}`;
 };
 
-const AcademicTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const AcademicTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Summary – pick the most relevant string

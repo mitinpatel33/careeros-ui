@@ -1,5 +1,7 @@
 import {
+  Autocomplete,
   Checkbox,
+  CircularProgress,
   FormControl,
   FormControlLabel,
   FormHelperText,
@@ -17,7 +19,7 @@ import {
   type Path,
 } from "react-hook-form";
 
-type Option = {
+export type Option = {
   label: string;
   value: string | boolean;
 };
@@ -27,20 +29,25 @@ type Props<T extends FieldValues> = {
   control: Control<T>;
   label: string;
   type?:
-  | "text"
-  | "number"
-  | "date"
-  | "select"
-  | "radio"
-  | "checkbox"
-  | "textarea"
-  | "url"
-  | "email";
+    | "text"
+    | "number"
+    | "date"
+    | "select"
+    | "radio"
+    | "checkbox"
+    | "textarea"
+    | "url"
+    | "email"
+    | "autocomplete";
   options?: Option[];
   rows?: number;
   disabled?: boolean;
+  loading?: boolean;
+  freeSolo?: boolean;
+  onSearch?: (term: string) => void;
   onValueChange?: (value: unknown) => void;
   endAdornment?: ReactNode;
+  selectProps?: object;
 };
 
 const AppFormField = <T extends FieldValues>({
@@ -51,8 +58,12 @@ const AppFormField = <T extends FieldValues>({
   options = [],
   rows = 3,
   disabled = false,
+  loading = false,
+  freeSolo = true,
+  onSearch,
   onValueChange,
   endAdornment,
+  selectProps,
 }: Props<T>) => {
   return (
     <Controller
@@ -109,6 +120,60 @@ const AppFormField = <T extends FieldValues>({
           );
         }
 
+        if (type === "autocomplete") {
+          return (
+            <Autocomplete
+              freeSolo={freeSolo}
+              disabled={disabled}
+              options={options.map((o) => o.label)}
+              value={(field.value as string) || ""}
+              onInputChange={(_, newInputValue, reason) => {
+                if (freeSolo) {
+                  handleChange(newInputValue);
+                }
+                if (reason === "input" || reason === "clear") {
+                  onSearch?.(newInputValue);
+                }
+              }}
+              onChange={(_, newValue) => {
+                const val =
+                  typeof newValue === "string" ? newValue : newValue || "";
+                handleChange(val);
+              }}
+              renderInput={(params) => {
+                const defaultEndAdornment = (params.slotProps?.input as {
+                  endAdornment?: ReactNode;
+                } | undefined)?.endAdornment;
+
+                return (
+                  <TextField
+                    {...params}
+                    fullWidth
+                    label={label}
+                    error={error}
+                    helperText={helperText}
+                    slotProps={{
+                      ...params.slotProps,
+                      input: {
+                        ...params.slotProps?.input,
+                        endAdornment: (
+                          <>
+                            {loading ? (
+                              <CircularProgress color="inherit" size={20} />
+                            ) : null}
+                            {defaultEndAdornment}
+                            {endAdornment}
+                          </>
+                        ),
+                      },
+                    }}
+                  />
+                );
+              }}
+            />
+          );
+        }
+
         return (
           <TextField
             {...field}
@@ -125,6 +190,7 @@ const AppFormField = <T extends FieldValues>({
             slotProps={{
               inputLabel: type === "date" ? { shrink: true } : undefined,
               input: endAdornment ? { endAdornment } : undefined,
+              select: type === "select" ? selectProps : undefined,
             }}
             value={field.value ?? ""}
           >

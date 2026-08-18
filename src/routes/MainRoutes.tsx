@@ -10,7 +10,7 @@ import VerifyOtpPage from "../pages/auth/VerifyOtpPage";
 
 import DashboardPage from "../pages/candidate/dashboard/DashboardPage";
 import ProfilePage from "../pages/candidate/profile/ProfilePage";
-import ResumeBuilderPage from "../pages/candidate/resume-builder/ResumeBuilderPage";
+// import ResumeBuilderPage from "../pages/candidate/resume-builder/ResumeBuilderPage";
 
 import CompanyDashboard from "../pages/company/CompanyDashboard";
 import CompanyProfilePage from "../pages/company/profile/CompanyProfilePage";
@@ -99,10 +99,10 @@ const MainRoutes = () => {
                   path: "profile/view",
                   element: <CandidateProfileView />,
                 },
-                {
-                  path: "resume-builder",
-                  element: <ResumeBuilderPage />,
-                },
+                // {
+                //   path: "resume-builder",
+                //   element: <ResumeBuilderPage />,
+                // },
               ],
             },
           ],

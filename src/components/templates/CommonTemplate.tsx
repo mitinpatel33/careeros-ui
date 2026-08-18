@@ -43,17 +43,17 @@ const CommonTemplate = ({ data, template, themeColor }: Props) => {
       {isTwoColumn ? (
         <Box sx={{ display: "grid", gridTemplateColumns: "260px 1fr", minHeight: "1123px" }}>
           <Box sx={{ bgcolor: primary, color: "#fff", p: 4 }}>
-            <Typography variant="h4" sx={{ fontWeight: 900 }}>
+            {/* <Typography variant="h4" sx={{ fontWeight: 900 }}>
               {data.personal?.fullName}
-            </Typography>
+            </Typography> */}
             <Typography sx={{ mt: 1 }}>{data.personal?.jobTitle}</Typography>
 
             <Divider sx={{ my: 3, borderColor: "rgba(255,255,255,0.35)" }} />
 
             <SmallTitle title="Contact" color="#fff" />
             <Typography sx={{ fontSize: 13 }}>{data.contact?.email}</Typography>
-            <Typography sx={{ fontSize: 13 }}>{data.contact?.phone}</Typography>
-            <Typography sx={{ fontSize: 13 }}>{data.personal?.location}</Typography>
+            {/* <Typography sx={{ fontSize: 13 }}>{data.contact?.phone}</Typography>
+            <Typography sx={{ fontSize: 13 }}>{data.personal?.location}</Typography> */}
 
             {data.skills?.length ? (
               <Box sx={{ mt: 3 }}>
@@ -80,21 +80,21 @@ const CommonTemplate = ({ data, template, themeColor }: Props) => {
               borderBottom: isElegant ? `5px solid ${primary}` : "none",
             }}
           >
-            <Typography
+            {/* <Typography
               variant={isMinimal ? "h3" : "h4"}
               sx={{ fontWeight: isMinimal ? 300 : 900 }}
             >
               {data.personal?.fullName}
-            </Typography>
+            </Typography> */}
 
             <Typography sx={{ fontWeight: 700 }}>{data.personal?.jobTitle}</Typography>
-            <Typography sx={{ fontSize: 13 }}>
+            {/* <Typography sx={{ fontSize: 13 }}>
               {data.personal?.location}
-            </Typography>
+            </Typography> */}
 
             {data.contact && (
               <Typography sx={{ fontSize: 13, mt: 1 }}>
-                {data.contact.email} | {data.contact.phone}
+                {data.contact.email} | {data.contact.mobile}
               </Typography>
             )}
           </Box>
@@ -120,7 +120,7 @@ const ResumeBody = ({
   <>
     {data.summary && (
       <Section title="Summary" color={primary}>
-        <Typography sx={{ fontSize: 14 }}>{data.summary}</Typography>
+        <Typography sx={{ fontSize: 14 }}>{data.summary.professionalSummary}</Typography>
       </Section>
     )}
 

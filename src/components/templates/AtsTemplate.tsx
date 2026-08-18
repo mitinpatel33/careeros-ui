@@ -25,23 +25,23 @@ const AtsTemplate = ({ data, themeColor }: Props) => {
         border: "1px solid #ddd",
       }}
     >
-      <Typography
+      {/* <Typography
         variant="h4"
         sx={{ fontWeight: 900, fontSize: { xs: 28, md: 36 } }}
       >
         {data.personal?.fullName}
-      </Typography>
+      </Typography> */}
 
       <Typography>{data.personal?.jobTitle}</Typography>
       <Typography sx={{ fontSize: 14 }}>
-        {data.contact?.email} | {data.contact?.phone}
+        {/* {data.contact?.email} | {data.contact?.phone} */}
       </Typography>
 
       <Divider sx={{ my: 2 }} />
 
-      {data.summary && (
-        <Section title="SUMMARY" color={primary} content={data.summary} />
-      )}
+      {/* {data.summary && ( */}
+        {/* // <Section title="SUMMARY" color={primary} content={data.summary} /> */}
+      {/* )} */}
 
       {data.skills?.length ? (
         <Section
@@ -62,7 +62,7 @@ const AtsTemplate = ({ data, themeColor }: Props) => {
               <Typography sx={{ fontWeight: 800 }}>
                 {item.designation}, {item.companyName}
               </Typography>
-              <Typography sx={{ fontSize: 13 }}>{item.duration}</Typography>
+              {/* <Typography sx={{ fontSize: 13 }}>{item.duration}</Typography> */}
               <Typography>{item.description}</Typography>
             </Box>
           ))}
@@ -77,7 +77,7 @@ const AtsTemplate = ({ data, themeColor }: Props) => {
 
           {data.education.map((item) => (
             <Typography key={item.degree}>
-              {item.degree}, {item.university}, {item.year}
+              {item.degree}, {item.instituteName}
             </Typography>
           ))}
         </Box>

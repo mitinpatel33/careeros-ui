@@ -1,8 +1,6 @@
 // CorporateTemplate.tsx
 import { Box, Typography, Paper } from "@mui/material";
 import type { TemplateRenderProps } from "../../../types/resumeTemplate.types";
-import type { ResumeData } from "../../../types/resumeData.types"; // import new type
-
 /**
  * Helper to format date range from start/end date and isCurrent flag.
  */
@@ -23,7 +21,7 @@ const formatDuration = (
   return `${start} – ${end}`;
 };
 
-const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const CorporateTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Determine which summary text to use
@@ -66,11 +64,10 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
         </Box>
       </Box>
 
-      {/* Professional Summary */}
       {summaryText && <Section title="Professional Summary">{summaryText}</Section>}
 
       {/* Experience */}
-      {data.experience?.length > 0 && (
+      {data.experience && data.experience?.length > 0 && (
         <Section title="Experience">
           {data.experience.map((exp, i) => (
             <Box key={i} sx={{ mb: 2 }}>
@@ -87,7 +84,7 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
       )}
 
       {/* Education */}
-      {data.education?.length > 0 && (
+      {data.education && data.education?.length > 0 && (
         <Section title="Education">
           {data.education.map((edu, i) => (
             <Typography key={i}>
@@ -105,7 +102,7 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
       )}
 
       {/* Skills */}
-      {data.skills?.length > 0 && (
+      {data.skills && data.skills?.length > 0 && (
         <Section title="Skills">
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {data.skills.map((skill, i) => (
@@ -127,7 +124,7 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
       )}
 
       {/* Projects (optional) */}
-      {data.projects?.length > 0 && (
+      {data.projects && data.projects?.length > 0 && (
         <Section title="Projects">
           {data.projects.map((proj, i) => (
             <Box key={i} sx={{ mb: 2 }}>
@@ -135,7 +132,7 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
                 {proj.projectName}
                 {proj.role ? ` (${proj.role})` : ""}
               </Typography>
-              {proj.technologies?.length > 0 && (
+              {proj.technologies && proj.technologies?.length > 0 && (
                 <Typography sx={{ color: "#777", fontSize: "0.9em" }}>
                   Technologies: {proj.technologies.join(", ")}
                 </Typography>
@@ -147,7 +144,7 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
       )}
 
       {/* Certifications (optional) */}
-      {data.certifications?.length > 0 && (
+      {data.certifications && data.certifications?.length > 0 && (
         <Section title="Certifications">
           {data.certifications.map((cert, i) => (
             <Typography key={i}>
@@ -159,7 +156,7 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
       )}
 
       {/* Achievements (optional) */}
-      {data.achievements?.length > 0 && (
+      {data.achievements && data.achievements?.length > 0 && (
         <Section title="Achievements">
           {data.achievements.map((ach, i) => (
             <Typography key={i}>
@@ -172,7 +169,7 @@ const CorporateTemplate = ({ data, config, settings }: TemplateRenderProps) => {
       )}
 
       {/* Languages (optional) */}
-      {data.languages?.length > 0 && (
+      {data.languages && data.languages?.length > 0 && (
         <Section title="Languages">
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
             {data.languages.map((lang, i) => (

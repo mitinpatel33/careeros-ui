@@ -21,19 +21,45 @@ import {
 
 import CompanyStatCard from "../components/CompanyStatCard";
 import CandidateCard from "./CandidateCard";
-
-import type { CandidateItem } from "../../../types/candidateProfile.types";
 import CandidateDetailsDrawer from "./CandidateDetailsDrawer";
 
-const initialCandidates: CandidateItem[] = [
+export type PipelineStage = "Applied" | "Screening" | "Interview" | "Shortlisted" | "Hired" | "Rejected";
+
+export type PipelineCandidate = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  jobId?: string;
+  jobTitle?: string;
+  location: string;
+  experience: string;
+  match: number;
+  matchScore?: number;
+  atsScore: number;
+  appliedDate?: string;
+  currentStage?: PipelineStage;
+  skills: string[];
+  matchedSkills?: string[];
+  missingSkills?: string[];
+  summary: string;
+  notes?: string[];
+  avatarUrl?: string;
+  expectedSalary?: string;
+  availability?: string;
+  education?: string;
+  status: string;
+  saved: boolean;
+};
+
+const initialCandidates: PipelineCandidate[] = [
   {
     id: "1",
     name: "Mitin Patel",
     role: "Full Stack Developer",
     location: "Surat",
     experience: "3 Years",
-    expectedSalary: "₹8 LPA",
-    availability: "Immediate",
     match: 94,
     atsScore: 96,
     email: "mitin@example.com",
@@ -72,10 +98,10 @@ const initialCandidates: CandidateItem[] = [
 
 const CandidateSearchPage = () => {
   const [candidates, setCandidates] =
-    useState<CandidateItem[]>(initialCandidates);
+    useState<PipelineCandidate[]>(initialCandidates);
 
   const [selectedCandidate, setSelectedCandidate] =
-    useState<CandidateItem | null>(null);
+    useState<PipelineCandidate | null>(null);
 
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
@@ -101,7 +127,7 @@ const CandidateSearchPage = () => {
 
       const matchScore =
         match === "All" ||
-        candidate.match >= Number(match);
+        candidate?.match >= Number(match);
 
       return (
         matchSearch &&
@@ -136,8 +162,6 @@ const CandidateSearchPage = () => {
     <Box>
       <Stack
         direction={{ xs: "column", md: "row" }}
-        
-        
         spacing={2}
         sx={{ mb: 3, justifyContent: "space-between", alignItems: { xs: "flex-start", md: "center" } }}
       >
@@ -167,7 +191,7 @@ const CandidateSearchPage = () => {
       </Stack>
 
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <Grid size={{xs: 12, sm: 6, lg: 3}}>
           <CompanyStatCard
             title="Total Candidates"
             subtitle="Resume database"
@@ -177,7 +201,7 @@ const CandidateSearchPage = () => {
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <Grid size={{xs: 12, sm: 6, lg: 3}}>
           <CompanyStatCard
             title="Top Match"
             subtitle="Best candidate"
@@ -187,7 +211,7 @@ const CandidateSearchPage = () => {
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <Grid size={{xs: 12, sm: 6, lg: 3}}>
           <CompanyStatCard
             title="Saved"
             subtitle="Saved profiles"
@@ -197,7 +221,7 @@ const CandidateSearchPage = () => {
           />
         </Grid>
 
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+        <Grid size={{xs: 12, sm: 6, lg: 3}}>
           <CompanyStatCard
             title="Shortlisted"
             subtitle="Ready for review"
@@ -218,7 +242,7 @@ const CandidateSearchPage = () => {
         }}
       >
         <Grid container spacing={2}>
-          <Grid size={{ xs: 12, md: 4 }}>
+          <Grid size={{xs: 12, md: 4}}>
             <TextField
               fullWidth
               label="Search skills, role or name"
@@ -227,7 +251,7 @@ const CandidateSearchPage = () => {
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 3 }}>
+          <Grid size={{xs: 12, md: 3}}>
             <TextField
               fullWidth
               label="Location"
@@ -236,7 +260,7 @@ const CandidateSearchPage = () => {
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 2 }}>
+          <Grid size={{xs: 12, md: 2}}>
             <TextField
               select
               fullWidth
@@ -252,7 +276,7 @@ const CandidateSearchPage = () => {
             </TextField>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 2 }}>
+          <Grid size={{xs: 12, md: 2}}>
             <TextField
               select
               fullWidth
@@ -267,7 +291,7 @@ const CandidateSearchPage = () => {
             </TextField>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 1 }}>
+          <Grid size={{xs: 12, md: 1}}>
             <Button
               fullWidth
               variant="contained"
@@ -285,7 +309,7 @@ const CandidateSearchPage = () => {
 
       <Grid container spacing={3}>
         {filteredCandidates.map((candidate) => (
-          <Grid key={candidate.id} size={{ xs: 12, md: 6, xl: 4 }}>
+          <Grid key={candidate.id} size={{xs: 12, md: 6, xl: 4}}>
             <CandidateCard
               candidate={candidate}
               onView={(selected) => setSelectedCandidate(selected)}

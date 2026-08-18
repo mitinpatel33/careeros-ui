@@ -26,13 +26,11 @@ import {
   AlignLeft,
   AlignRight,
   Bold,
-  CaseUpper,
   Check,
   Circle,
   Italic,
   Minus,
   Square,
-  Type,
   Underline,
 } from "lucide-react";
 

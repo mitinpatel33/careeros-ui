@@ -220,7 +220,7 @@ export type ResumeData = {
   };
 
   // From candidateSummary schema (can be merged into a string later)
-  summary?: {
+  summary: {
     professionalSummary?: string;
     careerObjective?: string;
   };

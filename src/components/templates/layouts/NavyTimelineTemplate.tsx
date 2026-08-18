@@ -44,7 +44,7 @@ const proficiencyToDots = (p?: string | number) => {
 const NavyTimelineTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
-  const location = [data.contact?.city, data.contact?.state, data.contact?.zip].filter(Boolean).join(", ");
+  const location = [data.contact?.city, data.contact?.state, data.contact?.pincode].filter(Boolean).join(", ");
 
   return (
     <Paper

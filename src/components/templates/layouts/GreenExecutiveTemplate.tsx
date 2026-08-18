@@ -18,7 +18,7 @@ const formatRange = (start?: Date | string, end?: Date | string, isCurrent?: boo
 
 const GreenExecutiveTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
-  const photoUrl = data.personal?.photoUrl ?? data.personal?.profileImage;
+  const photoUrl = data.personal?.photoUrl ?? data.personal?.photoUrl;
   const summaryText = data.summary?.professionalSummary || data.summary?.careerObjective || "";
 
   return (
@@ -40,7 +40,7 @@ const GreenExecutiveTemplate = ({ data, settings }: TemplateRenderProps) => {
       <Box sx={{ pl: 5, pr: 3, py: 4 }}>
         <Typography sx={{ fontSize: 22, fontWeight: 800, color: DARK }}>
           {fullName}
-          {data.personal?.credentials && `, ${data.personal.credentials}`}
+          {/* {data.personal?. && `, ${data.personal.credentials}`} */}
         </Typography>
         {data.personal?.jobTitle && (
           <Typography sx={{ fontSize: 13, color: GREEN, fontWeight: 700, mb: 2 }}>

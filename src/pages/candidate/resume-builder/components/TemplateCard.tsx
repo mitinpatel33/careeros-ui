@@ -1,134 +1,168 @@
-import { motion } from "framer-motion";
-import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
-import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
-import type { ResumeTemplateConfig } from "../../../../types/resumeTemplate.types";
+// import { Box, Chip, IconButton, Stack, Typography, alpha } from "@mui/material";
+// import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+// import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+// import { motion } from "framer-motion";
+// import { TEMPLATE_TOTAL, type ResumeTemplate } from "../../../../types/templateData";
 
-type Props = {
-  template: ResumeTemplateConfig;
-  selected: boolean;
-  onClick: () => void;
-};
+// const CATEGORY_LABEL: Record<ResumeTemplate["category"], string> = {
+//   classic: "Classic",
+//   photo: "Photo",
+//   modern: "Modern",
+// };
 
-const TemplateCard = ({ template, selected, onClick }: Props) => {
-  const isModernGradient = String(template.id) === "modernGradient";
+// interface TemplateCardProps {
+//   template: ResumeTemplate;
+//   selected: boolean;
+//   onSelect: (id: string) => void;
+//   onPreview: (id: string) => void;
+// }
 
-  return (
-    <motion.div whileHover={{ y: -2 }} whileTap={{ scale: 0.985 }}>
-      <Paper
-        onClick={onClick}
-        sx={{
-          p: 1.2,
-          cursor: "pointer",
-          borderRadius: 3.5,
-          position: "relative",
-          bgcolor: selected ? "#eff6ff" : "#fff",
-          border: selected ? "2px solid #2563eb" : "1px solid #e5e7eb",
-          boxShadow: selected
-            ? "0 12px 26px rgba(37,99,235,0.14)"
-            : "0 8px 20px rgba(15,23,42,0.06)",
-          transition: "0.25s ease",
-          "&:hover": {
-            boxShadow: "0 14px 30px rgba(15,23,42,0.12)",
-          },
-        }}
-      >
-        {selected && (
-          <CheckCircleRoundedIcon
-            color="primary"
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              bgcolor: "#fff",
-              borderRadius: "50%",
-              fontSize: 23,
-            }}
-          />
-        )}
+// const TemplateCard = ({ template, selected, onSelect, onPreview }: TemplateCardProps) => {
+//   return (
+//     <motion.div
+//       layout
+//       initial={{ opacity: 0, y: 16 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       exit={{ opacity: 0, y: -16 }}
+//       transition={{ duration: 0.25, ease: "easeOut" }}
+//       whileHover={{ y: -4 }}
+//     >
+//       <Box
+//         onClick={() => onSelect(template.id)}
+//         role="button"
+//         tabIndex={0}
+//         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onSelect(template.id)}
+//         sx={{
+//           cursor: "pointer",
+//           borderRadius: 4,
+//           overflow: "hidden",
+//           bgcolor: "background.paper",
+//           border: "2px solid",
+//           borderColor: selected ? "primary.main" : "transparent",
+//           boxShadow: selected
+//             ? (theme) => `0 8px 24px ${alpha(theme.palette.primary.main, 0.25)}`
+//             : "0 2px 10px rgba(15, 23, 42, 0.06)",
+//           transition: "box-shadow .2s ease, border-color .2s ease",
+//           "&:hover": {
+//             boxShadow: (theme) => `0 10px 28px ${alpha(theme.palette.primary.main, 0.18)}`,
+//           },
+//           "&:focus-visible": {
+//             outline: (theme) => `2px solid ${theme.palette.primary.main}`,
+//             outlineOffset: 2,
+//           },
+//         }}
+//       >
+//         {/* Thumbnail */}
+//         <Box
+//           sx={{
+//             position: "relative",
+//             aspectRatio: "3 / 4",
+//             background: `linear-gradient(155deg, ${alpha(template.accent, 0.92)}, ${alpha(
+//               template.accent,
+//               0.6,
+//             )})`,
+//           }}
+//         >
+//           {/* Mock resume lines so the placeholder reads as a document, not a color swatch */}
+//           <Stack
+//             spacing={1.1}
+//             sx={{ position: "absolute", inset: 0, p: "12% 10%", opacity: 0.9 }}
+//           >
+//             <Box sx={{ width: "55%", height: 10, borderRadius: 1, bgcolor: "rgba(255,255,255,0.95)" }} />
+//             <Box sx={{ width: "35%", height: 6, borderRadius: 1, bgcolor: "rgba(255,255,255,0.6)" }} />
+//             <Box sx={{ pt: 1.5, display: "flex", flexDirection: "column", gap: 0.7 }}>
+//               {[100, 90, 95, 70, 100, 85, 92].map((w, i) => (
+//                 <Box
+//                   key={i}
+//                   sx={{
+//                     width: `${w}%`,
+//                     height: 4,
+//                     borderRadius: 1,
+//                     bgcolor: "rgba(255,255,255,0.35)",
+//                   }}
+//                 />
+//               ))}
+//             </Box>
+//           </Stack>
 
-        <Stack direction="row" spacing={1.3} sx={{ alignItems: "center" }}>
-          <Box
-            sx={{
-              width: 104,
-              height: 72,
-              flexShrink: 0,
-              borderRadius: 2.5,
-              background:
-                isModernGradient
-                  ? "linear-gradient(135deg,#2563eb,#9333ea)"
-                  : template.primaryColor,
-              p: 1.1,
-            }}
-          >
-            <Box
-              sx={{
-                height: 6,
-                width: "65%",
-                bgcolor: "#fff",
-                borderRadius: 5,
-                mb: 0.8,
-              }}
-            />
+//           <Chip
+//             label={`${template.rank}/${TEMPLATE_TOTAL}`}
+//             size="small"
+//             sx={{
+//               position: "absolute",
+//               top: 10,
+//               left: 10,
+//               bgcolor: "rgba(15, 23, 42, 0.55)",
+//               color: "#fff",
+//               fontWeight: 700,
+//               backdropFilter: "blur(4px)",
+//             }}
+//           />
 
-            <Box
-              sx={{
-                height: 5,
-                width: "88%",
-                bgcolor: "rgba(255,255,255,.62)",
-                borderRadius: 5,
-              }}
-            />
-          </Box>
+//           <IconButton
+//             aria-label={`Preview ${template.name}`}
+//             size="small"
+//             onClick={(e) => {
+//               e.stopPropagation();
+//               onPreview(template.id);
+//             }}
+//             sx={{
+//               position: "absolute",
+//               top: 8,
+//               right: 8,
+//               bgcolor: "rgba(255,255,255,0.9)",
+//               "&:hover": { bgcolor: "#fff" },
+//             }}
+//           >
+//             <VisibilityRoundedIcon fontSize="small" />
+//           </IconButton>
 
-          <Box sx={{ flex: 1, minWidth: 0, pr: selected ? 2.5 : 0 }}>
-            <Typography sx={{ fontWeight: 950, fontSize: 14 }} noWrap>
-              {template.name}
-            </Typography>
+//           {selected && (
+//             <motion.div
+//               initial={{ scale: 0, opacity: 0 }}
+//               animate={{ scale: 1, opacity: 1 }}
+//               transition={{ type: "spring", stiffness: 400, damping: 20 }}
+//               style={{ position: "absolute", bottom: 10, right: 10 }}
+//             >
+//               <CheckCircleRoundedIcon sx={{ color: "#fff", fontSize: 30, filter: "drop-shadow(0 1px 3px rgba(0,0,0,.35))" }} />
+//             </motion.div>
+//           )}
+//         </Box>
 
-            <Stack
-              direction="row"
-              spacing={0.7}
-              sx={{ my: 0.6, flexWrap: "wrap" }}
-            >
-              <Chip
-                size="small"
-                label={template.category}
-                sx={{
-                  height: 21,
-                  fontSize: 11,
-                  bgcolor: "#f1f5f9",
-                }}
-              />
+//         {/* Meta */}
+//         <Box sx={{ p: 1.75 }}>
+//           <Stack direction="row" sx={{ mb: 0.5, alignItems: "center", justifyContent: "space-between" }}>
+//             <Typography sx={{ fontWeight: 800, fontSize: 15 }}>{template.name}</Typography>
+//             <Chip
+//               label={CATEGORY_LABEL[template.category]}
+//               size="small"
+//               sx={{
+//                 height: 20,
+//                 fontSize: 11,
+//                 fontWeight: 600,
+//                 bgcolor: alpha(template.accent, 0.12),
+//                 color: template.accent,
+//               }}
+//             />
+//           </Stack>
+//           <Typography
+//             variant="body2"
+//             color="text.secondary"
+//             sx={{
+//               display: "-webkit-box",
+//               WebkitLineClamp: 2,
+//               WebkitBoxOrient: "vertical",
+//               overflow: "hidden",
+//               minHeight: "2.6em",
+//               lineHeight: 1.3,
+//             }}
+//           >
+//             {template.tagline}
+//           </Typography>
+//         </Box>
+//       </Box>
+//     </motion.div>
+//   );
+// };
 
-              {template.category === "ATS" && (
-                <Chip
-                  size="small"
-                  color="success"
-                  variant="outlined"
-                  label="ATS"
-                  sx={{ height: 21, fontSize: 11 }}
-                />
-              )}
-            </Stack>
-
-            <Typography
-              color="text.secondary"
-              sx={{
-                lineHeight: 1.35,
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-                overflow: "hidden",
-                fontSize: 12,
-              }}
-            >
-              {template.description}
-            </Typography>
-          </Box>
-        </Stack>
-      </Paper>
-    </motion.div>
-  );
-};
-
-export default TemplateCard;
+// export default TemplateCard;

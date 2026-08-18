@@ -13,9 +13,9 @@ const ResumeStrengthCard = ({ data }: Props) => {
     (data.skills?.length ? 15 : 0) +
     (data.experience?.length ? 20 : 0) +
     (data.education?.length ? 10 : 0) +
-    (data.projects?.length ? 10 : 0) +
-    (data.contact?.linkedIn ? 5 : 0) +
-    (data.contact?.github ? 5 : 0);
+    (data.projects?.length ? 10 : 0)
+    // (data.contact?.linkedIn ? 5 : 0) +
+    // (data.contact?.github ? 5 : 0);
 
   return (
     <Paper

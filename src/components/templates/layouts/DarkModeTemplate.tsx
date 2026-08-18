@@ -22,7 +22,7 @@ const rangeStr = (
   return `${s} – ${fmtDate(end)}`;
 };
 
-const DarkModeTemplate = ({ data, config, settings }: TemplateRenderProps) => {
+const DarkModeTemplate = ({ data, settings }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();
 
   // Extract display summary from the summary object

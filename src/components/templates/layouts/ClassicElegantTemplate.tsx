@@ -24,7 +24,6 @@ const formatRange = (
 
 const ClassicElegantTemplate = ({
   data,
-  config,
   settings,
 }: TemplateRenderProps) => {
   const fullName = `${data.personal?.firstName ?? ""} ${data.personal?.lastName ?? ""}`.trim();

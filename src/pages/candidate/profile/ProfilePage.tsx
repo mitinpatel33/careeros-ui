@@ -7,12 +7,12 @@ import {
   Button,
 } from "@mui/material";
 import {
-  useEffect,
   useMemo,
   useState,
   useCallback,
   lazy,
   Suspense,
+  type ComponentType,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLocation } from "react-router-dom";
@@ -23,11 +23,14 @@ import {
   useGetCompletionQuery,
   useGetProfileCollectionQuery,
   useGetProfileQuery,
-  useUpdateProfileMutation,
+  useLazyGetProfileSectionsQuery,
 } from "../../../services/candidateprofileApi";
 import { useProfileSaver } from "../../../hooks/useProfileSaver";
+import type { ResumeData } from "../../../types/candidate/resume.types";
 
-// Lazy load tab components for better initial load
+// ---------------------------------------------------------------------------
+// Lazy-loaded step components
+// ---------------------------------------------------------------------------
 const PersonalDetails = lazy(() => import("./tabs/PersonalDetails"));
 const SummaryDetails = lazy(() => import("./tabs/SummaryDetails"));
 const ContactDetails = lazy(() => import("./tabs/ContactDetails"));
@@ -39,8 +42,17 @@ const ProjectsDetails = lazy(() => import("./tabs/ProjectsDetails"));
 const CertificatesDetails = lazy(() => import("./tabs/CertificatesDetails"));
 const AchievementsDetails = lazy(() => import("./tabs/AchievementsDetails"));
 const LanguagesDetails = lazy(() => import("./tabs/LanguagesDetails"));
+const TemplateSelectionStep = lazy(
+  () => import("./tabs/TemplateSelectionStep"),
+);
 const PublishSettings = lazy(() => import("./tabs/PublishSettings"));
+const ResumeEditorPage = lazy(
+  () => import("../../../components/templates/NewTemplate/ResumeEditorPage"),
+);
 
+// ---------------------------------------------------------------------------
+// Step definitions
+// ---------------------------------------------------------------------------
 const steps = [
   { key: "personal", title: "Personal", type: "form" },
   { key: "summary", title: "Summary", type: "form" },
@@ -53,6 +65,7 @@ const steps = [
   { key: "certificates", title: "Certificates", type: "list" },
   { key: "achievements", title: "Achievements", type: "list" },
   { key: "languages", title: "Languages", type: "list" },
+  { key: "template", title: "Choose Template", type: "gallery" },
   { key: "settings", title: "Settings", type: "form" },
 ] as const;
 
@@ -67,12 +80,57 @@ type ListStepKey = Extract<
   | "languages"
 >;
 
-// Loading fallback for lazy tabs
+// Every form step takes the same prop shape (defaultValues + onSubmit + nav
+// props), so a lookup table replaces a hand-written JSX branch per step.
+const FORM_STEP_COMPONENTS: Partial<
+  Record<ProfileStepKey, ComponentType<any>>
+> = {
+  personal: PersonalDetails,
+  summary: SummaryDetails,
+  contact: ContactDetails,
+  social: SocialDetails,
+  settings: PublishSettings,
+};
+
+// Same idea for list/collection steps.
+const LIST_STEP_COMPONENTS: Record<ListStepKey, ComponentType<any>> = {
+  skills: SkillsDetails,
+  educations: EducationDetails,
+  experiences: ExperienceDetails,
+  projects: ProjectsDetails,
+  certificates: CertificatesDetails,
+  achievements: AchievementsDetails,
+  languages: LanguagesDetails,
+};
+
 const TabLoader = () => (
   <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
     <CircularProgress />
   </Box>
 );
+
+/**
+ * Maps the raw `/profile/sections` payload (keyed by API route names, e.g.
+ * "educations", "certificates") onto the `ResumeData` shape the resume
+ * templates expect (e.g. "education", "certifications").
+ */
+const mapSectionsToResumeData = (sections: any): ResumeData | undefined => {
+  if (!sections) return undefined;
+
+  return {
+    personal: sections.personal,
+    contact: sections.contact,
+    summary: sections.summary,
+    social: sections.social,
+    skills: sections.skills || [],
+    education: sections.educations || [],
+    experience: sections.experiences || [],
+    projects: sections.projects || [],
+    certifications: sections.certificates || [],
+    achievements: sections.achievements || [],
+    languages: sections.languages || [],
+  };
+};
 
 const ProfilePage = () => {
   const location = useLocation();
@@ -80,31 +138,33 @@ const ProfilePage = () => {
     location.state?.step ?? "personal",
   );
 
-  // Snackbar state
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  // Get user from localStorage (memoized)
+  // Client-side template state (stored in localStorage)
+  const [selectedTemplate, setSelectedTemplate] = useState<string>(
+    () => localStorage.getItem("selected_resume_template") || "classic-blue",
+  );
+
+  // Switches step 12 from "pick a template" -> "preview & download"
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+
   const candidate = useMemo(() => {
     const raw = localStorage.getItem("user");
     return raw ? JSON.parse(raw) : { fullName: "" };
   }, []);
 
-  // Determine step type
-  const currentStep = useMemo(
-    () => steps.find((s) => s.key === activeStep)!,
-    [activeStep],
-  );
+  const activeIndex = steps.findIndex((s) => s.key === activeStep);
+  const currentStep = steps[activeIndex];
   const isFormStep = currentStep.type === "form";
   const isListStep = currentStep.type === "list";
+  const isGalleryStep = currentStep.type === "gallery";
 
-  // RTK Query hooks
   const { data: completionData, isLoading: isCompletionLoading } =
     useGetCompletionQuery();
-  console.log('completionData', completionData)
-  // Fetch form data – only if active step is form
+
   const {
     data: formData,
     isLoading: isFormLoading,
@@ -112,7 +172,6 @@ const ProfilePage = () => {
     error: formError,
   } = useGetProfileQuery(activeStep, { skip: !isFormStep });
 
-  // Fetch list data – only if active step is list
   const {
     data: listData,
     isLoading: isListLoading,
@@ -122,51 +181,68 @@ const ProfilePage = () => {
     skip: !isListStep,
   });
 
-  // Mutation hooks
-  const [updateProfile, { isLoading: isUpdateLoading }] =
-    useUpdateProfileMutation();
+  // Used for the sidebar name/photo/job title — always fetched.
+  const { data: personalData } = useGetProfileQuery("personal");
 
-  // Custom save hook (handles both form and list)
+  const [
+    fetchSections,
+    {
+      data: sectionsData,
+      isLoading: isSectionsLoading,
+      isFetching: isSectionsFetching,
+    },
+  ] = useLazyGetProfileSectionsQuery();
+
+  const resumeData = useMemo(
+    () => mapSectionsToResumeData(sectionsData?.data),
+    [sectionsData],
+  );
+
   const { saveStep } = useProfileSaver({
-    onSuccess: (step, title) => {
+    onSuccess: (_, title) => {
       setSnackbar({
         message: `${title} saved successfully ✨`,
         severity: "success",
       });
     },
-    onError: (step, title) => {
+    onError: (_, title) => {
       setSnackbar({ message: `Failed to save ${title}`, severity: "error" });
     },
     onNavigateNext: () => {
       const next = steps[activeIndex + 1];
-      if (next) setActiveStep(next.key);
+      if (next) setActiveStep(next.key as ProfileStepKey);
     },
   });
 
-  // Navigation helpers (memoized)
-  const activeIndex = steps.findIndex((s) => s.key === activeStep);
-
   const goNext = useCallback(() => {
     const next = steps[activeIndex + 1];
-    if (next) setActiveStep(next.key);
+    if (next) setActiveStep(next.key as ProfileStepKey);
   }, [activeIndex]);
 
   const goBack = useCallback(() => {
     const prev = steps[activeIndex - 1];
-    if (prev) setActiveStep(prev.key);
+    if (prev) setActiveStep(prev.key as ProfileStepKey);
   }, [activeIndex]);
 
-  // Combine loading/error states for active step
-  const isLoading = isFormLoading || isListLoading || isUpdateLoading;
-  const isError = isFormError || isListError;
-  const errorMessage = isError
+  const handleTemplateSubmit = useCallback(
+    (values: { selectedTemplate: string }) => {
+      setSelectedTemplate(values.selectedTemplate);
+      localStorage.setItem("selected_resume_template", values.selectedTemplate);
+      setIsPreviewMode(true);
+      fetchSections(); // ✅ Manually triggers the query fetch safely
+    },
+    [fetchSections],
+  );
+
+  const isStepLoading = isFormLoading || isListLoading || isCompletionLoading;
+  const isStepError = isFormError || isListError;
+  const errorMessage = isStepError
     ? (formError as any)?.data?.message ||
-    (listError as any)?.data?.message ||
-    "Failed to load data"
+      (listError as any)?.data?.message ||
+      "Failed to load data"
     : null;
 
-  // If there's an error loading the section, show a retry or fallback
-  if (isError && !isLoading) {
+  if (isStepError && !isStepLoading) {
     return (
       <Box sx={{ p: 4, textAlign: "center" }}>
         <Typography color="error">{errorMessage}</Typography>
@@ -181,109 +257,78 @@ const ProfilePage = () => {
     );
   }
 
-  // Common props for all form tabs
-  const formProps = {
-    loading: isUpdateLoading,
-    isFirst: activeIndex === 0,
-    isLast: activeIndex === steps.length - 1,
-    onBack: goBack,
+  const renderPreviewPanel = () => {
+    if (isSectionsLoading || isSectionsFetching) return <TabLoader />;
+
+    return (
+      <Box>
+        <Button
+          variant="outlined"
+          onClick={() => setIsPreviewMode(false)}
+          sx={{ mb: 2, textTransform: "none" }}
+        >
+          ← Change Selected Template
+        </Button>
+        <ResumeEditorPage templateId={selectedTemplate} data={resumeData} />
+        <Stack direction="row" sx={{ justifyContent: "flex-end", mt: 3 }}>
+          <Button variant="contained" onClick={goNext}>
+            Next Step →
+          </Button>
+        </Stack>
+      </Box>
+    );
   };
 
-  // Form components map – will be lazy loaded
-  const formComponents: Partial<Record<ProfileStepKey, React.ReactNode>> = {
-    personal: (
-      <PersonalDetails
-        {...formProps}
-        defaultValues={formData?.data}
-        onSubmit={(values) => saveStep("personal", values)}
+  const renderGalleryStep = () => {
+    if (isPreviewMode) return renderPreviewPanel();
+
+    return (
+      <TemplateSelectionStep
+        isFirst={activeIndex === 0}
+        isLast={activeIndex === steps.length - 1}
+        onBack={goBack}
+        loading={false}
+        selectedTemplate={selectedTemplate}
+        onSubmit={handleTemplateSubmit}
       />
-    ),
-    summary: (
-      <SummaryDetails
-        {...formProps}
-        defaultValues={formData?.data}
-        onSubmit={(values) => saveStep("summary", values)}
-      />
-    ),
-    contact: (
-      <ContactDetails
-        {...formProps}
-        defaultValues={formData?.data}
-        onSubmit={(values) => saveStep("contact", values)}
-      />
-    ),
-    social: (
-      <SocialDetails
-        {...formProps}
-        defaultValues={formData?.data}
-        onSubmit={(values) => saveStep("social", values)}
-      />
-    ),
-    settings: (
-      <PublishSettings
-        {...formProps}
-        defaultValues={formData?.data}
-        onSubmit={(values) => saveStep("settings", values)}
-      />
-    ),
+    );
   };
 
-  // List components – items are directly from RTK Query result
-  const listComponents: Record<ListStepKey, React.ReactNode> = {
-    skills: (
-      <SkillsDetails
-        items={listData?.data || []}
-        loading={isListLoading}
-        onSave={(items) => saveStep("skills", items)}
+  const renderFormStep = () => {
+    const FormComponent = FORM_STEP_COMPONENTS[activeStep];
+    if (!FormComponent) return null;
+
+    return (
+      <FormComponent
+        loading={isFormLoading}
+        isFirst={activeIndex === 0}
+        isLast={activeIndex === steps.length - 1}
+        onBack={goBack}
+        defaultValues={formData?.data}
+        onSubmit={(values: unknown) => saveStep(activeStep, values)}
       />
-    ),
-    educations: (
-      <EducationDetails
-        items={listData?.data || []}
+    );
+  };
+
+  const renderListStep = () => {
+    const ListComponent = LIST_STEP_COMPONENTS[activeStep as ListStepKey];
+    if (!ListComponent) return null;
+
+    return (
+      <ListComponent
+        items={
+          Array.isArray(listData) ? listData : (listData as any)?.data || []
+        }
         loading={isListLoading}
-        onSave={(items) => saveStep("educations", items)}
+        onSave={(items: unknown) => saveStep(activeStep, items)}
       />
-    ),
-    experiences: (
-      <ExperienceDetails
-        items={listData?.data || []}
-        loading={isListLoading}
-        onSave={(items) => saveStep("experiences", items)}
-      />
-    ),
-    projects: (
-      <ProjectsDetails
-        items={listData?.data || []}
-        loading={isListLoading}
-        onSave={(items) => saveStep("projects", items)}
-      />
-    ),
-    certificates: (
-      <CertificatesDetails
-        items={listData?.data || []}
-        loading={isListLoading}
-        onSave={(items) => saveStep("certificates", items)}
-      />
-    ),
-    achievements: (
-      <AchievementsDetails
-        items={listData?.data || []}
-        loading={isListLoading}
-        onSave={(items) => saveStep("achievements", items)}
-      />
-    ),
-    languages: (
-      <LanguagesDetails
-        items={listData?.data || []}
-        loading={isListLoading}
-        onSave={(items) => saveStep("languages", items)}
-      />
-    ),
+    );
   };
 
   const renderActiveStep = () => {
-    if (isFormStep) return formComponents[activeStep];
-    return listComponents[activeStep as ListStepKey];
+    if (isGalleryStep) return renderGalleryStep();
+    if (isFormStep) return renderFormStep();
+    return renderListStep();
   };
 
   return (
@@ -304,7 +349,7 @@ const ProfilePage = () => {
             Profile Setup ✨
           </Typography>
           <Typography color="text.secondary">
-            Save each profile section separately with smooth animations.
+            Save profile sections and choose your resume style.
           </Typography>
         </Stack>
 
@@ -314,25 +359,31 @@ const ProfilePage = () => {
               activeStep={activeStep}
               completion={completionData?.data?.completionPercentage ?? 0}
               fullName={candidate.fullName}
-              jobTitle={formData?.data?.jobTitle}
-              photoURL={formData?.data?.photoUrl ||
-                formData?.data?.photoURL || ""}
-              onStepChange={setActiveStep}
+              jobTitle={personalData?.data?.jobTitle}
+              photoURL={
+                personalData?.data?.photoUrl ||
+                personalData?.data?.photoURL ||
+                ""
+              }
+              onStepChange={(step) => {
+                setIsPreviewMode(false);
+                setActiveStep(step);
+              }}
               completedSteps={[]}
             />
           </Grid>
 
-          <Grid size={{ xs: 12, md: 8 }}>
+          <Grid size={{ xs: 12, md: 8 }} sx={{ minWidth: 0 }}>
             <AnimatePresence mode="wait">
               <motion.div
-                key={activeStep}
-                initial={{ opacity: 0, x: 30, scale: 0.98 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -30, scale: 0.98 }}
-                transition={{ duration: 0.35, ease: "easeOut" }}
+                key={activeStep + (isPreviewMode ? "-preview" : "-step")}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -30 }}
+                transition={{ duration: 0.3 }}
               >
                 <Suspense fallback={<TabLoader />}>
-                  {isLoading && !formData && !listData ? (
+                  {isStepLoading && !formData && !listData && !isGalleryStep ? (
                     <TabLoader />
                   ) : (
                     renderActiveStep()

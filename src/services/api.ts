@@ -4,7 +4,7 @@ export const api = createApi({
   reducerPath: "api",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api",
+    baseUrl: import.meta.env.VITE_API_BASE_URL,
 
     prepareHeaders: (headers) => {
 

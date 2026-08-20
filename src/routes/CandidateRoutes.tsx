@@ -9,10 +9,7 @@ import CandidateProfileView from "../pages/candidate/profile/CandidateProfileVie
 const CandidateRoutes = (
   <Route path="/candidate" element={<CandidateLayout />}>
     <Route index element={<Navigate to="dashboard" replace />} />
-
     <Route path="dashboard" element={<DashboardPage />} />
-    {/* <Route path="profile" element={<ProfilePage />} /> */}
-    {/* <Route path="resume-builder" element={<ResumeBuilderPage />} /> */}
     <Route path="profile" element={<CandidateProfileView />} />
   </Route>
 );

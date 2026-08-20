@@ -69,20 +69,20 @@ const AnimatedRocket = () => (
 // Shared input field styling for clean dark mode typography
 const darkTextFieldSx = {
   "& .MuiInputLabel-root": {
-    color: "rgba(255, 255, 255, 0.7)",
+    color: "rgba(255, 255, 255, 0.95)",
     fontSize: "0.9rem",
-    "&.Mui-focused": { color: "#60a5fa" },
+    "&.Mui-focused": { color: "#93c5fd" },
   },
   "& .MuiOutlinedInput-root": {
     color: "#fff",
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: "rgba(255, 255, 255, 0.2)", // Brighter translucent white input background
     borderRadius: "12px",
     fontSize: "0.95rem",
-    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#3b82f6", borderWidth: "2px" },
+    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.4)" },
+    "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.7)" },
+    "&.Mui-focused fieldset": { borderColor: "#60a5fa", borderWidth: "2px" },
   },
-  "& .MuiSvgIcon-root": { color: "rgba(255, 255, 255, 0.7)" },
+  "& .MuiSvgIcon-root": { color: "#fff" },
 };
 
 const LoginPage = () => {
@@ -170,10 +170,11 @@ const LoginPage = () => {
         sx={{
           p: { xs: 3, sm: 4 },
           borderRadius: 6,
-          background: "rgba(255, 255, 255, 0.05)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.12)",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
+          // Stronger white tint (30% opacity white)
+          background: "rgba(255, 255, 255, 0.3)",
+          backdropFilter: "blur(25px)",
+          border: "1px solid rgba(255, 255, 255, 0.45)",
+          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
           color: "#fff",
         }}
       >

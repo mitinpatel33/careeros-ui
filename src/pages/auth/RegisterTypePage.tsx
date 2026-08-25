@@ -78,15 +78,7 @@ const RegisterTypePage = () => {
                 gap: 1.5,
               }}
             >
-              <Box
-                component={motion.span}
-                animate={{ y: [0, -3, 0] }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
+              <Box>
                 Join Career OS
               </Box>
 

@@ -30,6 +30,14 @@ const personalSchema = z.object({
 
 export type PersonalFormType = z.infer<typeof personalSchema>;
 
+const formatDateForInput = (dateStr?: string | null): string => {
+  if (!dateStr) return "";
+  // Handles ISO strings like "2026-08-21T00:00:00.000Z" or pre-formatted dates
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return "";
+  return date.toISOString().split("T")[0];
+};
+
 type Props = {
   defaultValues?: Partial<PersonalFormType>;
   loading: boolean;
@@ -90,12 +98,12 @@ const PersonalDetails = memo(
         firstName: "",
         lastName: "",
         jobTitle: "",
-        dateOfBirth: "",
         gender: "",
         maritalStatus: "",
         // nationality: "",
         photoUrl: "",
         ...defaultValues,
+        dateOfBirth: formatDateForInput(defaultValues?.dateOfBirth),
       },
     });
 
@@ -104,12 +112,12 @@ const PersonalDetails = memo(
         firstName: "",
         lastName: "",
         jobTitle: "",
-        dateOfBirth: "",
         gender: "",
         maritalStatus: "",
         // nationality: "",
         photoUrl: "",
         ...defaultValues,
+        dateOfBirth: formatDateForInput(defaultValues?.dateOfBirth),
       });
     }, [defaultValues, reset]);
 
@@ -279,7 +287,7 @@ const PersonalDetails = memo(
                   label="Marital Status"
                   type="select"
                   options={maritalStatusOptions}
-                  
+
                 />
               </Grid>
               {/* <Grid size={{ xs: 12, md: 6 }}>

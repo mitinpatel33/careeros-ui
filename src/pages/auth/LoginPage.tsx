@@ -29,6 +29,79 @@ import { useLoginMutation } from "../../services/authApi";
 import { useAppDispatch } from "../../hooks/useLogin";
 import { appToast } from "../../common/toast/appToast";
 
+// EXACT MATCH TO IMAGE 2 (image_415a7c.png)
+const glowButtonSx = {
+  height: 50,
+  width: "100%",
+  borderRadius: "12px !important", // Match exact squircle corners (not full pill)
+  fontWeight: 700,
+  fontSize: "0.95rem",
+  fontFamily: "'Inter', -apple-system, sans-serif",
+  textTransform: "none",
+  color: "#ffffff",
+  letterSpacing: "0.3px",
+
+  // Linear blue gradient matching the visual core
+  background: "linear-gradient(180deg, #4da0ff 0%, #2b7fff 50%, #1e6bf0 100%)",
+
+  // Multi-layered outline: Crisp glowing white inner border + bright cyan outer glow
+  boxShadow: `
+    0 0 0 1px #ffffff,
+    0 0 0 2.5px #7dd3fc,
+    0 0 18px 4px rgba(56, 189, 248, 0.65),
+    0 0 35px 8px rgba(56, 189, 248, 0.35),
+    0 8px 20px rgba(37, 99, 235, 0.3)
+  `,
+
+  transition: "all 0.25s ease-in-out",
+
+  "&:hover": {
+    background:
+      "linear-gradient(180deg, #5fb0ff 0%, #3d8cff 50%, #2374ff 100%)",
+    boxShadow: `
+      0 0 0 1px #ffffff,
+      0 0 0 3px #bae6fd,
+      0 0 22px 6px rgba(56, 189, 248, 0.85),
+      0 0 45px 12px rgba(56, 189, 248, 0.5),
+      0 10px 25px rgba(37, 99, 235, 0.4)
+    `,
+    transform: "translateY(-1px)",
+  },
+
+  "&:active": {
+    transform: "translateY(1px)",
+    boxShadow: `
+      0 0 0 1px #ffffff,
+      0 0 0 2px #38bdf8,
+      0 0 12px 2px rgba(56, 189, 248, 0.5),
+      0 4px 12px rgba(37, 99, 235, 0.3)
+    `,
+  },
+};
+
+const lightTextFieldSx = {
+  "& .MuiInputLabel-root": {
+    color: "#64748b",
+    fontSize: "0.825rem",
+    fontWeight: 500,
+    "&.Mui-focused": { color: "#2563eb" },
+  },
+  "& .MuiOutlinedInput-root": {
+    color: "#0f172a",
+    backgroundColor: "#ffffff",
+    borderRadius: "14px",
+    fontSize: "0.925rem",
+    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.02)",
+    "& fieldset": { borderColor: "#e2e8f0", borderWidth: "1px" },
+    "&:hover fieldset": { borderColor: "#cbd5e1" },
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
+      borderWidth: "1.5px",
+    },
+  },
+  "& .MuiSvgIcon-root": { color: "#64748b" },
+};
+
 const GoogleIcon = ((props: SvgIconProps) => (
   <SvgIcon {...props} viewBox="0 0 24 24">
     <path
@@ -53,37 +126,13 @@ const GoogleIcon = ((props: SvgIconProps) => (
 const AnimatedRocket = () => (
   <Box
     component={motion.span}
-    animate={{ y: [0, -8, 0], x: [0, 3, 0], rotate: [0, 5, 0] }}
-    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-    sx={{
-      display: "inline-block",
-      position: "relative",
-      filter: "drop-shadow(0 0 10px rgba(249, 115, 22, 0.6))",
-      ml: 1,
-    }}
+    animate={{ y: [0, -5, 0], x: [0, 2, 0] }}
+    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+    sx={{ display: "inline-block", position: "relative", ml: 0.5 }}
   >
     🚀
   </Box>
 );
-
-// Shared input field styling for clean dark mode typography
-const darkTextFieldSx = {
-  "& .MuiInputLabel-root": {
-    color: "rgba(255, 255, 255, 0.95)",
-    fontSize: "0.9rem",
-    "&.Mui-focused": { color: "#93c5fd" },
-  },
-  "& .MuiOutlinedInput-root": {
-    color: "#fff",
-    backgroundColor: "rgba(255, 255, 255, 0.2)", // Brighter translucent white input background
-    borderRadius: "12px",
-    fontSize: "0.95rem",
-    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.4)" },
-    "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.7)" },
-    "&.Mui-focused fieldset": { borderColor: "#60a5fa", borderWidth: "2px" },
-  },
-  "& .MuiSvgIcon-root": { color: "#fff" },
-};
 
 const LoginPage = () => {
   const [login, { isLoading }] = useLoginMutation();
@@ -141,182 +190,177 @@ const LoginPage = () => {
     onError: () => appToast.error("Google login failed"),
   });
 
-  const handleFacebookLogin = async () => {
-    setSocialLoading(true);
-    try {
-      const response = await login({
-        token: "MOCK_FACEBOOK_TOKEN",
-        provider: "facebook",
-      } as any).unwrap();
-      handleLoginSuccess(response.data, response.message);
-    } catch (error: any) {
-      appToast.error(error.data?.message || "Facebook login failed");
-    } finally {
-      setSocialLoading(false);
-    }
-  };
-
   const isAnyLoading = isLoading || socialLoading;
 
   return (
     <Box
       component={motion.div}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      sx={{ width: "100%", maxWidth: 440, px: 2, zIndex: 2 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      sx={{ width: "100%", maxWidth: 420, px: 2, zIndex: 2 }}
     >
-      <AuthCard
-        sx={{
-          p: { xs: 3, sm: 4 },
-          borderRadius: 6,
-          // Stronger white tint (30% opacity white)
-          background: "rgba(255, 255, 255, 0.3)",
-          backdropFilter: "blur(25px)",
-          border: "1px solid rgba(255, 255, 255, 0.45)",
-          boxShadow: "0 20px 40px rgba(0, 0, 0, 0.3)",
-          color: "#fff",
-        }}
+      {/* Animated Floating Card */}
+      <Box
+        component={motion.div}
+        // animate={{ y: [0, -8, 0] }}
+        // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
-        <Stack spacing={3}>
-          <Box sx={{ textAlign: "center" }}>
-            <Typography
-              sx={{
-                fontWeight: 800,
-                fontSize: { xs: "1.75rem", sm: "2rem" },
-                color: "#fff",
-                letterSpacing: "-0.5px",
-              }}
-            >
-              Career OS <AnimatedRocket />
-            </Typography>
-            <Typography
-              sx={{
-                color: "rgba(255, 255, 255, 0.65)",
-                mt: 0.5,
-                fontSize: "0.875rem",
-              }}
-            >
-              Create Professional & Animated Resumes
-            </Typography>
-          </Box>
-
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2.5}>
-              <AppTextField<LoginSchemaType>
-                name="email"
-                control={control}
-                label="Email Address"
-                fullWidth
-                sx={darkTextFieldSx}
-              />
-
-              <PasswordField<LoginSchemaType>
-                name="password"
-                control={control}
-                label="Password"
-                fullWidth
-                sx={darkTextFieldSx}
-              />
-
-              <Box sx={{ textAlign: "right" }}>
-                <Typography
-                  sx={{
-                    cursor: "pointer",
-                    color: "#60a5fa",
-                    fontSize: "0.85rem",
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  Forgot Password?
-                </Typography>
-              </Box>
-
-              <AppButton
-                type="submit"
-                loading={isLoading}
+        <AuthCard
+          sx={{
+            p: { xs: 3.5, sm: 4.5 },
+            borderRadius: 8,
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.9)",
+            boxShadow: `
+              0 20px 50px -10px rgba(37, 99, 235, 0.2),
+              0 10px 30px -15px rgba(56, 189, 248, 0.25)
+            `,
+          }}
+        >
+          <Stack spacing={2.5}>
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
                 sx={{
-                  py: 1.3,
-                  borderRadius: 3,
-                  fontWeight: 700,
-                  fontSize: "0.95rem",
-                  bgcolor: "#3b82f6",
-                  "&:hover": { bgcolor: "#2563eb" },
+                  fontWeight: 800,
+                  fontSize: { xs: "1.85rem", sm: "2.1rem" },
+                  color: "#2563eb",
+                  letterSpacing: "-0.5px",
                 }}
               >
-                {isLoading ? "Logging in..." : "Login"}
-              </AppButton>
-            </Stack>
-          </form>
+                Career OS <AnimatedRocket />
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#64748b",
+                  mt: 0.5,
+                  fontSize: "0.85rem",
+                  fontWeight: 500,
+                }}
+              >
+                Create Professional & Animated Resumes
+              </Typography>
+            </Box>
 
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Divider
-              sx={{ flex: 1, borderColor: "rgba(255, 255, 255, 0.15)" }}
-            />
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={2}>
+                <AppTextField<LoginSchemaType>
+                  name="email"
+                  autoComplete="new-email"
+                  control={control}
+                  label="Email Address"
+                  fullWidth
+                  sx={lightTextFieldSx}
+                />
+
+                <PasswordField<LoginSchemaType>
+                  name="password"
+                  control={control}
+                  label="Password"
+                  fullWidth
+                  sx={lightTextFieldSx}
+                  autoComplete="new-password"
+                />
+
+                <Box sx={{ textAlign: "right", pt: 0.5 }}>
+                  <Typography
+                    sx={{
+                      cursor: "pointer",
+                      color: "#3b82f6",
+                      fontSize: "0.825rem",
+                      fontWeight: 600,
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    Forgot Password?
+                  </Typography>
+                </Box>
+
+                <AppButton type="submit" loading={isLoading} sx={glowButtonSx}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </AppButton>
+              </Stack>
+            </form>
+
+            <Box sx={{ display: "flex", alignItems: "center", my: 0.5 }}>
+              <Divider sx={{ flex: 1, borderColor: "#e2e8f0" }} />
+              <Typography
+                sx={{
+                  mx: 2,
+                  fontSize: "0.7rem",
+                  color: "#94a3b8",
+                  fontWeight: 700,
+                  letterSpacing: "0.5px",
+                }}
+              >
+                OR CONTINUE WITH
+              </Typography>
+              <Divider sx={{ flex: 1, borderColor: "#e2e8f0" }} />
+            </Box>
+
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{ justifyContent: "center" }}
+            >
+              <ActionIconButton
+                title="Google"
+                onClick={() => googleLogin()}
+                disabled={isAnyLoading}
+                icon={GoogleIcon}
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: "50%",
+                  bgcolor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                  "&:hover": { bgcolor: "#f8fafc", borderColor: "#cbd5e1" },
+                }}
+              />
+              <ActionIconButton
+                title="Facebook"
+                onClick={() => {}}
+                disabled={isAnyLoading}
+                icon={Facebook}
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: "50%",
+                  bgcolor: "#1877F2",
+                  color: "#ffffff",
+                  boxShadow: "0 4px 12px rgba(24, 119, 242, 0.3)",
+                  "&:hover": { bgcolor: "#166FE5" },
+                }}
+              />
+            </Stack>
+
             <Typography
               sx={{
-                mx: 2,
-                fontSize: "0.75rem",
-                color: "rgba(255,255,255,0.5)",
-                fontWeight: 700,
-                letterSpacing: "0.5px",
+                color: "#64748b",
+                fontSize: "0.85rem",
+                textAlign: "center",
+                fontWeight: 500,
               }}
             >
-              OR CONTINUE WITH
+              Don't have an account?{" "}
+              <Box
+                component="span"
+                onClick={() => navigate("/register")}
+                sx={{
+                  color: "#2563eb",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  "&:hover": { textDecoration: "underline" },
+                }}
+              >
+                Sign Up
+              </Box>
             </Typography>
-            <Divider
-              sx={{ flex: 1, borderColor: "rgba(255, 255, 255, 0.15)" }}
-            />
-          </Box>
-
-          <Stack direction="row" spacing={2} sx={{ justifyContent: "center" }}>
-            <ActionIconButton
-              title="Google"
-              onClick={() => googleLogin()}
-              disabled={isAnyLoading}
-              icon={GoogleIcon}
-              sx={{
-                bgcolor: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.2)",
-                "&:hover": { bgcolor: "rgba(255,255,255,0.18)" },
-              }}
-            />
-            <ActionIconButton
-              title="Facebook"
-              onClick={handleFacebookLogin}
-              disabled={isAnyLoading}
-              icon={Facebook}
-              sx={{
-                bgcolor: "#1877F2",
-                color: "#fff",
-                "&:hover": { bgcolor: "#166FE5" },
-              }}
-            />
           </Stack>
-
-          <Typography
-            sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              fontSize: "0.875rem",
-              textAlign: "center",
-            }}
-          >
-            Don't have an account?{" "}
-            <Box
-              component="span"
-              onClick={() => navigate("/register")}
-              sx={{
-                color: "#60a5fa",
-                fontWeight: 700,
-                cursor: "pointer",
-                textDecoration: "underline",
-              }}
-            >
-              Sign Up
-            </Box>
-          </Typography>
-        </Stack>
-      </AuthCard>
+        </AuthCard>
+      </Box>
     </Box>
   );
 };

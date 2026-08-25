@@ -22,9 +22,24 @@ const MainLayout = ({ portal }: Props) => {
         height: "100vh",
         overflow: "hidden",
         display: "flex",
-        bgcolor: "#eef2ff",
+        background:
+          "radial-gradient(circle at 50% 30%, #f0f7ff 0%, #e0f2fe 100%)",
+        position: "relative",
       }}
     >
+      {/* Background Floating Network SVG Grid */}
+      <Box
+        sx={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          opacity: 0.6,
+          //backgroundImage: `radial-gradient(#3b82f6 0.75px, transparent 0.75px), radial-gradient(#60a5fa 0.75px, #f0f7ff 0.75px)`,
+          backgroundSize: "30px 30px",
+          backgroundPosition: "0 0, 15px 15px",
+        }}
+      />
+
       <AppSidebar
         portal={portal}
         mobileOpen={mobileOpen}
@@ -38,12 +53,11 @@ const MainLayout = ({ portal }: Props) => {
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
+          position: "relative",
+          zIndex: 1,
         }}
       >
-        <AppHeader
-          portal={portal}
-          onMenuClick={() => setMobileOpen(true)}
-        />
+        <AppHeader portal={portal} onMenuClick={() => setMobileOpen(true)} />
 
         <Box
           component="main"
@@ -53,8 +67,6 @@ const MainLayout = ({ portal }: Props) => {
             overflowY: "auto",
             overflowX: "hidden",
             p: { xs: 2, md: 3 },
-            background:
-              "radial-gradient(circle at top left,#dbeafe 0,transparent 32%),linear-gradient(135deg,#f8fafc,#eef2ff)",
           }}
         >
           <Box

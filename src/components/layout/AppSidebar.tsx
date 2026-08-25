@@ -14,7 +14,6 @@ import {
 } from "@mui/material";
 
 import { Close, Logout } from "@mui/icons-material";
-
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { sidebarMenus, type PortalType } from "./sidebarMenus";
@@ -29,22 +28,19 @@ type Props = {
 
 const portalInfo = {
   candidate: {
-    title: "ResumeHub",
+    title: "Career OS 🚀",
     subtitle: "Candidate Portal",
     avatar: "C",
-    gradient: "linear-gradient(180deg,#667eea 0%,#764ba2 100%)",
   },
   company: {
-    title: "TalentHub",
+    title: "TalentHub 💼",
     subtitle: "Recruiter Portal",
     avatar: "HR",
-    gradient: "linear-gradient(180deg,#0f172a 0%,#1e1b4b 100%)",
   },
   admin: {
-    title: "AdminHub",
+    title: "AdminHub ⚡",
     subtitle: "Super Admin",
     avatar: "SA",
-    gradient: "linear-gradient(180deg,#020617 0%,#111827 100%)",
   },
 };
 
@@ -55,18 +51,44 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
   const info = portalInfo[portal];
   const menu = sidebarMenus[portal];
 
-  const sidebar = (
+  const sidebarContent = (
     <Box
       sx={{
-        height: "100vh",
-        color: "#fff",
-        background: info.gradient,
+        height: "100%",
         display: "flex",
         flexDirection: "column",
+        position: "relative",
         overflow: "hidden",
+        // Frosted Glass Layer over Login Background
+        bgcolor: "rgba(240, 246, 255, 0.45)",
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+        borderRight: "1px solid rgba(255, 255, 255, 0.6)",
+        boxShadow: "4px 0 24px rgba(0, 0, 0, 0.02)",
       }}
     >
-      <Box sx={{ px: 2.2, py: 2.2, flexShrink: 0 }}>
+      {/* Login Background Video Layer inside Sidebar */}
+      <Box
+        component="video"
+        autoPlay
+        loop
+        muted
+        playsInline
+        src="/assets/login-bg.mp4" // Ensure path matches your login background video asset
+        sx={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: -1,
+          opacity: 0.85,
+        }}
+      />
+
+      {/* Header / Branding */}
+      <Box sx={{ px: 3, py: 2.5, flexShrink: 0 }}>
         <Stack
           direction="row"
           spacing={1.5}
@@ -75,9 +97,13 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
           <Box>
             <Typography
               sx={{
-                fontWeight: 900,
-                fontSize: 24,
-                lineHeight: 1.1,
+                fontWeight: 800,
+                fontSize: 22,
+                background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                letterSpacing: "-0.02em",
+                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               }}
             >
               {info.title}
@@ -86,8 +112,10 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
             <Typography
               sx={{
                 fontSize: 12,
-                color: "rgba(255,255,255,.72)",
-                mt: 0.5,
+                color: "#64748b",
+                fontWeight: 600,
+                mt: 0.2,
+                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               }}
             >
               {info.subtitle}
@@ -97,7 +125,7 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
           <IconButton
             onClick={onClose}
             sx={{
-              color: "#fff",
+              color: "#64748b",
               display: { xs: "inline-flex", md: "none" },
             }}
           >
@@ -106,26 +134,19 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         </Stack>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,.1)" }} />
+      <Divider sx={{ borderColor: "rgba(203, 213, 225, 0.4)", mx: 2.5 }} />
 
+      {/* Navigation Menu */}
       <Box
         sx={{
           flex: 1,
           minHeight: 0,
           overflowY: "auto",
-          px: 1.5,
-          py: 1.5,
-
-          "&::-webkit-scrollbar": {
-            width: 6,
-          },
-
-          "&::-webkit-scrollbar-track": {
-            bgcolor: "transparent",
-          },
-
+          px: 2,
+          py: 2,
+          "&::-webkit-scrollbar": { width: 4 },
           "&::-webkit-scrollbar-thumb": {
-            bgcolor: "rgba(255,255,255,.25)",
+            bgcolor: "rgba(203, 213, 225, 0.5)",
             borderRadius: 10,
           },
         }}
@@ -144,50 +165,37 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                   onClose();
                 }}
                 sx={{
-                  mb: 0.6,
-                  px: 1.8,
-                  py: 1.1,
-                  borderRadius: 3,
-                  color: "#fff",
-                  position: "relative",
-                  overflow: "hidden",
-                  transition: "all .25s ease",
-
-                  bgcolor: active ? "rgba(255,255,255,.15)" : "transparent",
-
+                  mb: 1.2,
+                  px: 2,
+                  py: 1.2,
+                  borderRadius: "14px",
+                  color: active ? "#ffffff" : "#475569",
+                  background: active
+                    ? "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
+                    : "rgba(255, 255, 255, 0.35)",
+                  backdropFilter: active ? "none" : "blur(8px)",
+                  boxShadow: active
+                    ? "0 8px 20px rgba(37, 99, 235, 0.35)"
+                    : "0 2px 6px rgba(0, 0, 0, 0.01)",
                   border: active
-                    ? "1px solid rgba(255,255,255,.18)"
-                    : "1px solid transparent",
-
-                  boxShadow: active ? "0 10px 30px rgba(0,0,0,.18)" : "none",
-
-                  "&::before": active
-                    ? {
-                        content: '""',
-                        position: "absolute",
-                        left: 0,
-                        top: "22%",
-                        height: "56%",
-                        width: 4,
-                        borderRadius: 99,
-                        bgcolor: "#60a5fa",
-                      }
-                    : {},
+                    ? "1px solid rgba(255, 255, 255, 0.3)"
+                    : "1px solid rgba(255, 255, 255, 0.6)",
+                  transition: "all .25s ease-in-out",
 
                   "&:hover": {
-                    bgcolor: "rgba(255,255,255,.12)",
-                    transform: "translateX(4px)",
+                    background: active
+                      ? "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
+                      : "rgba(255, 255, 255, 0.75)",
+                    transform: "translateY(-1px)",
+                    color: active ? "#ffffff" : "#1e293b",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    color: active ? "#93c5fd" : "rgba(255,255,255,.82)",
-                    minWidth: 40,
-
-                    "& svg": {
-                      fontSize: 21,
-                    },
+                    color: active ? "#ffffff" : "#3b82f6",
+                    minWidth: 38,
+                    "& svg": { fontSize: 22 },
                   }}
                 >
                   {item.icon}
@@ -199,11 +207,12 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                       component="span"
                       sx={{
                         display: "block",
-                        fontWeight: active ? 900 : 700,
+                        fontWeight: active ? 700 : 600,
                         fontSize: 14,
                         whiteSpace: "nowrap",
                         overflow: "hidden",
                         textOverflow: "ellipsis",
+                        fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                       }}
                     >
                       {item.label}
@@ -216,13 +225,16 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         </List>
       </Box>
 
-      <Box sx={{ p: 1.5, flexShrink: 0 }}>
+      {/* User Footer Profile Card */}
+      <Box sx={{ p: 2, flexShrink: 0 }}>
         <Box
           sx={{
-            p: 1.4,
-            borderRadius: 4,
-            bgcolor: "rgba(255,255,255,.10)",
-            border: "1px solid rgba(255,255,255,.12)",
+            p: 1.5,
+            borderRadius: "18px",
+            bgcolor: "rgba(255, 255, 255, 0.75)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.03)",
           }}
         >
           <Stack direction="row" spacing={1.3} sx={{ alignItems: "center" }}>
@@ -230,9 +242,10 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
               sx={{
                 width: 38,
                 height: 38,
-                bgcolor: "#2563eb",
-                fontWeight: 900,
+                bgcolor: "#3b82f6",
+                fontWeight: 700,
                 fontSize: 13,
+                boxShadow: "0 4px 12px rgba(59, 130, 246, 0.35)",
               }}
             >
               {info.avatar}
@@ -241,11 +254,13 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography
                 sx={{
-                  fontWeight: 900,
+                  fontWeight: 700,
                   fontSize: 13,
+                  color: "#0f172a",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
+                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                 }}
               >
                 {portal === "company"
@@ -258,10 +273,11 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
               <Typography
                 sx={{
                   fontSize: 11,
-                  color: "rgba(255,255,255,.65)",
+                  color: "#64748b",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
+                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
                 }}
               >
                 {info.subtitle}
@@ -271,22 +287,26 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
 
           <Button
             fullWidth
-            startIcon={<Logout />}
+            startIcon={<Logout sx={{ fontSize: 18 }} />}
+            onClick={() => navigate("/login")}
             sx={{
-              mt: 1.3,
-              color: "#fff",
-              justifyContent: "flex-start",
-              borderRadius: 2.5,
+              mt: 1.5,
+              color: "#ef4444",
+              justifyContent: "center",
+              borderRadius: "12px",
               textTransform: "none",
-              fontWeight: 800,
-              bgcolor: "rgba(255,255,255,.08)",
-
+              fontWeight: 600,
+              bgcolor: "rgba(254, 242, 242, 0.8)",
+              fontSize: 13,
+              py: 0.8,
+              boxShadow: "none",
+              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
               "&:hover": {
-                bgcolor: "rgba(255,255,255,.14)",
+                bgcolor: "#fee2e2",
               },
             }}
           >
-            Logout
+            Log Out
           </Button>
         </Box>
       </Box>
@@ -308,18 +328,16 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", md: "none" },
-
           "& .MuiDrawer-paper": {
             width: drawerWidth,
-            height: "100vh",
-            border: 0,
-            overflow: "hidden",
-            bgcolor: "transparent",
-            boxShadow: "0 24px 80px rgba(0,0,0,.35)",
+            boxSizing: "border-box",
+            border: "none",
+            backgroundColor: "transparent !important",
+            backgroundImage: "none !important",
           },
         }}
       >
-        {sidebar}
+        {sidebarContent}
       </Drawer>
 
       <Drawer
@@ -327,18 +345,17 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         open
         sx={{
           display: { xs: "none", md: "block" },
-
           "& .MuiDrawer-paper": {
             width: drawerWidth,
-            height: "100vh",
-            border: 0,
-            overflow: "hidden",
-            bgcolor: "transparent",
-            boxShadow: "8px 0 30px rgba(15,23,42,.12)",
+            boxSizing: "border-box",
+            border: "none",
+            backgroundColor: "transparent !important",
+            backgroundImage: "none !important",
+            boxShadow: "none",
           },
         }}
       >
-        {sidebar}
+        {sidebarContent}
       </Drawer>
     </Box>
   );

@@ -25,6 +25,7 @@ const PasswordField = <T extends FieldValues>({
       name={name}
       control={control}
       type={showPassword ? "text" : "password"}
+      autoComplete="new-password"
       slotProps={{
         input: {
           endAdornment: (
@@ -32,8 +33,24 @@ const PasswordField = <T extends FieldValues>({
               <IconButton
                 edge="end"
                 onClick={() => setShowPassword((prev) => !prev)}
+                sx={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  bgcolor: "#e0f2fe", // Light soft-blue bubble container
+                  color: "#3b82f6",
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    bgcolor: "#bae6fd",
+                    transform: "scale(1.05)",
+                  },
+                }}
               >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
+                {showPassword ? (
+                  <VisibilityOff sx={{ fontSize: "1.1rem" }} />
+                ) : (
+                  <Visibility sx={{ fontSize: "1.1rem" }} />
+                )}
               </IconButton>
             </InputAdornment>
           ),

@@ -4,17 +4,17 @@ import { ArrowForward, CheckCircle } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-// Stagger Animation Variants
+// Entrance Animation Variants
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.15 },
+    transition: { staggerChildren: 0.12 },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
@@ -29,25 +29,20 @@ const RegisterTypePage = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        // position: "relative",
         overflow: "hidden",
         display: "grid",
         placeItems: "center",
         p: { xs: 2, sm: 3 },
-        // background:
-        //   "linear-gradient(135deg, #090d16 0%, #0f172a 40%, #1e1b4b 100%)",
+        background: "linear-gradient(135deg, #f0f7ff 0%, #eef2ff 100%)",
+        position: "relative",
       }}
     >
-      {/* Background Animated Glow Elements */}
-      <Glow top="-5%" left="-5%" color="#3b82f6" duration={6} />
-      <Glow bottom="-5%" right="-5%" color="#8b5cf6" duration={8} />
-
       <Stack
         component={motion.div}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        spacing={3}
+        spacing={3.5}
         sx={{ width: "100%", maxWidth: 860, zIndex: 2 }}
       >
         {/* Title Header */}
@@ -56,15 +51,15 @@ const RegisterTypePage = () => {
             <Chip
               label="Choose your journey"
               sx={{
-                mb: 1.5,
-                color: "#93c5fd",
-                fontSize: "12px",
-                fontWeight: 700,
-                bgcolor: "rgba(59, 130, 246, 0.12)",
-                border: "1px solid rgba(147, 197, 253, 0.25)",
-                backdropFilter: "blur(8px)",
-                px: 0.5,
-                height: "26px",
+                mb: 2,
+                color: "#2563eb",
+                fontSize: "13px",
+                fontWeight: 600,
+                bgcolor: "#e0edff",
+                border: "1px solid #c7d2fe",
+                borderRadius: "20px",
+                px: 1,
+                height: "30px",
               }}
             />
           </motion.div>
@@ -73,76 +68,68 @@ const RegisterTypePage = () => {
             <Typography
               component="h1"
               sx={{
-                color: "#fff",
+                color: "#1e3a8a",
                 fontWeight: 900,
-                fontSize: { xs: 28, sm: 38, md: 44 },
-                letterSpacing: "-0.02em",
+                fontSize: { xs: 32, sm: 42, md: 48 },
+                letterSpacing: "-0.03em",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
                 gap: 1.5,
               }}
             >
-              Join Resume Builder
-              {/* Video-style Animated Flying Rocket */}
+              <Box
+                component={motion.span}
+                animate={{ y: [0, -3, 0] }}
+                transition={{
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
+              >
+                Join Career OS
+              </Box>
+
+              {/* Animated Flying Rocket */}
               <Box
                 component={motion.span}
                 animate={{
-                  y: [0, -10, 0],
-                  x: [0, 4, 0],
+                  y: [0, -8, 0],
+                  x: [0, 3, 0],
                   rotate: [0, 6, 0],
                 }}
                 transition={{
-                  duration: 3,
+                  duration: 2.8,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
                 sx={{
                   display: "inline-block",
                   position: "relative",
-                  filter: "drop-shadow(0 0 12px rgba(249, 115, 22, 0.6))",
+                  filter: "drop-shadow(0 4px 10px rgba(0, 0, 0, 0.15))",
                 }}
               >
                 🚀
-                {/* Rocket Exhaust Fire Pulse */}
-                <Box
-                  component={motion.span}
-                  animate={{
-                    scale: [0.8, 1.3, 0.8],
-                    opacity: [0.4, 0.9, 0.4],
-                  }}
-                  transition={{
-                    duration: 0.6,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                  sx={{
-                    position: "absolute",
-                    bottom: -4,
-                    left: -4,
-                    width: 14,
-                    height: 14,
-                    borderRadius: "50%",
-                    bgcolor: "#f97316",
-                    filter: "blur(6px)",
-                    zIndex: -1,
-                  }}
-                />
               </Box>
             </Typography>
           </motion.div>
 
           <motion.div variants={itemVariants}>
             <Typography
-              sx={{ color: "rgba(255,255,255,0.7)", mt: 0.8, fontSize: "14px" }}
+              sx={{
+                color: "#64748b",
+                mt: 1,
+                fontSize: "15px",
+                fontWeight: 500,
+              }}
             >
               Select how you want to use the platform.
             </Typography>
           </motion.div>
         </Box>
 
-        {/* Compact Account Type Cards Grid */}
-        <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5}>
+        {/* Account Type Cards Grid */}
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={3.5}>
           <CompactAccountCard
             animatedIcon={<CandidateAnimatedIcon />}
             title="Candidate"
@@ -154,8 +141,9 @@ const RegisterTypePage = () => {
               "ATS Score Analysis",
             ]}
             buttonText="Start as Candidate"
-            accentColor="#3b82f6"
-            hoverGradient="linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(99, 102, 241, 0.05))"
+            buttonGradient="linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)"
+            glowColor="rgba(37, 99, 235, 0.45)"
+            iconBg="#e0edff"
             onClick={() => navigate("/register/candidate")}
           />
 
@@ -170,8 +158,9 @@ const RegisterTypePage = () => {
               "Hiring Pipeline",
             ]}
             buttonText="Start as Company"
-            accentColor="#a855f7"
-            hoverGradient="linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.05))"
+            buttonGradient="linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)"
+            glowColor="rgba(139, 92, 246, 0.45)"
+            iconBg="#f3e8ff"
             onClick={() => navigate("/register/company")}
           />
         </Stack>
@@ -181,8 +170,10 @@ const RegisterTypePage = () => {
           <Typography
             sx={{
               textAlign: "center",
-              color: "rgba(255,255,255,0.8)",
-              fontSize: "13.5px",
+              color: "#64748b",
+              fontSize: "14px",
+              fontWeight: 500,
+              mt: 1,
             }}
           >
             Already have an account?{" "}
@@ -190,12 +181,10 @@ const RegisterTypePage = () => {
               component="span"
               onClick={() => navigate("/login")}
               sx={{
-                fontWeight: 800,
-                color: "#60a5fa",
+                fontWeight: 700,
+                color: "#2563eb",
                 cursor: "pointer",
-                textDecoration: "underline",
-                transition: "color 0.2s",
-                "&:hover": { color: "#93c5fd" },
+                "&:hover": { textDecoration: "underline" },
               }}
             >
               Login
@@ -213,8 +202,9 @@ interface CompactCardProps {
   subtitle: string;
   features: string[];
   buttonText: string;
-  accentColor: string;
-  hoverGradient: string;
+  buttonGradient: string;
+  glowColor: string;
+  iconBg: string;
   onClick: () => void;
 }
 
@@ -224,93 +214,84 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
   subtitle,
   features,
   buttonText,
-  accentColor,
-  hoverGradient,
+  buttonGradient,
+  glowColor,
+  iconBg,
   onClick,
 }) => (
   <Paper
     component={motion.div}
     variants={itemVariants}
-    whileHover={{ y: -8, scale: 1.015 }}
-    transition={{ type: "spring", stiffness: 220, damping: 18 }}
+    whileHover={{ y: -4, scale: 1.005 }}
+    transition={{ type: "spring", stiffness: 200, damping: 16 }}
     onClick={onClick}
     sx={{
       flex: 1,
-      p: { xs: 2.5, sm: 3 },
-      borderRadius: 5,
+      p: { xs: 2.5, sm: 3 }, // Reduced vertical padding to prevent scrolling
+      borderRadius: "24px", // Compact border radius
       cursor: "pointer",
-      color: "#fff",
+      color: "#0f172a",
       position: "relative",
-      background: "rgba(255, 255, 255, 0.04)",
-      backdropFilter: "blur(18px)",
-      border: "1px solid rgba(255, 255, 255, 0.1)",
-      boxShadow: "0 20px 40px -10px rgba(0,0,0,0.5)",
+      bgcolor: "#ffffff",
+      boxShadow:
+        "0 15px 35px -10px rgba(37, 99, 235, 0.18), 0 5px 15px -5px rgba(59, 130, 246, 0.12)",
+      border: "1px solid rgba(191, 219, 254, 0.5)",
       overflow: "hidden",
-      transition: "border-color 0.3s ease",
+      transition: "all 0.3s ease-in-out",
       "&:hover": {
-        borderColor: accentColor,
-      },
-      "&:hover .card-glow": {
-        opacity: 1,
-      },
-      "&:hover .cta-btn": {
-        bgcolor: accentColor,
-        color: "#ffffff",
-        boxShadow: `0 8px 20px -4px ${accentColor}80`,
+        boxShadow: `0 20px 40px -8px ${glowColor}, 0 8px 20px -8px rgba(37, 99, 235, 0.2)`,
+        borderColor: "rgba(147, 197, 253, 0.8)",
       },
     }}
   >
-    {/* Inner Hover Gradient Glow Layer */}
-    <Box
-      className="card-glow"
-      sx={{
-        position: "absolute",
-        inset: 0,
-        background: hoverGradient,
-        opacity: 0,
-        transition: "opacity 0.4s ease",
-        pointerEvents: "none",
-      }}
-    />
-
     <Stack spacing={2} sx={{ position: "relative", zIndex: 1 }}>
-      {/* Animated Icon Housing */}
+      {/* Smaller Icon Container */}
       <Box
         sx={{
-          width: 64,
-          height: 64,
-          borderRadius: 4,
+          width: 46,
+          height: 46,
+          borderRadius: "12px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "rgba(255, 255, 255, 0.06)",
-          border: "1px solid rgba(255, 255, 255, 0.12)",
+          bgcolor: iconBg,
         }}
       >
         {animatedIcon}
       </Box>
 
-      {/* Card Header */}
+      {/* Card Title & Subtitle */}
       <Box>
         <Typography
           variant="h5"
-          sx={{ fontWeight: 800, fontSize: "20px", mb: 0.5 }}
+          sx={{
+            fontWeight: 800,
+            fontSize: "1.25rem",
+            color: "#1e3a8a",
+            mb: 0.5,
+          }}
         >
           {title}
         </Typography>
         <Typography
           sx={{
-            color: "rgba(255, 255, 255, 0.65)",
-            fontSize: "12.5px",
-            lineHeight: 1.45,
+            color: "#64748b",
+            fontSize: "0.8rem",
+            lineHeight: 1.4,
+            fontWeight: 500,
+            minHeight: "34px", // Fixes layout shift across different subtitle lengths
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         >
           {subtitle}
         </Typography>
       </Box>
 
-      {/* Feature Bullet Points */}
-      <Stack spacing={1}>
+      {/* Compact Feature List */}
+      <Stack spacing={1} sx={{ pt: 0.25 }}>
         {features.map((feature) => (
           <Stack
             key={feature}
@@ -318,12 +299,12 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
             spacing={1}
             sx={{ alignItems: "center" }}
           >
-            <CheckCircle sx={{ fontSize: 16, color: "#4ade80" }} />
+            <CheckCircle sx={{ fontSize: 16, color: "#16a34a" }} />
             <Typography
               sx={{
-                fontSize: "13px",
-                fontWeight: 600,
-                color: "rgba(255,255,255,0.85)",
+                fontSize: "0.8rem",
+                fontWeight: 700,
+                color: "#334155",
               }}
             >
               {feature}
@@ -337,17 +318,26 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
         className="cta-btn"
         fullWidth
         variant="contained"
-        endIcon={<ArrowForward sx={{ fontSize: "18px !important" }} />}
+        endIcon={<ArrowForward sx={{ fontSize: "16px !important" }} />}
         sx={{
           mt: 1,
           py: 1.1,
-          borderRadius: 3,
-          fontWeight: 800,
-          fontSize: "13.5px",
+          borderRadius: "50px",
+          fontWeight: 700,
+          fontSize: "0.875rem",
           textTransform: "none",
-          bgcolor: "#ffffff",
-          color: "#0f172a",
-          transition: "all 0.3s ease",
+          background: buttonGradient,
+          color: "#ffffff",
+          boxShadow: `0 0 16px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.3)`,
+          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          "&:hover": {
+            transform: "translateY(-1px)",
+            background: buttonGradient,
+            boxShadow: `0 0 24px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.5)`,
+          },
+          "&:active": {
+            transform: "translateY(1px)",
+          },
         }}
       >
         {buttonText}
@@ -356,45 +346,47 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
   </Paper>
 );
 
-// Video/SVG Custom Candidate Animation Component
+// Original Candidate Custom Animated Icon
 const CandidateAnimatedIcon = () => (
   <Box
     sx={{
       position: "relative",
       width: 36,
       height: 36,
-      display: "grid",
-      placeItems: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
     }}
   >
     <Box
       component={motion.div}
-      animate={{ y: [-2, 3, -2] }}
+      animate={{ y: [-2, 2, -2] }}
       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       sx={{
-        width: 18,
-        height: 18,
+        width: 16,
+        height: 16,
         borderRadius: "50%",
-        bgcolor: "#60a5fa",
-        boxShadow: "0 0 10px #60a5fa",
+        bgcolor: "#3b82f6",
+        boxShadow: "0 0 8px rgba(59, 130, 246, 0.5)",
       }}
     />
     <Box
       component={motion.div}
-      animate={{ scaleY: [0.8, 1.1, 0.8] }}
+      animate={{ scaleY: [0.85, 1.1, 0.85] }}
       transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
       sx={{
-        width: 28,
+        width: 26,
         height: 10,
-        borderRadius: "8px 8px 0 0",
-        bgcolor: "#3b82f6",
+        borderRadius: "6px 6px 0 0",
+        bgcolor: "#2563eb",
         mt: 0.5,
       }}
     />
   </Box>
 );
 
-// Video/SVG Custom Company Animation Component
+// Original Company Custom Animated Icon
 const CompanyAnimatedIcon = () => (
   <Box
     sx={{
@@ -404,66 +396,27 @@ const CompanyAnimatedIcon = () => (
       display: "flex",
       alignItems: "flex-end",
       justifyContent: "center",
-      gap: 0.5,
+      gap: 0.6,
     }}
   >
     <Box
       component={motion.div}
-      animate={{ height: ["14px", "22px", "14px"] }}
+      animate={{ height: ["12px", "20px", "12px"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-      sx={{ width: 10, bgcolor: "#c084fc", borderRadius: "2px 2px 0 0" }}
+      sx={{ width: 9, bgcolor: "#a855f7", borderRadius: "3px 3px 0 0" }}
     />
     <Box
       component={motion.div}
-      animate={{ height: ["24px", "16px", "24px"] }}
+      animate={{ height: ["22px", "14px", "22px"] }}
       transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
       sx={{
-        width: 12,
-        bgcolor: "#a855f7",
-        borderRadius: "2px 2px 0 0",
-        boxShadow: "0 0 8px #a855f7",
+        width: 11,
+        bgcolor: "#7c3aed",
+        borderRadius: "3px 3px 0 0",
+        boxShadow: "0 0 8px rgba(124, 58, 237, 0.4)",
       }}
     />
   </Box>
-);
-
-// Animated Background Glow Element
-const Glow = ({
-  top,
-  left,
-  right,
-  bottom,
-  color,
-  duration,
-}: {
-  top?: string;
-  left?: string;
-  right?: string;
-  bottom?: string;
-  color: string;
-  duration: number;
-}) => (
-  <Box
-    component={motion.div}
-    animate={{
-      scale: [1, 1.2, 1],
-      opacity: [0.2, 0.4, 0.2],
-    }}
-    transition={{ duration, repeat: Infinity, ease: "easeInOut" }}
-    sx={{
-      position: "absolute",
-      top,
-      left,
-      right,
-      bottom,
-      width: 380,
-      height: 380,
-      borderRadius: "50%",
-      bgcolor: color,
-      filter: "blur(120px)",
-      pointerEvents: "none",
-    }}
-  />
 );
 
 export default RegisterTypePage;

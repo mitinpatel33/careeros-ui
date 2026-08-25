@@ -1,4 +1,10 @@
-import { Button, CircularProgress, type SxProps, type Theme } from "@mui/material";
+import React from "react";
+import {
+  Button,
+  CircularProgress,
+  type SxProps,
+  type Theme,
+} from "@mui/material";
 
 interface AppButtonProps {
   children: React.ReactNode;
@@ -11,21 +17,21 @@ interface AppButtonProps {
   endIcon?: React.ReactNode;
   disabled?: boolean;
   onClick?: () => void;
-  sx?: SxProps<Theme>; // 1. Added sx prop definition
+  sx?: SxProps<Theme>;
 }
 
 const AppButton = ({
   children,
   loading = false,
   type = "button",
-  fullWidth = false,
+  fullWidth = true,
   color = "primary",
   variant = "contained",
   startIcon,
   endIcon,
   disabled,
   onClick,
-  sx, // 2. Received sx prop
+  sx,
 }: AppButtonProps) => {
   return (
     <Button
@@ -35,23 +41,21 @@ const AppButton = ({
       type={type}
       color={color}
       disabled={loading || disabled}
-      startIcon={loading ? <CircularProgress size={18} color="inherit" /> : startIcon}
+      startIcon={
+        loading ? <CircularProgress size={18} color="inherit" /> : startIcon
+      }
       endIcon={!loading ? endIcon : undefined}
       onClick={onClick}
-      sx={{
-        height: 50,
-        px: 3,
-        borderRadius: 3,
-        textTransform: "none",
-        fontWeight: 800,
-        boxShadow: variant === "contained" ? "0 12px 30px rgba(25,118,210,.25)" : "none",
-        transition: "0.25s",
-        "&:hover": {
-          transform: "translateY(-2px)",
+      sx={[
+        {
+          height: 48,
+          px: 3,
+          borderRadius: "16px",
+          textTransform: "none",
+          fontWeight: 700,
         },
-        // 3. Merged incoming custom sx styles smoothly
         ...(Array.isArray(sx) ? sx : [sx]),
-      }}
+      ]}
     >
       {loading ? "Please Wait..." : children}
     </Button>

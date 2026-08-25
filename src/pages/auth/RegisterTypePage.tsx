@@ -28,13 +28,13 @@ const RegisterTypePage = () => {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
+        // minHeight: "100vh",
         overflow: "hidden",
         display: "grid",
         placeItems: "center",
-        p: { xs: 2, sm: 3 },
-        background: "linear-gradient(135deg, #f0f7ff 0%, #eef2ff 100%)",
-        position: "relative",
+        // p: { xs: 2, sm: 3 },
+        // background: "linear-gradient(135deg, #f0f7ff 0%, #eef2ff 100%)",
+        // position: "relative",
       }}
     >
       <Stack

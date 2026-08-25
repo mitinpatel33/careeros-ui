@@ -14,7 +14,7 @@ import type { PortalType } from "./sidebarMenus";
 import { useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../../services/authApi";
 
-const drawerWidth = 260;
+const drawerWidth = 270;
 
 type Props = {
   portal: PortalType;
@@ -22,9 +22,9 @@ type Props = {
 };
 
 const headerTitle = {
-  candidate: "Candidate Portal",
-  company: "Company Portal",
-  admin: "Admin Panel",
+  candidate: "Candidate Portal 🚀",
+  company: "Company Portal 💼",
+  admin: "Admin Panel ⚡",
 };
 
 const headerSubtitle = {
@@ -41,15 +41,12 @@ const avatarText = {
 
 const AppHeader = ({ portal, onMenuClick }: Props) => {
   const navigate = useNavigate();
-
   const [logout, { isLoading }] = useLogoutMutation();
 
   const handleLogout = async () => {
     try {
-      // retrieve refreshToken from localStorage (or from Redux)
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) {
-        // if no token, just redirect to login
         localStorage.removeItem("token");
         localStorage.removeItem("refreshToken");
         navigate("/login");
@@ -57,15 +54,11 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
       }
 
       await logout({ refreshToken }).unwrap();
-      // success: clear tokens and redirect
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
-      // If using Redux, dispatch logout action here
       navigate("/login");
     } catch (error) {
-      // handle error (e.g., show snackbar)
       console.error("Logout failed:", error);
-      // still clear local tokens to avoid getting stuck
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       navigate("/login");
@@ -77,60 +70,61 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
       position="sticky"
       elevation={0}
       sx={{
-        ml: {
-          md: `${drawerWidth}px`,
-        },
-        bgcolor: "rgba(255,255,255,0.85)",
+        ml: { md: `${drawerWidth}px` },
+        bgcolor: "rgba(255, 255, 255, 0.65)",
         backdropFilter: "blur(16px)",
-        color: "text.primary",
-        borderBottom: "1px solid #e5e7eb",
-        boxShadow: "none",
+        color: "#0f172a",
+        borderBottom: "1px solid rgba(219, 234, 254, 0.6)",
       }}
     >
-      <Toolbar
-        sx={{
-          justifyContent: "space-between",
-        }}
-      >
-        <Stack direction="row" sx={{ spacing: 1.5, alignItems: "center" }}>
+      <Toolbar sx={{ justifyContent: "space-between", py: 0.5 }}>
+        <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
           <IconButton
             onClick={onMenuClick}
             sx={{
-              display: {
-                xs: "inline-flex",
-                md: "none",
-              },
+              display: { xs: "inline-flex", md: "none" },
+              bgcolor: "#ffffff",
+              color: "#3b82f6",
+              boxShadow: "0 2px 8px rgba(59, 130, 246, 0.15)",
             }}
           >
             <Menu />
           </IconButton>
 
           <Box>
-            <Typography sx={{ fontWeight: 900 }}>
+            <Typography
+              sx={{ fontWeight: 800, fontSize: "1.1rem", color: "#1e3a8a" }}
+            >
               {headerTitle[portal]}
             </Typography>
 
-            <Typography
-              sx={{
-                fontSize: 12,
-                color: "text.secondary",
-              }}
-            >
+            <Typography sx={{ fontSize: 12, color: "#64748b" }}>
               {headerSubtitle[portal]}
             </Typography>
           </Box>
         </Stack>
 
         <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
-          <IconButton>
-            <Notifications />
+          <IconButton
+            sx={{
+              bgcolor: "#ffffff",
+              color: "#3b82f6",
+              boxShadow: "0 2px 8px rgba(59, 130, 246, 0.1)",
+              "&:hover": { bgcolor: "#f0f7ff" },
+            }}
+          >
+            <Notifications sx={{ fontSize: 20 }} />
           </IconButton>
 
           <Avatar
             sx={{
-              bgcolor: portal === "admin" ? "error.main" : "primary.main",
+              width: 38,
+              height: 38,
+              background: "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
+              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.35)",
               fontWeight: 800,
               cursor: "pointer",
+              fontSize: 14,
             }}
             onClick={() => navigate(`/${portal}/profile`)}
           >
@@ -140,9 +134,14 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
           <IconButton
             onClick={handleLogout}
             disabled={isLoading}
-            // color="inherit"
+            sx={{
+              bgcolor: "#ffffff",
+              color: "#ef4444",
+              boxShadow: "0 2px 8px rgba(239, 68, 68, 0.1)",
+              "&:hover": { bgcolor: "#fef2f2" },
+            }}
           >
-            <Logout />
+            <Logout sx={{ fontSize: 20 }} />
           </IconButton>
         </Stack>
       </Toolbar>

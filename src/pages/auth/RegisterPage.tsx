@@ -20,35 +20,92 @@ import { loginSuccess } from "../../store/auth/authSlice";
 const AnimatedRocket = () => (
   <Box
     component={motion.span}
-    animate={{ y: [0, -8, 0], x: [0, 3, 0], rotate: [0, 5, 0] }}
-    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+    animate={{ y: [0, -6, 0], x: [0, 2, 0], rotate: [0, 4, 0] }}
+    transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
     sx={{
       display: "inline-block",
       position: "relative",
-      filter: "drop-shadow(0 0 10px rgba(249, 115, 22, 0.6))",
-      ml: 1,
+      ml: 0.5,
     }}
   >
     🚀
   </Box>
 );
 
-const darkTextFieldSx = {
+// High-contrast clean input styling for light theme
+const lightTextFieldSx = {
   "& .MuiInputLabel-root": {
-    color: "rgba(255, 255, 255, 0.7)",
-    fontSize: "0.9rem",
-    "&.Mui-focused": { color: "#60a5fa" },
+    color: "#64748b",
+    fontSize: "0.825rem",
+    fontWeight: 500,
+    "&.Mui-focused": { color: "#2563eb" },
   },
   "& .MuiOutlinedInput-root": {
-    color: "#fff",
-    backgroundColor: "rgba(255, 255, 255, 0.06)",
+    color: "#0f172a",
+    backgroundColor: "#f8fafc",
     borderRadius: "12px",
-    fontSize: "0.95rem",
-    "& fieldset": { borderColor: "rgba(255, 255, 255, 0.18)" },
-    "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.35)" },
-    "&.Mui-focused fieldset": { borderColor: "#3b82f6", borderWidth: "2px" },
+    fontSize: "0.9rem",
+    "& fieldset": { borderColor: "#e2e8f0", borderWidth: "1px" },
+    "&:hover fieldset": { borderColor: "#cbd5e1" },
+    "&.Mui-focused": {
+      backgroundColor: "#ffffff",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#3b82f6",
+      borderWidth: "1.5px",
+    },
   },
-  "& .MuiSvgIcon-root": { color: "rgba(255, 255, 255, 0.7)" },
+  "& .MuiSvgIcon-root": { color: "#64748b" },
+};
+
+// Glowing pill button style matching Login
+const glowButtonSx = {
+  height: 50,
+  width: "100%",
+  borderRadius: "12px !important", // Match exact squircle corners (not full pill)
+  fontWeight: 700,
+  fontSize: "0.95rem",
+  fontFamily: "'Inter', -apple-system, sans-serif",
+  textTransform: "none",
+  color: "#ffffff",
+  letterSpacing: "0.3px",
+
+  // Linear blue gradient matching the visual core
+  background: "linear-gradient(180deg, #4da0ff 0%, #2b7fff 50%, #1e6bf0 100%)",
+
+  // Multi-layered outline: Crisp glowing white inner border + bright cyan outer glow
+  boxShadow: `
+    0 0 0 1px #ffffff,
+    0 0 0 2.5px #7dd3fc,
+    0 0 18px 4px rgba(56, 189, 248, 0.65),
+    0 0 35px 8px rgba(56, 189, 248, 0.35),
+    0 8px 20px rgba(37, 99, 235, 0.3)
+  `,
+
+  transition: "all 0.25s ease-in-out",
+
+  "&:hover": {
+    background:
+      "linear-gradient(180deg, #5fb0ff 0%, #3d8cff 50%, #2374ff 100%)",
+    boxShadow: `
+      0 0 0 1px #ffffff,
+      0 0 0 3px #bae6fd,
+      0 0 22px 6px rgba(56, 189, 248, 0.85),
+      0 0 45px 12px rgba(56, 189, 248, 0.5),
+      0 10px 25px rgba(37, 99, 235, 0.4)
+    `,
+    transform: "translateY(-1px)",
+  },
+
+  "&:active": {
+    transform: "translateY(1px)",
+    boxShadow: `
+      0 0 0 1px #ffffff,
+      0 0 0 2px #38bdf8,
+      0 0 12px 2px rgba(56, 189, 248, 0.5),
+      0 4px 12px rgba(37, 99, 235, 0.3)
+    `,
+  },
 };
 
 const RegisterPage = () => {
@@ -89,29 +146,30 @@ const RegisterPage = () => {
   return (
     <Box
       component={motion.div}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      sx={{ width: "100%", maxWidth: 520, px: 2, zIndex: 2, py: 3 }}
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.4 }}
+      sx={{ width: "100%", maxWidth: 460, px: 2, zIndex: 2, py: 2 }}
     >
       <AuthCard
         sx={{
-          p: { xs: 3, sm: 4 },
-          borderRadius: 6,
-          background: "rgba(255, 255, 255, 0.05)",
+          p: { xs: 3, sm: 3.5 },
+          borderRadius: 7,
+          background: "rgba(255, 255, 255, 0.92)",
           backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.12)",
-          boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.5)",
-          color: "#fff",
+          border: "1px solid rgba(191, 219, 254, 0.6)",
+          boxShadow:
+            "0 20px 45px -10px rgba(37, 99, 235, 0.25), 0 10px 25px -15px rgba(59, 130, 246, 0.2)",
         }}
       >
-        <Stack spacing={3}>
+        <Stack spacing={2.5}>
+          {/* Header */}
           <Box sx={{ textAlign: "center" }}>
             <Typography
               sx={{
                 fontWeight: 800,
-                fontSize: { xs: "1.75rem", sm: "2rem" },
-                color: "#fff",
+                fontSize: { xs: "1.75rem", sm: "1.95rem" },
+                color: "#2563eb",
                 letterSpacing: "-0.5px",
               }}
             >
@@ -119,25 +177,27 @@ const RegisterPage = () => {
             </Typography>
             <Typography
               sx={{
-                color: "rgba(255, 255, 255, 0.65)",
-                mt: 0.5,
-                fontSize: "0.875rem",
+                color: "#64748b",
+                mt: 0.25,
+                fontSize: "0.825rem",
+                fontWeight: 500,
               }}
             >
               Start building your professional resume
             </Typography>
           </Box>
 
+          {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2.5}>
-              <Grid container spacing={2}>
+            <Stack spacing={1.8}>
+              <Grid container spacing={1.5}>
                 <Grid size={{ xs: 12, sm: 6 }}>
                   <AppTextField<RegisterSchemaType>
                     name="firstName"
                     control={control}
                     label="First Name"
                     fullWidth
-                    sx={darkTextFieldSx}
+                    sx={lightTextFieldSx}
                   />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6 }}>
@@ -146,7 +206,7 @@ const RegisterPage = () => {
                     control={control}
                     label="Last Name"
                     fullWidth
-                    sx={darkTextFieldSx}
+                    sx={lightTextFieldSx}
                   />
                 </Grid>
               </Grid>
@@ -156,7 +216,7 @@ const RegisterPage = () => {
                 control={control}
                 label="Email Address"
                 fullWidth
-                sx={darkTextFieldSx}
+                sx={lightTextFieldSx}
               />
 
               <PasswordField<RegisterSchemaType>
@@ -164,7 +224,7 @@ const RegisterPage = () => {
                 control={control}
                 label="Password"
                 fullWidth
-                sx={darkTextFieldSx}
+                sx={lightTextFieldSx}
               />
 
               <PasswordField<RegisterSchemaType>
@@ -172,32 +232,26 @@ const RegisterPage = () => {
                 control={control}
                 label="Confirm Password"
                 fullWidth
-                sx={darkTextFieldSx}
+                sx={lightTextFieldSx}
               />
 
               <AppButton
                 type="submit"
                 loading={isLoading}
-                sx={{
-                  mt: 1,
-                  py: 1.3,
-                  borderRadius: 3,
-                  fontWeight: 700,
-                  fontSize: "0.95rem",
-                  bgcolor: "#3b82f6",
-                  "&:hover": { bgcolor: "#2563eb" },
-                }}
+                sx={{ ...glowButtonSx, mt: 1 }}
               >
-                Create Account
+                {isLoading ? "Creating Account..." : "Create Account"}
               </AppButton>
             </Stack>
           </form>
 
+          {/* Footer Link */}
           <Typography
             sx={{
-              color: "rgba(255, 255, 255, 0.7)",
-              fontSize: "0.875rem",
+              color: "#64748b",
+              fontSize: "0.825rem",
               textAlign: "center",
+              fontWeight: 500,
             }}
           >
             Already have an account?{" "}
@@ -205,7 +259,7 @@ const RegisterPage = () => {
               component={RouterLink}
               to="/login"
               underline="hover"
-              sx={{ color: "#60a5fa", fontWeight: 700 }}
+              sx={{ color: "#2563eb", fontWeight: 700 }}
             >
               Login
             </Link>

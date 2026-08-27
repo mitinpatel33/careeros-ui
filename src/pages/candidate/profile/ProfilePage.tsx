@@ -351,7 +351,7 @@ const ProfilePage = () => {
         >
           ← Change Selected Template
         </Button>
-        <ResumeEditorPage templateId={selectedTemplate} data={resumeData} />
+        <ResumeEditorPage initialTemplateId={selectedTemplate} data={resumeData} />
         <Stack direction="row" sx={{ justifyContent: "flex-end", mt: 3 }}>
           <Button
             variant="contained"

@@ -7,7 +7,7 @@ import AppHeader from "../components/layout/AppHeader";
 import type { PortalType } from "../components/layout/sidebarMenus";
 import ConnectedConstellationBg from "./ConnectedConstellationBg";
 
-const drawerWidth = 270;
+// const drawerWidth = 270;
 
 type Props = {
   portal: PortalType;

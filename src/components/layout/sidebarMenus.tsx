@@ -1,7 +1,6 @@
 import {
   Dashboard,
   Person,
-  Description,
   Palette,
   Analytics,
   Settings,

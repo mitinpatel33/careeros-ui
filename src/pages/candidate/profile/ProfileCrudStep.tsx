@@ -27,8 +27,8 @@ export type FieldConfig<T> = {
   rows?: number;
   options?: { label: string; value: string | boolean }[];
   onSearch?: (term: string) => void; // Pass search callback
-  loading?: boolean;                 // Pass loading indicator
-  freeSolo?: boolean;               // Pass freeSolo setting
+  loading?: boolean; // Pass loading indicator
+  freeSolo?: boolean; // Pass freeSolo setting
 };
 
 // BaseItem supports both 'id' and '_id'
@@ -46,6 +46,9 @@ type Props<T extends BaseItem> = {
   defaultItem: T;
   fields: FieldConfig<T>[];
   loading?: boolean;
+  isFirst?: boolean;
+  isLast?: boolean;
+  onBack?: () => void;
   getTitle: (item: T) => string;
   getSubtitle?: (item: T) => string;
   onSave: (items: T[]) => Promise<void>;
@@ -60,6 +63,9 @@ const ProfileCrudStep = <T extends BaseItem>({
   defaultItem,
   fields,
   loading,
+  isFirst,
+  isLast,
+  onBack,
   getTitle,
   getSubtitle,
   onSave,
@@ -98,8 +104,10 @@ const ProfileCrudStep = <T extends BaseItem>({
       setLocalItems(
         localItems.map((x) => {
           const currentId = getItemId(x);
-          return currentId === editingId ? { ...x, ...values, id: currentId } : x;
-        })
+          return currentId === editingId
+            ? { ...x, ...values, id: currentId }
+            : x;
+        }),
       );
     } else {
       setLocalItems([
@@ -148,12 +156,20 @@ const ProfileCrudStep = <T extends BaseItem>({
         onAdd={openAdd}
         onEdit={openEdit}
         onDelete={handleDelete}
+        onBack={onBack}
+        isFirst={isFirst}
+        isLast={isLast}
         onSave={handleSave}
         loading={loading}
         saving={saving}
       />
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
         <DialogTitle sx={{ fontWeight: 900 }}>
           {editingItem ? `Edit ${title}` : `Add ${title}`}
         </DialogTitle>

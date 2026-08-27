@@ -4,7 +4,12 @@ import { ArrowForward, CheckCircle } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-// Entrance Animation Variants
+type RoleType = "Candidate" | "Company";
+
+interface RegisterTypePageProps {
+  onSelectRole?: (role: RoleType) => void;
+}
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -22,21 +27,22 @@ const itemVariants = {
   },
 };
 
-const RegisterTypePage = () => {
+const RegisterTypePage: React.FC<RegisterTypePageProps> = ({
+  onSelectRole,
+}) => {
   const navigate = useNavigate();
 
+  const handleSelect = (role: RoleType) => {
+    debugger;
+    if (onSelectRole) {
+      onSelectRole(role);
+    } else {
+      navigate(`/register/${role.toLowerCase()}`);
+    }
+  };
+
   return (
-    <Box
-      sx={{
-        // minHeight: "100vh",
-        overflow: "hidden",
-        display: "grid",
-        placeItems: "center",
-        // p: { xs: 2, sm: 3 },
-        // background: "linear-gradient(135deg, #f0f7ff 0%, #eef2ff 100%)",
-        // position: "relative",
-      }}
-    >
+    <Box sx={{ overflow: "hidden", display: "grid", placeItems: "center" }}>
       <Stack
         component={motion.div}
         variants={containerVariants}
@@ -45,7 +51,6 @@ const RegisterTypePage = () => {
         spacing={3.5}
         sx={{ width: "100%", maxWidth: 860, zIndex: 2 }}
       >
-        {/* Title Header */}
         <Box sx={{ textAlign: "center" }}>
           <motion.div variants={itemVariants}>
             <Chip
@@ -90,7 +95,6 @@ const RegisterTypePage = () => {
                 Join Career OS
               </Box>
 
-              {/* Animated Flying Rocket */}
               <Box
                 component={motion.span}
                 animate={{
@@ -128,7 +132,6 @@ const RegisterTypePage = () => {
           </motion.div>
         </Box>
 
-        {/* Account Type Cards Grid */}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={3.5}>
           <CompactAccountCard
             animatedIcon={<CandidateAnimatedIcon />}
@@ -144,7 +147,7 @@ const RegisterTypePage = () => {
             buttonGradient="linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)"
             glowColor="rgba(37, 99, 235, 0.45)"
             iconBg="#e0edff"
-            onClick={() => navigate("/register/candidate")}
+            onClick={() => handleSelect("Candidate")}
           />
 
           <CompactAccountCard
@@ -161,11 +164,10 @@ const RegisterTypePage = () => {
             buttonGradient="linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)"
             glowColor="rgba(139, 92, 246, 0.45)"
             iconBg="#f3e8ff"
-            onClick={() => navigate("/register/company")}
+            onClick={() => handleSelect("Company")}
           />
         </Stack>
 
-        {/* Footer Navigation */}
         <motion.div variants={itemVariants}>
           <Typography
             sx={{
@@ -227,8 +229,8 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
     onClick={onClick}
     sx={{
       flex: 1,
-      p: { xs: 2.5, sm: 3 }, // Reduced vertical padding to prevent scrolling
-      borderRadius: "24px", // Compact border radius
+      p: { xs: 2.5, sm: 3 },
+      borderRadius: "24px",
       cursor: "pointer",
       color: "#0f172a",
       position: "relative",
@@ -245,7 +247,6 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
     }}
   >
     <Stack spacing={2} sx={{ position: "relative", zIndex: 1 }}>
-      {/* Smaller Icon Container */}
       <Box
         sx={{
           width: 46,
@@ -260,7 +261,6 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
         {animatedIcon}
       </Box>
 
-      {/* Card Title & Subtitle */}
       <Box>
         <Typography
           variant="h5"
@@ -279,7 +279,7 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
             fontSize: "0.8rem",
             lineHeight: 1.4,
             fontWeight: 500,
-            minHeight: "34px", // Fixes layout shift across different subtitle lengths
+            minHeight: "34px",
             display: "-webkit-box",
             WebkitLineClamp: 2,
             WebkitBoxOrient: "vertical",
@@ -290,7 +290,6 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
         </Typography>
       </Box>
 
-      {/* Compact Feature List */}
       <Stack spacing={1} sx={{ pt: 0.25 }}>
         {features.map((feature) => (
           <Stack
@@ -313,12 +312,15 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
         ))}
       </Stack>
 
-      {/* Action Button */}
       <Button
         className="cta-btn"
         fullWidth
         variant="contained"
         endIcon={<ArrowForward sx={{ fontSize: "16px !important" }} />}
+        onClick={(e) => {
+          e.stopPropagation();
+          onClick();
+        }}
         sx={{
           mt: 1,
           py: 1.1,
@@ -346,7 +348,6 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
   </Paper>
 );
 
-// Original Candidate Custom Animated Icon
 const CandidateAnimatedIcon = () => (
   <Box
     sx={{
@@ -386,7 +387,6 @@ const CandidateAnimatedIcon = () => (
   </Box>
 );
 
-// Original Company Custom Animated Icon
 const CompanyAnimatedIcon = () => (
   <Box
     sx={{

@@ -25,10 +25,13 @@ const COMMON_SKILLS = [
 type Props = {
   items: ProfileSkill[];
   loading?: boolean;
+  isFirst?: boolean;
+  isLast?: boolean;
+  onBack?: () => void;
   onSave: (items: ProfileSkill[]) => Promise<void>;
 };
 
-const SkillsDetails = ({ items, loading, onSave }: Props) => {
+const SkillsDetails = ({ items, loading, isFirst, isLast, onBack, onSave }: Props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [skillOptions, setSkillOptions] = useState<{ label: string; value: string }[]>(
     COMMON_SKILLS.map((s) => ({ label: s, value: s }))
@@ -83,6 +86,9 @@ const SkillsDetails = ({ items, loading, onSave }: Props) => {
       icon={<Psychology />}
       items={items}
       loading={loading}
+      isFirst={isFirst}
+      isLast={isLast}
+      onBack={onBack}
       defaultItem={{
         skillName: "",
         proficiency: "Beginner",

@@ -1,95 +1,75 @@
-import { useCallback, useState, type RefObject } from "react";
-
-// Standard A4 Dimensions in Pixels (at 96 DPI)
+import { useCallback, useState } from "react";
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 
-export function useDownloadResumePdf(nodeRef: RefObject<HTMLElement>, fileName = "resume.pdf") {
+export function useDownloadResumePdf(
+  resumeRef: React.RefObject<HTMLElement | null>,
+  fileName: string
+) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const download = useCallback(async () => {
-    if (!nodeRef.current) return;
+    if (!resumeRef.current) return;
     setIsDownloading(true);
     setError(null);
 
-    let cloneContainer: HTMLDivElement | null = null;
+    const element = resumeRef.current;
+
+    const originalTransform = element.style.transform;
+    const originalWidth = element.style.width;
+    const originalMinHeight = element.style.minHeight;
+    const originalBoxSizing = element.style.boxSizing;
 
     try {
-      // 1. Wait for web fonts to load to avoid text overlaps
       if (document.fonts) {
         await document.fonts.ready;
       }
 
-      // @ts-ignore - html2pdf.js standard import
+      // @ts-ignore
       const html2pdf = (await import("html2pdf.js")).default;
-      const sourceElement = nodeRef.current;
 
-      // 2. Clone the element to an isolated off-screen container.
-      // This prevents UI zoom/scale or parent layout flex constraints from collapsing the columns.
-      cloneContainer = document.createElement("div");
-      cloneContainer.style.position = "fixed";
-      cloneContainer.style.top = "-9999px";
-      cloneContainer.style.left = "-9999px";
-      cloneContainer.style.width = `${A4_WIDTH_PX}px`;
-      cloneContainer.style.minHeight = `${A4_HEIGHT_PX}px`;
-      cloneContainer.style.backgroundColor = "#ffffff";
-      cloneContainer.style.boxSizing = "border-box";
+      element.style.transform = "none";
+      element.style.width = `${A4_WIDTH_PX}px`;
+      element.style.minHeight = `${A4_HEIGHT_PX}px`;
+      element.style.boxSizing = "border-box";
 
-      const clonedNode = sourceElement.cloneNode(true) as HTMLElement;
+      await new Promise((resolve) => setTimeout(resolve, 150));
 
-      // Reset transform/scale applied by preview components
-      clonedNode.style.transform = "none";
-      clonedNode.style.width = "100%";
-      clonedNode.style.minWidth = "100%";
-      clonedNode.style.height = "auto";
-      clonedNode.style.margin = "0";
-
-      // 3. Force letter-spacing normal and ensure flexbox items maintain row layout
-      const elements = clonedNode.querySelectorAll<HTMLElement>("*");
-      elements.forEach((el) => {
-        el.style.letterSpacing = "normal";
-      });
-
-      cloneContainer.appendChild(clonedNode);
-      document.body.appendChild(cloneContainer);
-
-      // Brief pause to allow browser layout reflow
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      // 4. Configure html2pdf options
+      // Add 'as const' at the end of the object declaration below
       const opt = {
         margin: 0,
         filename: fileName,
-        image: { type: "png" as const, quality: 1.0 },
+        image: { type: "jpeg", quality: 0.98 },
         html2canvas: {
           scale: 2,
           useCORS: true,
-          scrollX: 0,
-          scrollY: 0,
+          logging: false,
           windowWidth: A4_WIDTH_PX,
           width: A4_WIDTH_PX,
+          scrollX: 0,
+          scrollY: 0,
         },
         jsPDF: {
           unit: "px",
           format: [A4_WIDTH_PX, A4_HEIGHT_PX] as [number, number],
-          orientation: "portrait" as const,
+          orientation: "portrait",
           compress: true,
         },
-      };
+      } as const; // <--- ADDED 'as const' HERE
 
-      // Generate PDF
-      await html2pdf().set(opt).from(clonedNode).save();
+      await html2pdf().set(opt).from(element).save();
     } catch (err) {
       console.error("Resume PDF export failed:", err);
       setError("Couldn't generate the PDF. Please try again.");
     } finally {
-      if (cloneContainer && document.body.contains(cloneContainer)) {
-        document.body.removeChild(cloneContainer);
-      }
+      element.style.transform = originalTransform;
+      element.style.width = originalWidth;
+      element.style.minHeight = originalMinHeight;
+      element.style.boxSizing = originalBoxSizing;
       setIsDownloading(false);
     }
-  }, [nodeRef, fileName]);
+  }, [resumeRef, fileName]);
 
   return { download, isDownloading, error };
 }

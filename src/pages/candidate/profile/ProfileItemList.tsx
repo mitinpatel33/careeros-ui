@@ -11,8 +11,7 @@ import {
   ArrowBack,
   ArrowForward,
   Delete,
-  Edit,
-  Save,
+  Edit
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import AppButton from "../../../components/common/AppButton";

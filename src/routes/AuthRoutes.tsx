@@ -7,7 +7,6 @@ import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import VerifyOtpPage from "../pages/auth/VerifyOtpPage";
 import { ROUTES } from "../constants/routePaths";
 import RegisterTypePage from "../pages/auth/RegisterTypePage";
-import CompanyRegisterPage from "../pages/auth/CompanyRegisterPage";
 import AuthLayout from "../layouts/AuthLayout";
 
 const AuthRoutes = (
@@ -16,7 +15,7 @@ const AuthRoutes = (
     <Route path="login" element={<LoginPage />} />
     <Route path="register" element={<RegisterTypePage />} />
     <Route path="register/candidateregister" element={<RegisterPage />} />
-    <Route path="register/companyregister" element={<CompanyRegisterPage />} />
+    <Route path="register/companyregister" element={<RegisterPage />} />
     <Route path="forgot-password" element={<ForgotPasswordPage />} />
     <Route path="reset-password" element={<ResetPasswordPage />} />
     <Route path="verify-otp" element={<VerifyOtpPage />} />

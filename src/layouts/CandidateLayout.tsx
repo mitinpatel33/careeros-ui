@@ -16,7 +16,6 @@ import {
 
 import {
   Dashboard,
-  Description,
   Person,
   Menu,
   Notifications,

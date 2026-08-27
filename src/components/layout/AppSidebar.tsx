@@ -37,11 +37,7 @@ const portalInfo = {
     subtitle: "Recruiter Portal",
     avatar: "HR",
   },
-  admin: {
-    title: "AdminHub ⚡",
-    subtitle: "Super Admin",
-    avatar: "SA",
-  },
+  admin: { title: "AdminHub ⚡", subtitle: "Super Admin", avatar: "SA" },
 };
 
 const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
@@ -51,6 +47,44 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
   const info = portalInfo[portal];
   const menu = sidebarMenus[portal];
 
+  // Dynamic Glass Theme Configuration
+  const isCandidate = portal === "candidate";
+
+  const themeStyles = {
+    // Lavender Blue (Candidate) vs Lavender Purple (Company/Admin)
+    sidebarBg: isCandidate
+      ? "rgba(235, 240, 255, 0.25)" // Soft Lavender Blue glass
+      : "rgba(245, 235, 255, 0.25)", // Soft Lavender Purple glass
+
+    borderRight: isCandidate
+      ? "1px solid rgba(147, 197, 253, 0.35)"
+      : "1px solid rgba(216, 180, 254, 0.35)",
+
+    titleColor: isCandidate ? "#1d4ed8" : "#6b21a8",
+    subtitleColor: isCandidate ? "#3b82f6" : "#9333ea",
+
+    iconColor: isCandidate ? "#2563eb" : "#9333ea",
+    activeTextColor: "#ffffff",
+    inactiveTextColor: isCandidate ? "#1e40af" : "#581c87",
+
+    activeGradient: isCandidate
+      ? "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)" // Lavender Blue Gradient
+      : "linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)", // Lavender Purple Gradient
+
+    activeShadow: isCandidate
+      ? "0 8px 20px rgba(37, 99, 235, 0.35)"
+      : "0 8px 20px rgba(168, 85, 247, 0.35)",
+
+    btnHoverBg: isCandidate
+      ? "rgba(239, 246, 255, 0.6)"
+      : "rgba(255, 255, 255, 0.4)",
+
+    avatarBg: isCandidate ? "#2563eb" : "#9333ea",
+    avatarShadow: isCandidate
+      ? "0 4px 12px rgba(37, 99, 235, 0.3)"
+      : "0 4px 12px rgba(147, 51, 234, 0.3)",
+  };
+
   const sidebarContent = (
     <Box
       sx={{
@@ -59,34 +93,14 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         flexDirection: "column",
         position: "relative",
         overflow: "hidden",
-        // Frosted Glass Layer over Login Background
-        bgcolor: "rgba(240, 246, 255, 0.45)",
-        backdropFilter: "blur(24px) saturate(180%)",
-        WebkitBackdropFilter: "blur(24px) saturate(180%)",
-        borderRight: "1px solid rgba(255, 255, 255, 0.6)",
-        boxShadow: "4px 0 24px rgba(0, 0, 0, 0.02)",
+        bgcolor: themeStyles.sidebarBg,
+        backdropFilter: "blur(20px) saturate(160%)",
+        WebkitBackdropFilter: "blur(20px) saturate(160%)",
+        borderRight: themeStyles.borderRight,
+        boxShadow: "4px 0 24px rgba(0, 0, 0, 0.03)",
+        transition: "all 0.3s ease",
       }}
     >
-      {/* Login Background Video Layer inside Sidebar */}
-      <Box
-        component="video"
-        autoPlay
-        loop
-        muted
-        playsInline
-        src="/assets/login-bg.mp4" // Ensure path matches your login background video asset
-        sx={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          zIndex: -1,
-          opacity: 0.85,
-        }}
-      />
-
       {/* Header / Branding */}
       <Box sx={{ px: 3, py: 2.5, flexShrink: 0 }}>
         <Stack
@@ -99,11 +113,9 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
               sx={{
                 fontWeight: 800,
                 fontSize: 22,
-                background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
+                color: themeStyles.titleColor,
                 letterSpacing: "-0.02em",
-                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
               {info.title}
@@ -112,10 +124,10 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
             <Typography
               sx={{
                 fontSize: 12,
-                color: "#64748b",
+                color: themeStyles.subtitleColor,
                 fontWeight: 600,
                 mt: 0.2,
-                fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
               }}
             >
               {info.subtitle}
@@ -125,7 +137,7 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
           <IconButton
             onClick={onClose}
             sx={{
-              color: "#64748b",
+              color: themeStyles.titleColor,
               display: { xs: "inline-flex", md: "none" },
             }}
           >
@@ -134,9 +146,16 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         </Stack>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(203, 213, 225, 0.4)", mx: 2.5 }} />
+      <Divider
+        sx={{
+          borderColor: isCandidate
+            ? "rgba(147, 197, 253, 0.3)"
+            : "rgba(216, 180, 254, 0.3)",
+          mx: 2.5,
+        }}
+      />
 
-      {/* Navigation Menu */}
+      {/* Navigation List */}
       <Box
         sx={{
           flex: 1,
@@ -146,7 +165,9 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
           py: 2,
           "&::-webkit-scrollbar": { width: 4 },
           "&::-webkit-scrollbar-thumb": {
-            bgcolor: "rgba(203, 213, 225, 0.5)",
+            bgcolor: isCandidate
+              ? "rgba(59, 130, 246, 0.3)"
+              : "rgba(168, 85, 247, 0.3)",
             borderRadius: 10,
           },
         }}
@@ -169,31 +190,32 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                   px: 2,
                   py: 1.2,
                   borderRadius: "14px",
-                  color: active ? "#ffffff" : "#475569",
+                  color: active
+                    ? themeStyles.activeTextColor
+                    : themeStyles.inactiveTextColor,
                   background: active
-                    ? "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
-                    : "rgba(255, 255, 255, 0.35)",
+                    ? themeStyles.activeGradient
+                    : "rgba(255, 255, 255, 0.25)",
                   backdropFilter: active ? "none" : "blur(8px)",
-                  boxShadow: active
-                    ? "0 8px 20px rgba(37, 99, 235, 0.35)"
-                    : "0 2px 6px rgba(0, 0, 0, 0.01)",
+                  boxShadow: active ? themeStyles.activeShadow : "none",
                   border: active
-                    ? "1px solid rgba(255, 255, 255, 0.3)"
-                    : "1px solid rgba(255, 255, 255, 0.6)",
-                  transition: "all .25s ease-in-out",
+                    ? "1px solid rgba(255, 255, 255, 0.5)"
+                    : "1px solid rgba(255, 255, 255, 0.35)",
+                  transition: "all .2s ease-in-out",
 
                   "&:hover": {
                     background: active
-                      ? "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
-                      : "rgba(255, 255, 255, 0.75)",
+                      ? themeStyles.activeGradient
+                      : themeStyles.btnHoverBg,
                     transform: "translateY(-1px)",
-                    color: active ? "#ffffff" : "#1e293b",
                   },
                 }}
               >
                 <ListItemIcon
                   sx={{
-                    color: active ? "#ffffff" : "#3b82f6",
+                    color: active
+                      ? themeStyles.activeTextColor
+                      : themeStyles.iconColor,
                     minWidth: 38,
                     "& svg": { fontSize: 22 },
                   }}
@@ -209,10 +231,7 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                         display: "block",
                         fontWeight: active ? 700 : 600,
                         fontSize: 14,
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
                       }}
                     >
                       {item.label}
@@ -225,16 +244,16 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         </List>
       </Box>
 
-      {/* User Footer Profile Card */}
+      {/* Profile Box */}
       <Box sx={{ p: 2, flexShrink: 0 }}>
         <Box
           sx={{
             p: 1.5,
             borderRadius: "18px",
-            bgcolor: "rgba(255, 255, 255, 0.75)",
+            bgcolor: "rgba(255, 255, 255, 0.3)",
             backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255, 255, 255, 0.8)",
-            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.03)",
+            border: "1px solid rgba(255, 255, 255, 0.45)",
+            boxShadow: "0 4px 15px rgba(0, 0, 0, 0.03)",
           }}
         >
           <Stack direction="row" spacing={1.3} sx={{ alignItems: "center" }}>
@@ -242,10 +261,10 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
               sx={{
                 width: 38,
                 height: 38,
-                bgcolor: "#3b82f6",
+                bgcolor: themeStyles.avatarBg,
                 fontWeight: 700,
                 fontSize: 13,
-                boxShadow: "0 4px 12px rgba(59, 130, 246, 0.35)",
+                boxShadow: themeStyles.avatarShadow,
               }}
             >
               {info.avatar}
@@ -256,11 +275,11 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                 sx={{
                   fontWeight: 700,
                   fontSize: 13,
-                  color: "#0f172a",
+                  color: isCandidate ? "#1e3a8a" : "#3b0764",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
                   textOverflow: "ellipsis",
-                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
                 {portal === "company"
@@ -273,11 +292,8 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
               <Typography
                 sx={{
                   fontSize: 11,
-                  color: "#64748b",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+                  color: themeStyles.subtitleColor,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
                 {info.subtitle}
@@ -296,13 +312,14 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
               borderRadius: "12px",
               textTransform: "none",
               fontWeight: 600,
-              bgcolor: "rgba(254, 242, 242, 0.8)",
+              bgcolor: "rgba(254, 242, 242, 0.45)",
+              backdropFilter: "blur(6px)",
               fontSize: 13,
               py: 0.8,
-              boxShadow: "none",
-              fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif",
+              border: "1px solid rgba(254, 202, 202, 0.5)",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               "&:hover": {
-                bgcolor: "#fee2e2",
+                bgcolor: "rgba(254, 226, 226, 0.75)",
               },
             }}
           >

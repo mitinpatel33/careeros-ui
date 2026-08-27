@@ -5,6 +5,7 @@ import {
   Typography,
   CircularProgress,
   Button,
+  Paper,
 } from "@mui/material";
 import {
   useMemo,
@@ -14,7 +15,7 @@ import {
   Suspense,
   type ComponentType,
 } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
 import ProfileStepCards, { type ProfileStepKey } from "./ProfileStepCards";
@@ -28,9 +29,55 @@ import {
 import { useProfileSaver } from "../../../hooks/useProfileSaver";
 import type { ResumeData } from "../../../types/candidate/resume.types";
 
-// ---------------------------------------------------------------------------
-// Lazy-loaded step components
-// ---------------------------------------------------------------------------
+// Visual style token palette matching Glassmorphism Blue theme
+const themeStyles = {
+  titleColor: "#1d4ed8",
+  subtitleColor: "#3b82f6",
+  iconColor: "#2563eb",
+  activeGradient: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
+  activeShadow: "0 8px 20px rgba(37, 99, 235, 0.35)",
+  glassBg: "rgba(255, 255, 255, 0.65)",
+  glassBorder: "1px solid rgba(255, 255, 255, 0.8)",
+  glassFilter: "blur(16px)",
+};
+
+// Motion animation variants for step switching & page elements
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      when: "beforeChildren",
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" },
+  },
+};
+
+const stepTransitionVariants: Variants = {
+  initial: { opacity: 0, scale: 0.98, y: 8 },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.25, ease: "easeOut" },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.98,
+    y: -8,
+    transition: { duration: 0.2, ease: "easeIn" },
+  },
+};
+
 const PersonalDetails = lazy(() => import("./tabs/PersonalDetails"));
 const SummaryDetails = lazy(() => import("./tabs/SummaryDetails"));
 const ContactDetails = lazy(() => import("./tabs/ContactDetails"));
@@ -50,9 +97,6 @@ const ResumeEditorPage = lazy(
   () => import("../../../components/templates/NewTemplate/ResumeEditorPage"),
 );
 
-// ---------------------------------------------------------------------------
-// Step definitions
-// ---------------------------------------------------------------------------
 const steps = [
   { key: "personal", title: "Personal", type: "form" },
   { key: "summary", title: "Summary", type: "form" },
@@ -80,8 +124,6 @@ type ListStepKey = Extract<
   | "languages"
 >;
 
-// Every form step takes the same prop shape (defaultValues + onSubmit + nav
-// props), so a lookup table replaces a hand-written JSX branch per step.
 const FORM_STEP_COMPONENTS: Partial<
   Record<ProfileStepKey, ComponentType<any>>
 > = {
@@ -92,7 +134,6 @@ const FORM_STEP_COMPONENTS: Partial<
   settings: PublishSettings,
 };
 
-// Same idea for list/collection steps.
 const LIST_STEP_COMPONENTS: Record<ListStepKey, ComponentType<any>> = {
   skills: SkillsDetails,
   educations: EducationDetails,
@@ -104,19 +145,21 @@ const LIST_STEP_COMPONENTS: Record<ListStepKey, ComponentType<any>> = {
 };
 
 const TabLoader = () => (
-  <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
-    <CircularProgress />
+  <Box
+    sx={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: 300,
+      py: 6,
+    }}
+  >
+    <CircularProgress sx={{ color: themeStyles.iconColor }} size={36} />
   </Box>
 );
 
-/**
- * Maps the raw `/profile/sections` payload (keyed by API route names, e.g.
- * "educations", "certificates") onto the `ResumeData` shape the resume
- * templates expect (e.g. "education", "certifications").
- */
 const mapSectionsToResumeData = (sections: any): ResumeData | undefined => {
   if (!sections) return undefined;
-
   return {
     personal: sections.personal,
     contact: sections.contact,
@@ -137,18 +180,14 @@ const ProfilePage = () => {
   const [activeStep, setActiveStep] = useState<ProfileStepKey>(
     location.state?.step ?? "personal",
   );
-
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  // Client-side template state (stored in localStorage)
   const [selectedTemplate, setSelectedTemplate] = useState<string>(
     () => localStorage.getItem("selected_resume_template") || "classic-blue",
   );
-
-  // Switches step 12 from "pick a template" -> "preview & download"
   const [isPreviewMode, setIsPreviewMode] = useState(false);
 
   const candidate = useMemo(() => {
@@ -181,7 +220,6 @@ const ProfilePage = () => {
     skip: !isListStep,
   });
 
-  // Used for the sidebar name/photo/job title — always fetched.
   const { data: personalData } = useGetProfileQuery("personal");
 
   const [
@@ -229,7 +267,7 @@ const ProfilePage = () => {
       setSelectedTemplate(values.selectedTemplate);
       localStorage.setItem("selected_resume_template", values.selectedTemplate);
       setIsPreviewMode(true);
-      fetchSections(); // ✅ Manually triggers the query fetch safely
+      fetchSections();
     },
     [fetchSections],
   );
@@ -244,12 +282,41 @@ const ProfilePage = () => {
 
   if (isStepError && !isStepLoading) {
     return (
-      <Box sx={{ p: 4, textAlign: "center" }}>
-        <Typography color="error">{errorMessage}</Typography>
+      <Box
+        sx={{
+          p: { xs: 3, md: 5 },
+          textAlign: "center",
+          bgcolor: themeStyles.glassBg,
+          backdropFilter: themeStyles.glassFilter,
+          WebkitBackdropFilter: themeStyles.glassFilter,
+          border: themeStyles.glassBorder,
+          borderRadius: "24px",
+          maxWidth: 480,
+          mx: "auto",
+          mt: 6,
+        }}
+      >
+        <Typography
+          color="error"
+          sx={{
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontWeight: 700,
+          }}
+        >
+          {errorMessage}
+        </Typography>
         <Button
           onClick={() => window.location.reload()}
           variant="contained"
-          sx={{ mt: 2 }}
+          sx={{
+            mt: 2,
+            background: themeStyles.activeGradient,
+            boxShadow: themeStyles.activeShadow,
+            borderRadius: "12px",
+            textTransform: "none",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontWeight: 600,
+          }}
         >
           Retry
         </Button>
@@ -265,13 +332,41 @@ const ProfilePage = () => {
         <Button
           variant="outlined"
           onClick={() => setIsPreviewMode(false)}
-          sx={{ mb: 2, textTransform: "none" }}
+          sx={{
+            mb: 2,
+            textTransform: "none",
+            fontFamily: "'Plus Jakarta Sans', sans-serif",
+            fontWeight: 600,
+            color: themeStyles.titleColor,
+            borderColor: "rgba(147, 197, 253, 0.6)",
+            bgcolor: "rgba(255, 255, 255, 0.45)",
+            backdropFilter: themeStyles.glassFilter,
+            WebkitBackdropFilter: themeStyles.glassFilter,
+            borderRadius: "12px",
+            "&:hover": {
+              borderColor: themeStyles.titleColor,
+              bgcolor: "rgba(255, 255, 255, 0.85)",
+            },
+          }}
         >
           ← Change Selected Template
         </Button>
         <ResumeEditorPage templateId={selectedTemplate} data={resumeData} />
         <Stack direction="row" sx={{ justifyContent: "flex-end", mt: 3 }}>
-          <Button variant="contained" onClick={goNext}>
+          <Button
+            variant="contained"
+            onClick={goNext}
+            sx={{
+              background: themeStyles.activeGradient,
+              boxShadow: themeStyles.activeShadow,
+              borderRadius: "12px",
+              textTransform: "none",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontWeight: 700,
+              px: 3,
+              py: 1,
+            }}
+          >
             Next Step →
           </Button>
         </Stack>
@@ -281,7 +376,6 @@ const ProfilePage = () => {
 
   const renderGalleryStep = () => {
     if (isPreviewMode) return renderPreviewPanel();
-
     return (
       <TemplateSelectionStep
         isFirst={activeIndex === 0}
@@ -297,7 +391,6 @@ const ProfilePage = () => {
   const renderFormStep = () => {
     const FormComponent = FORM_STEP_COMPONENTS[activeStep];
     if (!FormComponent) return null;
-
     return (
       <FormComponent
         loading={isFormLoading}
@@ -313,13 +406,15 @@ const ProfilePage = () => {
   const renderListStep = () => {
     const ListComponent = LIST_STEP_COMPONENTS[activeStep as ListStepKey];
     if (!ListComponent) return null;
-
     return (
       <ListComponent
         items={
           Array.isArray(listData) ? listData : (listData as any)?.data || []
         }
         loading={isListLoading}
+        isFirst={activeIndex === 0}
+        isLast={activeIndex === steps.length - 1}
+        onBack={goBack}
         onSave={(items: unknown) => saveStep(activeStep, items)}
       />
     );
@@ -332,55 +427,93 @@ const ProfilePage = () => {
   };
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        p: { xs: 2, md: 4 },
-        background: "linear-gradient(135deg,#eef6ff,#f5f0ff)",
-      }}
-    >
+    <Box sx={{ width: "100%", minHeight: "100%", overflowX: "hidden" }}>
       <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
       >
-        <Stack spacing={0.8} sx={{ mb: 4 }}>
-          <Typography sx={{ fontSize: { xs: 30, md: 42 }, fontWeight: 900 }}>
-            Profile Setup ✨
-          </Typography>
-          <Typography color="text.secondary">
-            Save profile sections and choose your resume style.
-          </Typography>
-        </Stack>
+        {/* Page Top Header with Blue Glassmorphism */}
+        <motion.div
+          variants={itemVariants}
+          style={{
+            position: "sticky",
+            top: 16,
+            zIndex: 10,
+            marginBottom: 24,
+          }}
+        >
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2.5, sm: 3 },
+              mb: { xs: 2.5, md: 3.5 },
+              borderRadius: "24px",
+              bgcolor: "rgba(255, 255, 255, 0.65)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1px solid rgba(255, 255, 255, 0.8)",
+              boxShadow: "0 10px 30px -5px rgba(37, 99, 235, 0.08)",
+            }}
+          >
+            <Stack spacing={0.5}>
+              <Typography
+                sx={{
+                  fontSize: { xs: 24, sm: 28, md: 32 },
+                  fontWeight: 800,
+                  color: themeStyles.titleColor,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Profile Setup 🚀
+              </Typography>
+              <Typography
+                sx={{
+                  color: themeStyles.subtitleColor,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontWeight: 600,
+                  fontSize: { xs: 13, sm: 14 },
+                }}
+              >
+                Save profile sections and choose your resume style.
+              </Typography>
+            </Stack>
+          </Paper>
+        </motion.div>
 
-        <Grid container spacing={3}>
-          <Grid size={{ xs: 12, md: 4 }}>
-            <ProfileStepCards
-              activeStep={activeStep}
-              completion={completionData?.data?.completionPercentage ?? 0}
-              fullName={candidate.fullName}
-              jobTitle={personalData?.data?.jobTitle}
-              photoURL={
-                personalData?.data?.photoUrl ||
-                personalData?.data?.photoURL ||
-                ""
-              }
-              onStepChange={(step) => {
-                setIsPreviewMode(false);
-                setActiveStep(step);
-              }}
-              completedSteps={[]}
-            />
+        {/* Dynamic Sidebar & Step Section Grid */}
+        <Grid container spacing={{ xs: 2, md: 3 }}>
+          <Grid size={{ xs: 12, md: 4, lg: 3.5 }}>
+            <motion.div variants={itemVariants}>
+              <ProfileStepCards
+                activeStep={activeStep}
+                completion={completionData?.data?.completionPercentage ?? 0}
+                fullName={candidate.fullName}
+                jobTitle={personalData?.data?.jobTitle}
+                photoURL={
+                  personalData?.data?.photoUrl ||
+                  personalData?.data?.photoURL ||
+                  ""
+                }
+                onStepChange={(step) => {
+                  setIsPreviewMode(false);
+                  setActiveStep(step);
+                }}
+                completedSteps={[]}
+              />
+            </motion.div>
           </Grid>
 
-          <Grid size={{ xs: 12, md: 8 }} sx={{ minWidth: 0 }}>
+          <Grid size={{ xs: 12, md: 8, lg: 8.5 }} sx={{ minWidth: 0 }}>
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeStep + (isPreviewMode ? "-preview" : "-step")}
-                initial={{ opacity: 0, x: 30 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -30 }}
-                transition={{ duration: 0.3 }}
+                variants={stepTransitionVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                style={{ width: "100%" }}
               >
                 <Suspense fallback={<TabLoader />}>
                   {isStepLoading && !formData && !listData && !isGalleryStep ? (

@@ -18,6 +18,7 @@ import {
   WorkspacePremium,
   EmojiEvents,
   Translate,
+  Palette,
   Settings,
   CheckCircle,
 } from "@mui/icons-material";
@@ -35,6 +36,7 @@ export type ProfileStepKey =
   | "certificates"
   | "achievements"
   | "languages"
+  | "template"
   | "settings";
 
 type Props = {
@@ -113,6 +115,12 @@ const steps = [
     title: "Languages",
     subtitle: "Known languages",
     icon: <Translate />,
+  },
+  {
+    key: "template",
+    title: "Template",
+    subtitle: "Choose your style",
+    icon: <Palette />,
   },
   {
     key: "settings",

@@ -113,6 +113,9 @@ const steps = [
   { key: "settings", title: "Settings", type: "form" },
 ] as const;
 
+const isProfileStepKey = (value: unknown): value is ProfileStepKey =>
+  steps.some((step) => step.key === value);
+
 type ListStepKey = Extract<
   ProfileStepKey,
   | "skills"
@@ -178,7 +181,7 @@ const mapSectionsToResumeData = (sections: any): ResumeData | undefined => {
 const ProfilePage = () => {
   const location = useLocation();
   const [activeStep, setActiveStep] = useState<ProfileStepKey>(
-    location.state?.step ?? "personal",
+    isProfileStepKey(location.state?.step) ? location.state.step : "personal",
   );
   const [snackbar, setSnackbar] = useState<{
     message: string;

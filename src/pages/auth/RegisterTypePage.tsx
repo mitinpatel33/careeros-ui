@@ -33,7 +33,6 @@ const RegisterTypePage: React.FC<RegisterTypePageProps> = ({
   const navigate = useNavigate();
 
   const handleSelect = (role: RoleType) => {
-    debugger;
     if (onSelectRole) {
       onSelectRole(role);
     } else {
@@ -221,131 +220,120 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
   iconBg,
   onClick,
 }) => (
-  <Paper
-    component={motion.div}
-    variants={itemVariants}
-    whileHover={{ y: -4, scale: 1.005 }}
-    transition={{ type: "spring", stiffness: 200, damping: 16 }}
-    onClick={onClick}
-    sx={{
-      flex: 1,
-      p: { xs: 2.5, sm: 3 },
-      borderRadius: "24px",
-      cursor: "pointer",
-      color: "#0f172a",
-      position: "relative",
-      bgcolor: "#ffffff",
-      boxShadow:
-        "0 15px 35px -10px rgba(37, 99, 235, 0.18), 0 5px 15px -5px rgba(59, 130, 246, 0.12)",
-      border: "1px solid rgba(191, 219, 254, 0.5)",
-      overflow: "hidden",
-      transition: "all 0.3s ease-in-out",
-      "&:hover": {
-        boxShadow: `0 20px 40px -8px ${glowColor}, 0 8px 20px -8px rgba(37, 99, 235, 0.2)`,
-        borderColor: "rgba(147, 197, 253, 0.8)",
-      },
-    }}
-  >
-    <Stack spacing={2} sx={{ position: "relative", zIndex: 1 }}>
-      <Box
-        sx={{
-          width: 46,
-          height: 46,
-          borderRadius: "12px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          bgcolor: iconBg,
-        }}
-      >
-        {animatedIcon}
-      </Box>
-
-      <Box>
-        <Typography
-          variant="h5"
+  <motion.div variants={itemVariants} style={{ flex: 1 }}>
+    <Paper
+      onClick={onClick}
+      sx={{
+        p: { xs: 2.5, sm: 3 },
+        borderRadius: "24px",
+        cursor: "pointer",
+        color: "#0f172a",
+        position: "relative",
+        bgcolor: "#ffffff",
+        boxShadow:
+          "0 15px 35px -10px rgba(37, 99, 235, 0.18), 0 5px 15px -5px rgba(59, 130, 246, 0.12)",
+        border: "1px solid rgba(191, 219, 254, 0.5)",
+        overflow: "hidden",
+        transition:
+          "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+        "&:hover": {
+          transform: "translateY(-4px) scale(1.005)",
+          boxShadow: `0 20px 40px -8px ${glowColor}, 0 8px 20px -8px rgba(37, 99, 235, 0.2)`,
+          borderColor: "rgba(147, 197, 253, 0.8)",
+        },
+        "&:active": {
+          transform: "translateY(0px) scale(1)",
+        },
+      }}
+    >
+      <Stack spacing={2} sx={{ position: "relative", zIndex: 1 }}>
+        <Box
           sx={{
-            fontWeight: 800,
-            fontSize: "1.25rem",
-            color: "#1e3a8a",
-            mb: 0.5,
+            width: 46,
+            height: 46,
+            borderRadius: "12px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: iconBg,
           }}
         >
-          {title}
-        </Typography>
-        <Typography
-          sx={{
-            color: "#64748b",
-            fontSize: "0.8rem",
-            lineHeight: 1.4,
-            fontWeight: 500,
-            minHeight: "34px",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {subtitle}
-        </Typography>
-      </Box>
+          {animatedIcon}
+        </Box>
 
-      <Stack spacing={1} sx={{ pt: 0.25 }}>
-        {features.map((feature) => (
-          <Stack
-            key={feature}
-            direction="row"
-            spacing={1}
-            sx={{ alignItems: "center" }}
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 800,
+              fontSize: "1.25rem",
+              color: "#1e3a8a",
+              mb: 0.5,
+            }}
           >
-            <CheckCircle sx={{ fontSize: 16, color: "#16a34a" }} />
-            <Typography
-              sx={{
-                fontSize: "0.8rem",
-                fontWeight: 700,
-                color: "#334155",
-              }}
-            >
-              {feature}
-            </Typography>
-          </Stack>
-        ))}
-      </Stack>
+            {title}
+          </Typography>
+          <Typography
+            sx={{
+              color: "#64748b",
+              fontSize: "0.8rem",
+              lineHeight: 1.4,
+              fontWeight: 500,
+              minHeight: "34px",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {subtitle}
+          </Typography>
+        </Box>
 
-      <Button
-        className="cta-btn"
-        fullWidth
-        variant="contained"
-        endIcon={<ArrowForward sx={{ fontSize: "16px !important" }} />}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick();
-        }}
-        sx={{
-          mt: 1,
-          py: 1.1,
-          borderRadius: "50px",
-          fontWeight: 700,
-          fontSize: "0.875rem",
-          textTransform: "none",
-          background: buttonGradient,
-          color: "#ffffff",
-          boxShadow: `0 0 16px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.3)`,
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          "&:hover": {
-            transform: "translateY(-1px)",
+        <Stack spacing={1} sx={{ pt: 0.25 }}>
+          {features.map((feature) => (
+            <Stack
+              key={feature}
+              direction="row"
+              spacing={1}
+              sx={{ alignItems: "center" }}
+            >
+              <CheckCircle sx={{ fontSize: 16, color: "#16a34a" }} />
+              <Typography
+                sx={{
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  color: "#334155",
+                }}
+              >
+                {feature}
+              </Typography>
+            </Stack>
+          ))}
+        </Stack>
+
+        <Button
+          fullWidth
+          variant="contained"
+          endIcon={<ArrowForward sx={{ fontSize: "16px !important" }} />}
+          sx={{
+            mt: 1,
+            py: 1.1,
+            borderRadius: "50px",
+            fontWeight: 700,
+            fontSize: "0.875rem",
+            textTransform: "none",
             background: buttonGradient,
-            boxShadow: `0 0 24px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.5)`,
-          },
-          "&:active": {
-            transform: "translateY(1px)",
-          },
-        }}
-      >
-        {buttonText}
-      </Button>
-    </Stack>
-  </Paper>
+            color: "#ffffff",
+            pointerEvents: "none", // Allows direct clicks to pass directly through to Paper handler
+            boxShadow: `0 0 16px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.3)`,
+          }}
+        >
+          {buttonText}
+        </Button>
+      </Stack>
+    </Paper>
+  </motion.div>
 );
 
 const CandidateAnimatedIcon = () => (

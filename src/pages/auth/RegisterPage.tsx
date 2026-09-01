@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { Box, Typography, Grid, Link, IconButton, Stack } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useParams } from "react-router-dom";
 import { z } from "zod";
 
 import AuthCard from "../../components/common/AuthCard";
@@ -14,7 +14,6 @@ import PasswordField from "../../components/common/PasswordField";
 import { useSignupMutation } from "../../services/authApi";
 import { useAppDispatch } from "../../hooks/useLogin";
 import { loginSuccess } from "../../store/auth/authSlice";
-import RegisterTypePage from "./RegisterTypePage";
 
 const baseRegisterSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -42,7 +41,6 @@ const unifiedRegisterSchema = z
   });
 
 type UnifiedRegisterSchemaType = z.infer<typeof unifiedRegisterSchema>;
-type RoleType = "Candidate" | "Company";
 
 const lightTextFieldSx = {
   "& .MuiInputLabel-root": {
@@ -65,16 +63,20 @@ const lightTextFieldSx = {
 };
 
 const RegisterPage = () => {
-  const [selectedRole, setSelectedRole] = useState<RoleType | null>(null);
-  const [signup, { isLoading }] = useSignupMutation();
-  const dispatch = useAppDispatch();
+  const { roleType } = useParams<{ roleType: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [signup, { isLoading }] = useSignupMutation();
 
-  const { control, handleSubmit, setValue, clearErrors, reset } =
+  // Determine current role cleanly from URL param
+  const isCompany = roleType?.toLowerCase() === "company";
+  const currentRole = isCompany ? "Company" : "Candidate";
+
+  const { control, handleSubmit, setValue, clearErrors } =
     useForm<UnifiedRegisterSchemaType>({
       resolver: zodResolver(unifiedRegisterSchema),
       defaultValues: {
-        role: "Candidate",
+        role: currentRole,
         firstName: "",
         lastName: "",
         email: "",
@@ -83,21 +85,18 @@ const RegisterPage = () => {
       },
     });
 
-  const handleRoleSelect = (role: RoleType) => {
-    setSelectedRole(role);
+  // Keep form context synced with URL route changes
+  useEffect(() => {
     clearErrors();
-    if (role === "Company") {
+    if (isCompany) {
       setValue("role", "Company");
-      setValue("companyName", "");
-      setValue("website", "");
     } else {
       setValue("role", "Candidate");
     }
-  };
+  }, [roleType, isCompany, setValue, clearErrors]);
 
   const handleBackToSelection = () => {
-    setSelectedRole(null);
-    reset();
+    navigate("/register");
   };
 
   const onSubmit = async (data: UnifiedRegisterSchemaType) => {
@@ -128,217 +127,205 @@ const RegisterPage = () => {
       dispatch(loginSuccess(response.data));
 
       navigate(
-        data.role === "Company" ? "/company/dashboard" : "/candidate/dashboard",
+        data.role === "Company" ? "/company/dashboard" : "/candidate/dashboard"
       );
     } catch (error) {
       console.error("Signup failed:", error);
     }
   };
 
-  const isCompany = selectedRole === "Company";
-
   return (
     <Box sx={{ overflow: "hidden", display: "grid", placeItems: "center" }}>
-      <AnimatePresence mode="wait">
-        {!selectedRole ? (
-          <RegisterTypePage
-            key="selection-view"
-            onSelectRole={handleRoleSelect}
-          />
-        ) : (
-          <Box
-            key="form-view"
-            component={motion.div}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            sx={{
-              width: "100%",
-              maxWidth: 520,
-              px: 2,
-              py: 2,
-              zIndex: 2,
-              mx: "auto",
-            }}
-          >
-            <AuthCard
-              sx={{
-                p: { xs: 3, sm: 3.5 },
-                borderRadius: 7,
-                background: "rgba(255, 255, 255, 0.92)",
-                backdropFilter: "blur(20px)",
-                border: "1px solid rgba(191, 219, 254, 0.6)",
-                boxShadow:
-                  "0 20px 45px -10px rgba(37, 99, 235, 0.25), 0 10px 25px -15px rgba(59, 130, 246, 0.2)",
-              }}
-            >
-              <Stack spacing={2.5}>
-                <Box sx={{ position: "relative", textAlign: "center" }}>
-                  <IconButton
-                    onClick={handleBackToSelection}
-                    sx={{
-                      position: "absolute",
-                      left: 0,
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      color: "#64748b",
-                      "&:hover": { color: "#2563eb", bgcolor: "#f1f5f9" },
-                    }}
-                  >
-                    <ArrowBack />
-                  </IconButton>
+      <Box
+        component={motion.div}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        sx={{
+          width: "100%",
+          maxWidth: 520,
+          px: 2,
+          py: 2,
+          zIndex: 2,
+          mx: "auto",
+        }}
+      >
+        <AuthCard
+          sx={{
+            p: { xs: 3, sm: 3.5 },
+            borderRadius: 7,
+            background: "rgba(255, 255, 255, 0.92)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(191, 219, 254, 0.6)",
+            boxShadow:
+              "0 20px 45px -10px rgba(37, 99, 235, 0.25), 0 10px 25px -15px rgba(59, 130, 246, 0.2)",
+          }}
+        >
+          <Stack spacing={2.5}>
+            <Box sx={{ position: "relative", textAlign: "center" }}>
+              <IconButton
+                onClick={handleBackToSelection}
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  color: "#64748b",
+                  "&:hover": { color: "#2563eb", bgcolor: "#f1f5f9" },
+                }}
+              >
+                <ArrowBack />
+              </IconButton>
 
-                  <Typography
-                    sx={{
-                      fontWeight: 800,
-                      fontSize: { xs: "1.5rem", sm: "1.75rem" },
-                      color: isCompany ? "#7c3aed" : "#2563eb",
-                      letterSpacing: "-0.5px",
-                    }}
-                  >
-                    {isCompany ? "Company Sign Up" : "Candidate Sign Up"}
-                  </Typography>
+              <Typography
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: "1.5rem", sm: "1.75rem" },
+                  color: isCompany ? "#7c3aed" : "#2563eb",
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                {isCompany ? "Company Sign Up" : "Candidate Sign Up"}
+              </Typography>
 
-                  <Typography
-                    sx={{
-                      color: "#64748b",
-                      mt: 0.25,
-                      fontSize: "0.825rem",
-                      fontWeight: 500,
-                    }}
-                  >
-                    {isCompany
-                      ? "Create company account and start hiring"
-                      : "Start building your professional resume"}
-                  </Typography>
-                </Box>
+              <Typography
+                sx={{
+                  color: "#64748b",
+                  mt: 0.25,
+                  fontSize: "0.825rem",
+                  fontWeight: 500,
+                }}
+              >
+                {isCompany
+                  ? "Create company account and start hiring"
+                  : "Start building your professional resume"}
+              </Typography>
+            </Box>
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <Stack spacing={1.8}>
-                    {isCompany && (
-                      <>
-                        <AppTextField<UnifiedRegisterSchemaType>
-                          name="companyName"
-                          control={control}
-                          label="Company Name"
-                          fullWidth
-                          sx={lightTextFieldSx}
-                        />
-                        <AppTextField<UnifiedRegisterSchemaType>
-                          name="website"
-                          control={control}
-                          label="Company Website"
-                          fullWidth
-                          sx={lightTextFieldSx}
-                        />
-                      </>
-                    )}
-
-                    <Grid container spacing={1.5}>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <AppTextField<UnifiedRegisterSchemaType>
-                          name="firstName"
-                          control={control}
-                          label={isCompany ? "Admin First Name" : "First Name"}
-                          fullWidth
-                          sx={lightTextFieldSx}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <AppTextField<UnifiedRegisterSchemaType>
-                          name="lastName"
-                          control={control}
-                          label={isCompany ? "Admin Last Name" : "Last Name"}
-                          fullWidth
-                          sx={lightTextFieldSx}
-                        />
-                      </Grid>
-                    </Grid>
-
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={1.8}>
+                {isCompany && (
+                  <>
                     <AppTextField<UnifiedRegisterSchemaType>
-                      name="email"
+                      name="companyName"
                       control={control}
-                      label={isCompany ? "Company Email" : "Email Address"}
+                      label="Company Name"
                       fullWidth
                       sx={lightTextFieldSx}
                     />
-
-                    <PasswordField<UnifiedRegisterSchemaType>
-                      name="password"
+                    <AppTextField<UnifiedRegisterSchemaType>
+                      name="website"
                       control={control}
-                      label="Password"
+                      label="Company Website"
                       fullWidth
                       sx={lightTextFieldSx}
                     />
+                  </>
+                )}
 
-                    <PasswordField<UnifiedRegisterSchemaType>
-                      name="confirmPassword"
+                <Grid container spacing={1.5}>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <AppTextField<UnifiedRegisterSchemaType>
+                      name="firstName"
                       control={control}
-                      label="Confirm Password"
+                      label={isCompany ? "Admin First Name" : "First Name"}
                       fullWidth
                       sx={lightTextFieldSx}
                     />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 6 }}>
+                    <AppTextField<UnifiedRegisterSchemaType>
+                      name="lastName"
+                      control={control}
+                      label={isCompany ? "Admin Last Name" : "Last Name"}
+                      fullWidth
+                      sx={lightTextFieldSx}
+                    />
+                  </Grid>
+                </Grid>
 
-                    <AppButton
-                      type="submit"
-                      loading={isLoading}
-                      sx={{
-                        height: 50,
-                        width: "100%",
-                        borderRadius: "12px !important",
-                        fontWeight: 700,
-                        fontSize: "0.95rem",
-                        textTransform: "none",
-                        color: "#ffffff",
-                        mt: 1,
-                        background: isCompany
-                          ? "linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)"
-                          : "linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)",
-                        boxShadow: isCompany
-                          ? "0 0 18px 4px rgba(168, 85, 247, 0.4)"
-                          : "0 0 18px 4px rgba(56, 189, 248, 0.45)",
-                        "&:hover": {
-                          background: isCompany
-                            ? "linear-gradient(180deg, #b86eff 0%, #8b46ff 100%)"
-                            : "linear-gradient(180deg, #4da0ff 0%, #2b7fff 100%)",
-                        },
-                      }}
-                    >
-                      {isLoading
-                        ? isCompany
-                          ? "Creating Company..."
-                          : "Creating Account..."
-                        : isCompany
-                          ? "Create Company Account"
-                          : "Create Account"}
-                    </AppButton>
-                  </Stack>
-                </form>
+                <AppTextField<UnifiedRegisterSchemaType>
+                  name="email"
+                  control={control}
+                  label={isCompany ? "Company Email" : "Email Address"}
+                  fullWidth
+                  sx={lightTextFieldSx}
+                />
 
-                <Typography
+                <PasswordField<UnifiedRegisterSchemaType>
+                  name="password"
+                  control={control}
+                  label="Password"
+                  fullWidth
+                  sx={lightTextFieldSx}
+                />
+
+                <PasswordField<UnifiedRegisterSchemaType>
+                  name="confirmPassword"
+                  control={control}
+                  label="Confirm Password"
+                  fullWidth
+                  sx={lightTextFieldSx}
+                />
+
+                <AppButton
+                  type="submit"
+                  loading={isLoading}
                   sx={{
-                    color: "#64748b",
-                    fontSize: "0.825rem",
-                    textAlign: "center",
-                    fontWeight: 500,
+                    height: 50,
+                    width: "100%",
+                    borderRadius: "12px !important",
+                    fontWeight: 700,
+                    fontSize: "0.95rem",
+                    textTransform: "none",
+                    color: "#ffffff",
+                    mt: 1,
+                    background: isCompany
+                      ? "linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)"
+                      : "linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)",
+                    boxShadow: isCompany
+                      ? "0 0 18px 4px rgba(168, 85, 247, 0.4)"
+                      : "0 0 18px 4px rgba(56, 189, 248, 0.45)",
+                    "&:hover": {
+                      background: isCompany
+                        ? "linear-gradient(180deg, #b86eff 0%, #8b46ff 100%)"
+                        : "linear-gradient(180deg, #4da0ff 0%, #2b7fff 100%)",
+                    },
                   }}
                 >
-                  Already have an account?{" "}
-                  <Link
-                    component={RouterLink}
-                    to="/login"
-                    underline="hover"
-                    sx={{ color: "#2563eb", fontWeight: 700 }}
-                  >
-                    Login
-                  </Link>
-                </Typography>
+                  {isLoading
+                    ? isCompany
+                      ? "Creating Company..."
+                      : "Creating Account..."
+                    : isCompany
+                    ? "Create Company Account"
+                    : "Create Account"}
+                </AppButton>
               </Stack>
-            </AuthCard>
-          </Box>
-        )}
-      </AnimatePresence>
+            </form>
+
+            <Typography
+              sx={{
+                color: "#64748b",
+                fontSize: "0.825rem",
+                textAlign: "center",
+                fontWeight: 500,
+              }}
+            >
+              Already have an account?{" "}
+              <Link
+                component={RouterLink}
+                to="/login"
+                underline="hover"
+                sx={{ color: "#2563eb", fontWeight: 700 }}
+              >
+                Login
+              </Link>
+            </Typography>
+          </Stack>
+        </AuthCard>
+      </Box>
     </Box>
   );
 };

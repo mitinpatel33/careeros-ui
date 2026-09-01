@@ -8,7 +8,6 @@ import { Country, State, City } from "country-state-city";
 import AnimatedSectionCard from "../../../../components/common/AnimatedSectionCard";
 import AppFormField from "../../../../components/common/AppFormField";
 import SaveFooter from "../../../../layouts/SaveFooter";
-import { useGetRealTimeCountriesQuery } from "../../../../services/thirdPartyApi";
 
 const contactSchema = z.object({
   email: z.string().email("Invalid email").min(1, "Email is required"),
@@ -16,8 +15,8 @@ const contactSchema = z.object({
   alternateMobile: z.string().optional(),
   address: z.string().optional(),
   country: z.string().optional(), // stores country NAME
-  state: z.string().optional(),   // stores state NAME
-  city: z.string().optional(),    // stores city NAME
+  state: z.string().optional(), // stores state NAME
+  city: z.string().optional(), // stores city NAME
   pincode: z.string().optional(),
 });
 
@@ -34,8 +33,6 @@ type Props = {
 
 const ContactDetails = memo(
   ({ defaultValues, loading, isFirst, isLast, onBack, onSubmit }: Props) => {
-    const { data: realTimeCountries = [] } = useGetRealTimeCountriesQuery();
-
     const { control, handleSubmit, watch, resetField } =
       useForm<ContactFormType>({
         resolver: zodResolver(contactSchema),
@@ -56,40 +53,31 @@ const ContactDetails = memo(
     const selectedCountryName = watch("country");
     const selectedStateName = watch("state");
 
-    // All countries merged with static ISO fallback mapping
+    // Retrieve all countries locally (No external API or CORS issue)
     const countryOptions = useMemo(() => {
-      const staticCountries = Country.getAllCountries();
-      if (realTimeCountries.length === 0) return staticCountries;
-      
-      return realTimeCountries.map((rtc) => {
-        const match = staticCountries.find((sc) => sc.name === rtc.label);
-        return {
-          name: rtc.label,
-          isoCode: match?.isoCode || rtc.code || "",
-        };
-      });
-    }, [realTimeCountries]);
+      return Country.getAllCountries();
+    }, []);
 
     // Resolve the ISO code from the stored country NAME
     const selectedCountryIso = useMemo(
       () =>
         countryOptions.find((c) => c.name === selectedCountryName)?.isoCode ??
         "",
-      [countryOptions, selectedCountryName]
+      [countryOptions, selectedCountryName],
     );
 
     // States for that country
     const stateOptions = useMemo(
       () =>
         selectedCountryIso ? State.getStatesOfCountry(selectedCountryIso) : [],
-      [selectedCountryIso]
+      [selectedCountryIso],
     );
 
     // Resolve the ISO code from the stored state NAME
     const selectedStateIso = useMemo(
       () =>
         stateOptions.find((s) => s.name === selectedStateName)?.isoCode ?? "",
-      [stateOptions, selectedStateName]
+      [stateOptions, selectedStateName],
     );
 
     // Cities for that country + state
@@ -98,88 +86,131 @@ const ContactDetails = memo(
         selectedCountryIso && selectedStateIso
           ? City.getCitiesOfState(selectedCountryIso, selectedStateIso)
           : [],
-      [selectedCountryIso, selectedStateIso]
+      [selectedCountryIso, selectedStateIso],
     );
 
     return (
-      <AnimatedSectionCard title="Contact Information" subtitle="Email, mobile and address details" icon={<ContactMail />}>
+      <AnimatedSectionCard
+        title="Contact Information"
+        subtitle="Email, mobile and address details"
+        icon={<ContactMail />}
+      >
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2.5}>
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="email" control={control} label="Email *" type="email" />
+              <AppFormField
+                name="email"
+                control={control}
+                label="Email *"
+                type="email"
+              />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <AppFormField name="mobile" control={control} label="Mobile *" />
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
-              <AppFormField name="alternateMobile" control={control} label="Alternate Mobile" />
+              <AppFormField
+                name="alternateMobile"
+                control={control}
+                label="Alternate Mobile"
+              />
             </Grid>
 
             {/* Country */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <Controller name="country" control={control} render={({ field, fieldState }) => (
-                <Autocomplete
-                  options={countryOptions}
-                  getOptionLabel={(opt) => opt.name}
-                  isOptionEqualToValue={(opt, val) => !!val && opt.name === val.name}
-                  value={
-                    countryOptions.find((c) => c.name === field.value) ?? null
-                  }
-                  onChange={(_, newValue) => {
-                    field.onChange(newValue?.name ?? "");
-                    resetField("state", { defaultValue: "" });
-                    resetField("city", { defaultValue: "" });
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Country" error={!!fieldState.error} helperText={fieldState.error?.message} />
-                  )}
-                />
-              )}
+              <Controller
+                name="country"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Autocomplete
+                    options={countryOptions}
+                    getOptionLabel={(opt) => opt.name}
+                    isOptionEqualToValue={(opt, val) =>
+                      !!val && opt.name === val.name
+                    }
+                    value={
+                      countryOptions.find((c) => c.name === field.value) ?? null
+                    }
+                    onChange={(_, newValue) => {
+                      field.onChange(newValue?.name ?? "");
+                      resetField("state", { defaultValue: "" });
+                      resetField("city", { defaultValue: "" });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Country"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                )}
               />
             </Grid>
 
             {/* State */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <Controller name="state" control={control} render={({ field, fieldState }) => (
-                <Autocomplete
-                  options={stateOptions}
-                  disabled={!selectedCountryIso}
-                  getOptionLabel={(opt) => opt.name}
-                  isOptionEqualToValue={(opt, val) => !!val && opt.name === val.name}
-                  value={
-                    stateOptions.find((s) => s.name === field.value) ?? null
-                  }
-                  onChange={(_, newValue) => {
-                    field.onChange(newValue?.name ?? "");
-                    resetField("city", { defaultValue: "" });
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="State" error={!!fieldState.error} helperText={fieldState.error?.message} />
-                  )}
-                />
-              )}
+              <Controller
+                name="state"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Autocomplete
+                    options={stateOptions}
+                    disabled={!selectedCountryIso}
+                    getOptionLabel={(opt) => opt.name}
+                    isOptionEqualToValue={(opt, val) =>
+                      !!val && opt.name === val.name
+                    }
+                    value={
+                      stateOptions.find((s) => s.name === field.value) ?? null
+                    }
+                    onChange={(_, newValue) => {
+                      field.onChange(newValue?.name ?? "");
+                      resetField("city", { defaultValue: "" });
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="State"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                )}
               />
             </Grid>
 
             {/* City */}
             <Grid size={{ xs: 12, md: 6 }}>
-              <Controller name="city" control={control} render={({ field, fieldState }) => (
-                <Autocomplete
-                  options={cityOptions}
-                  disabled={!selectedStateIso}
-                  getOptionLabel={(opt) => opt.name}
-                  isOptionEqualToValue={(opt, val) => !!val && opt.name === val.name}
-                  value={
-                    cityOptions.find((c) => c.name === field.value) ?? null
-                  }
-                  onChange={(_, newValue) => {
-                    field.onChange(newValue?.name ?? "");
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="City" error={!!fieldState.error} helperText={fieldState.error?.message} />
-                  )}
-                />
-              )}
+              <Controller
+                name="city"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Autocomplete
+                    options={cityOptions}
+                    disabled={!selectedStateIso}
+                    getOptionLabel={(opt) => opt.name}
+                    isOptionEqualToValue={(opt, val) =>
+                      !!val && opt.name === val.name
+                    }
+                    value={
+                      cityOptions.find((c) => c.name === field.value) ?? null
+                    }
+                    onChange={(_, newValue) => {
+                      field.onChange(newValue?.name ?? "");
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="City"
+                        error={!!fieldState.error}
+                        helperText={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                )}
               />
             </Grid>
 
@@ -188,7 +219,13 @@ const ContactDetails = memo(
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <AppFormField name="address" control={control} label="Address" type="textarea" rows={4} />
+              <AppFormField
+                name="address"
+                control={control}
+                label="Address"
+                type="textarea"
+                rows={4}
+              />
             </Grid>
           </Grid>
 
@@ -201,7 +238,7 @@ const ContactDetails = memo(
         </form>
       </AnimatedSectionCard>
     );
-  }
+  },
 );
 
 ContactDetails.displayName = "ContactDetails";

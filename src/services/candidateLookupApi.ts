@@ -11,7 +11,35 @@ export interface SkillSuggestion {
   uri: string;
 }
 
-const REST_COUNTRIES_API_KEY = "rc_live_ac49546ec9894eee82bbb585e19f5af0"; // ideally proxied via your backend, not exposed client-side
+// Indian standard qualifications and degrees
+const INDIAN_DEGREES: DropdownOption[] = [
+  "10th Standard (SSC / CBSE / ICSE)",
+  "12th Standard (HSC / CBSE / ISC)",
+  "Diploma in Engineering",
+  "Bachelor of Technology (B.Tech)",
+  "Bachelor of Engineering (B.E.)",
+  "Bachelor of Computer Applications (BCA)",
+  "Bachelor of Science (B.Sc)",
+  "Bachelor of Commerce (B.Com)",
+  "Bachelor of Business Administration (BBA)",
+  "Bachelor of Arts (B.A.)",
+  "Bachelor of Architecture (B.Arch)",
+  "Bachelor of Pharmacy (B.Pharm)",
+  "Bachelor of Design (B.Des)",
+  "Bachelor of Medicine, Bachelor of Surgery (MBBS)",
+  "Bachelor of Laws (LL.B.)",
+  "Master of Technology (M.Tech)",
+  "Master of Computer Applications (MCA)",
+  "Master of Science (M.Sc)",
+  "Master of Business Administration (MBA)",
+  "Master of Commerce (M.Com)",
+  "Master of Arts (M.A.)",
+  "Master of Pharmacy (M.Pharm)",
+  "Master of Laws (LL.M.)",
+  "Doctor of Philosophy (Ph.D.)",
+].map((degree) => ({ label: degree, value: degree }));
+
+const REST_COUNTRIES_API_KEY = "rc_live_ac49546ec9894eee82bbb585e19f5af0";
 
 interface RestCountryV5 {
   names?: { common?: string };
@@ -25,7 +53,7 @@ export const candidateLookupApi = api.injectEndpoints({
     getNationalities: builder.query<DropdownOption[], void>({
       queryFn: async (_arg, _api, _extra, baseQuery) => {
         const allObjects: RestCountryV5[] = [];
-        const limit = 100; // free-plan max
+        const limit = 100;
         let offset = 0;
         let more = true;
 
@@ -62,21 +90,10 @@ export const candidateLookupApi = api.injectEndpoints({
       },
     }),
 
+    // ✅ FIXED: Returns Indian degrees instantly without hitting external APIs or CORS
     getDegrees: builder.query<DropdownOption[], void>({
-      query: () =>
-        "https://datausa.io/api/data?measures=SubgroupId&drilldowns=Degree",
-      transformResponse: (res: { data: Array<{ Degree: string }> }) => {
-        if (!res?.data || !Array.isArray(res.data)) return [];
-
-        // Remove duplicates and extract degree titles
-        const uniqueDegrees = Array.from(
-          new Set(res.data.map((item) => item.Degree)),
-        );
-
-        return uniqueDegrees.map((degree) => ({
-          label: degree,
-          value: degree,
-        }));
+      queryFn: () => {
+        return { data: INDIAN_DEGREES };
       },
     }),
 
@@ -97,7 +114,6 @@ export const candidateLookupApi = api.injectEndpoints({
         if (!Array.isArray(items)) return [];
 
         return items.map((item) => {
-          // Extract a human‑readable label
           let label = item.title || "";
           if (!label) {
             if (typeof item.preferredLabel === "string") {
@@ -110,12 +126,11 @@ export const candidateLookupApi = api.injectEndpoints({
 
           return {
             label: displayLabel,
-            // ✅ FIX: store the skill name, not the URI
             value: displayLabel,
           };
         });
       },
-      keepUnusedDataFor: 300, // 5 minutes cache
+      keepUnusedDataFor: 300,
     }),
   }),
 });

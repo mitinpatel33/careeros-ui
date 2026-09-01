@@ -11,7 +11,7 @@ import {
   ArrowBack,
   ArrowForward,
   Delete,
-  Edit
+  Edit,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import AppButton from "../../../components/common/AppButton";
@@ -107,46 +107,50 @@ const ProfileItemList = <T,>({
             </Typography>
           )}
 
-          {items?.map((item, index) => (
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Box
-                key={(item as any).id || (item as any)._id || index}
-                sx={{
-                  p: 2,
-                  borderRadius: 3,
-                  border: "1px solid #e5e7eb",
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  bgcolor: "#fff",
-                  gap: 2,
-                }}
+          {items?.map((item, index) => {
+            const itemKey =
+              (item as any).id || (item as any)._id || `item-${index}`;
+            return (
+              <motion.div
+                key={itemKey} // ✅ Moved key prop here
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
               >
-                <Box>
-                  <Typography sx={{ fontWeight: 900 }}>
-                    {getTitle(item)}
-                  </Typography>
-                  {getSubtitle && (
-                    <Typography color="text.secondary" sx={{ fontSize: 14 }}>
-                      {getSubtitle(item)}
+                <Box
+                  sx={{
+                    p: 2,
+                    borderRadius: 3,
+                    border: "1px solid #e5e7eb",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    bgcolor: "#fff",
+                    gap: 2,
+                  }}
+                >
+                  <Box>
+                    <Typography sx={{ fontWeight: 900 }}>
+                      {getTitle(item)}
                     </Typography>
-                  )}
-                </Box>
+                    {getSubtitle && (
+                      <Typography color="text.secondary" sx={{ fontSize: 14 }}>
+                        {getSubtitle(item)}
+                      </Typography>
+                    )}
+                  </Box>
 
-                <Stack direction="row">
-                  <IconButton onClick={() => onEdit(item)}>
-                    <Edit />
-                  </IconButton>
-                  <IconButton color="error" onClick={() => onDelete(item)}>
-                    <Delete />
-                  </IconButton>
-                </Stack>
-              </Box>
-            </motion.div>
-          ))}
+                  <Stack direction="row">
+                    <IconButton onClick={() => onEdit(item)}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => onDelete(item)}>
+                      <Delete />
+                    </IconButton>
+                  </Stack>
+                </Box>
+              </motion.div>
+            );
+          })}
         </Stack>
 
         <Stack

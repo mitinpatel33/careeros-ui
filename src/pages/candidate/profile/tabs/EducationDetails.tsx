@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { School } from "@mui/icons-material";
 import ProfileCrudStep from "../ProfileCrudStep";
 import { useGetDegreesQuery } from "../../../../services/candidateLookupApi";
@@ -17,21 +17,6 @@ export type ProfileEducation = {
   displayOrder?: number;
 };
 
-// Fallback Degree Options if RTK Query or API is empty
-const DEFAULT_DEGREES = [
-  "High School Diploma",
-  "Associate of Arts (A.A.)",
-  "Associate of Science (A.S.)",
-  "Bachelor of Arts (B.A.)",
-  "Bachelor of Science (B.S.)",
-  "Bachelor of Engineering (B.E. / B.Tech)",
-  "Master of Arts (M.A.)",
-  "Master of Science (M.S.)",
-  "Master of Business Administration (MBA)",
-  "Master of Technology (M.Tech)",
-  "Doctor of Philosophy (Ph.D.)",
-];
-
 type Props = {
   items: ProfileEducation[];
   loading?: boolean;
@@ -39,19 +24,20 @@ type Props = {
 };
 
 const EducationDetails = ({ items, loading, onSave }: Props) => {
-  // RTK Query hook for dynamic degree options from your backend lookup
+  // RTK Query hook for dynamic degree options from candidateLookupApi
   const { data: degreeOptionsFromApi = [] } = useGetDegreesQuery();
 
-  // Search states for dynamic Institute API (Hipolabs Universities API)
+  // Search states for dynamic Indian Institute API (Hipolabs API)
   const [instituteSearch, setInstituteSearch] = useState("");
-  const [instituteOptions, setInstituteOptions] = useState<{ label: string; value: string }[]>([]);
+  const [instituteOptions, setInstituteOptions] = useState<
+    { label: string; value: string }[]
+  >([]);
   const [isSearchingInstitutes, setIsSearchingInstitutes] = useState(false);
 
-  // Search states for dynamic Degree API filtering
+  // Search state for Degree API filtering
   const [degreeSearch, setDegreeSearch] = useState("");
-  const [degreeOptions, setDegreeOptions] = useState<{ label: string; value: string }[]>([]);
 
-  // 1. Debounced Search Effect for Third-Party Universities API
+  // 1. Debounced Search Effect for Indian Universities
   useEffect(() => {
     if (!instituteSearch.trim() || instituteSearch.trim().length < 2) {
       setInstituteOptions([]);
@@ -61,28 +47,26 @@ const EducationDetails = ({ items, loading, onSave }: Props) => {
     const timer = setTimeout(async () => {
       setIsSearchingInstitutes(true);
       try {
-        // Free third-party Universities API (Hipolabs)
         const response = await fetch(
-          `http://universities.hipolabs.com/search?name=${encodeURIComponent(
-            instituteSearch
-          )}&limit=20`
+          `http://universities.hipolabs.com/search?country=India&name=${encodeURIComponent(
+            instituteSearch.trim(),
+          )}`,
         );
         if (response.ok) {
           const data = await response.json();
-          // Map response data
           const formatted = data.map((item: any) => ({
-            label: `${item.name} (${item.country})`,
+            label: item.name,
             value: item.name,
           }));
-          
-          // Remove duplicates
+
+          // Remove duplicate college entries
           const unique = Array.from(
-            new Map(formatted.map((m: any) => [m.label, m])).values()
+            new Map(formatted.map((m: any) => [m.label, m])).values(),
           );
           setInstituteOptions(unique as { label: string; value: string }[]);
         }
       } catch (err) {
-        console.error("Institute search failed:", err);
+        console.error("Indian institute search failed:", err);
       } finally {
         setIsSearchingInstitutes(false);
       }
@@ -91,33 +75,25 @@ const EducationDetails = ({ items, loading, onSave }: Props) => {
     return () => clearTimeout(timer);
   }, [instituteSearch]);
 
-  // 2. Degree options filtering (uses API data if present, otherwise defaults)
-  useEffect(() => {
-    const rawList: string[] =
-      degreeOptionsFromApi && degreeOptionsFromApi.length > 0
-        ? degreeOptionsFromApi.map((d: any) => (typeof d === "string" ? d : d.label || d.name))
-        : DEFAULT_DEGREES;
-
+  // 2. ✅ FIX: Use useMemo for filtering degrees to PREVENT infinite render loops ("Maximum update depth exceeded")
+  const degreeOptions = useMemo(() => {
     if (!degreeSearch.trim()) {
-      setDegreeOptions(rawList.map((d) => ({ label: d, value: d })));
-      return;
+      return degreeOptionsFromApi;
     }
 
-    const filtered = rawList.filter((d) =>
-      d.toLowerCase().includes(degreeSearch.toLowerCase())
+    const filtered = degreeOptionsFromApi.filter((d) =>
+      d.label.toLowerCase().includes(degreeSearch.toLowerCase()),
     );
 
-    setDegreeOptions(
-      filtered.length > 0
-        ? filtered.map((d) => ({ label: d, value: d }))
-        : [{ label: degreeSearch, value: degreeSearch }]
-    );
+    return filtered.length > 0
+      ? filtered
+      : [{ label: degreeSearch, value: degreeSearch }];
   }, [degreeSearch, degreeOptionsFromApi]);
 
   const fields: any[] = [
     {
       name: "instituteName",
-      label: "Institute Name",
+      label: "Institute / College Name",
       type: "autocomplete",
       options: instituteOptions,
       onSearch: setInstituteSearch,
@@ -126,16 +102,16 @@ const EducationDetails = ({ items, loading, onSave }: Props) => {
     },
     {
       name: "degree",
-      label: "Degree",
+      label: "Degree / Qualification",
       type: "autocomplete",
       options: degreeOptions,
       onSearch: setDegreeSearch,
       freeSolo: true,
     },
-    { name: "fieldOfStudy", label: "Field Of Study" },
+    { name: "fieldOfStudy", label: "Field Of Study / Branch" },
     { name: "startDate", label: "Start Date", type: "date" },
     { name: "endDate", label: "End Date", type: "date" },
-    { name: "percentage", label: "Percentage", type: "number" },
+    { name: "percentage", label: "Percentage / CGPA", type: "number" },
     { name: "grade", label: "Grade" },
     { name: "description", label: "Description", type: "textarea", rows: 4 },
   ];
@@ -159,7 +135,9 @@ const EducationDetails = ({ items, loading, onSave }: Props) => {
       }}
       fields={fields}
       getTitle={(x) => x.degree || "Education"}
-      getSubtitle={(x) => `${x.instituteName || "N/A"} • ${x.fieldOfStudy || "N/A"}`}
+      getSubtitle={(x) =>
+        `${x.instituteName || "N/A"} • ${x.fieldOfStudy || "N/A"}`
+      }
       onSave={onSave}
     />
   );

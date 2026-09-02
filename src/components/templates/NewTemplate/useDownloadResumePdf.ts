@@ -2,9 +2,14 @@ import { useCallback, useState } from "react";
 const A4_WIDTH_PX = 794;
 const A4_HEIGHT_PX = 1123;
 
+// Must be >= the widest MUI breakpoint any template uses (default md = 900, lg = 1200).
+// Setting it generously high is safe — it only affects media-query evaluation,
+// not the actual captured/output size.
+const RENDER_WINDOW_WIDTH = 1440;
+
 export function useDownloadResumePdf(
   resumeRef: React.RefObject<HTMLElement | null>,
-  fileName: string
+  fileName: string,
 ) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,11 +21,6 @@ export function useDownloadResumePdf(
 
     const element = resumeRef.current;
 
-    const originalTransform = element.style.transform;
-    const originalWidth = element.style.width;
-    const originalMinHeight = element.style.minHeight;
-    const originalBoxSizing = element.style.boxSizing;
-
     try {
       if (document.fonts) {
         await document.fonts.ready;
@@ -29,14 +29,8 @@ export function useDownloadResumePdf(
       // @ts-ignore
       const html2pdf = (await import("html2pdf.js")).default;
 
-      element.style.transform = "none";
-      element.style.width = `${A4_WIDTH_PX}px`;
-      element.style.minHeight = `${A4_HEIGHT_PX}px`;
-      element.style.boxSizing = "border-box";
-
       await new Promise((resolve) => setTimeout(resolve, 150));
 
-      // Add 'as const' at the end of the object declaration below
       const opt = {
         margin: 0,
         filename: fileName,
@@ -45,8 +39,17 @@ export function useDownloadResumePdf(
           scale: 2,
           useCORS: true,
           logging: false,
-          windowWidth: A4_WIDTH_PX,
+          // KEY FIX: iframe "sees" a wide desktop viewport so md/lg
+          // breakpoints still match, but only a 794px-wide region is captured.
+          windowWidth: RENDER_WINDOW_WIDTH,
+          windowHeight: Math.max(
+            RENDER_WINDOW_WIDTH,
+            element.scrollHeight || A4_HEIGHT_PX,
+          ),
           width: A4_WIDTH_PX,
+          height: element.scrollHeight || A4_HEIGHT_PX,
+          x: 0,
+          y: 0,
           scrollX: 0,
           scrollY: 0,
         },
@@ -56,17 +59,13 @@ export function useDownloadResumePdf(
           orientation: "portrait",
           compress: true,
         },
-      } as const; // <--- ADDED 'as const' HERE
+      } as const;
 
       await html2pdf().set(opt).from(element).save();
     } catch (err) {
       console.error("Resume PDF export failed:", err);
       setError("Couldn't generate the PDF. Please try again.");
     } finally {
-      element.style.transform = originalTransform;
-      element.style.width = originalWidth;
-      element.style.minHeight = originalMinHeight;
-      element.style.boxSizing = originalBoxSizing;
       setIsDownloading(false);
     }
   }, [resumeRef, fileName]);

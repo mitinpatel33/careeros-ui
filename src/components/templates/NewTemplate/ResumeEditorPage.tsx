@@ -78,18 +78,19 @@ const ResumeEditorPage = ({
   initialTemplateId = "sidebar",
   data = SAMPLE_RESUME_DATA,
 }: ResumeEditorPageProps) => {
-  // 1. Manage current selected template / theme state locally
   const [selectedTemplateId, setSelectedTemplateId] =
     useState<string>(initialTemplateId);
 
-  // 2. Fetch selected template entry from registry dynamically
   const entry = useMemo(
     () => getTemplateById(selectedTemplateId) ?? TEMPLATE_REGISTRY[0],
     [selectedTemplateId],
   );
 
-  // 3. Fix Ref Type Definition
+  // Ref for the visible, scaled preview (display only — never export from this)
   const resumeRef = useRef<HTMLDivElement | null>(null);
+
+  // Ref for a hidden, full-size, unscaled clone used ONLY for PDF export
+  const exportRef = useRef<HTMLDivElement | null>(null);
 
   const fileName =
     `${data.personal?.firstName ?? "resume"}-${data.personal?.lastName ?? ""}`
@@ -98,7 +99,7 @@ const ResumeEditorPage = ({
       .toLowerCase() + `-${selectedTemplateId}-resume.pdf`;
 
   const { download, isDownloading, error } = useDownloadResumePdf(
-    resumeRef,
+    exportRef,
     fileName,
   );
 
@@ -124,9 +125,8 @@ const ResumeEditorPage = ({
           </Typography>
         </Box>
 
-        <Stack direction="row" spacing={2} sx={{alignItems: "center"}}>
-          {/* Theme Switcher Selector */}
-          <Select
+        <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+          {/* <Select
             size="small"
             value={selectedTemplateId}
             onChange={(e) => setSelectedTemplateId(e.target.value)}
@@ -142,9 +142,8 @@ const ResumeEditorPage = ({
                 {tpl.name}
               </MenuItem>
             ))}
-          </Select>
+          </Select> */}
 
-          {/* Download PDF Trigger Button */}
           <Button
             variant="contained"
             startIcon={<DownloadRoundedIcon />}
@@ -168,11 +167,28 @@ const ResumeEditorPage = ({
         </Alert>
       )}
 
-      {/* Renders and scales whatever template is actively selected */}
+      {/* Visible, scaled preview */}
       <Box sx={{ py: 2 }}>
         <ScaledResume resumeRef={resumeRef}>
           <TemplateComponent ref={resumeRef} data={data} />
         </ScaledResume>
+      </Box>
+
+      {/* Hidden, full-size, unscaled clone — export source of truth.
+          Rendered off-screen (not display:none) so layout/columns compute
+          exactly as they would at true A4 width, unaffected by the
+          preview's scale transform or the real browser viewport width. */}
+      <Box
+        aria-hidden
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: "-10000px",
+          width: `${A4_WIDTH_PX}px`,
+          pointerEvents: "none",
+        }}
+      >
+        <TemplateComponent ref={exportRef} data={data} />
       </Box>
     </Box>
   );

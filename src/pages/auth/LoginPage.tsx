@@ -350,7 +350,7 @@ const LoginPage = () => {
             />
             <ActionIconButton
               title="Facebook"
-              onClick={() => {}}
+              onClick={() => { }}
               disabled={isAnyLoading}
               icon={Facebook}
               sx={{

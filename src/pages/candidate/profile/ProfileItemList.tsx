@@ -6,8 +6,15 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Add, Delete, Edit, Save } from "@mui/icons-material";
+import {
+  Add,
+  ArrowBack,
+  ArrowForward,
+  Delete,
+  Edit
+} from "@mui/icons-material";
 import { motion } from "framer-motion";
+import AppButton from "../../../components/common/AppButton";
 
 type Props<T> = {
   title: string;
@@ -22,6 +29,9 @@ type Props<T> = {
   onSave: () => void;
   loading?: boolean;
   saving?: boolean;
+  onBack?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 };
 
 const ProfileItemList = <T,>({
@@ -37,6 +47,9 @@ const ProfileItemList = <T,>({
   onSave,
   loading = false,
   saving = false,
+  onBack,
+  isFirst = false,
+  isLast = false,
 }: Props<T>) => {
   return (
     <Card
@@ -136,21 +149,38 @@ const ProfileItemList = <T,>({
           ))}
         </Stack>
 
-        <Stack direction="row" sx={{ justifyContent: "flex-end" }}>
+        <Stack
+          direction="row"
+          sx={{ justifyContent: "space-between", alignItems: "center", mt: 2 }}
+        >
           <Button
-            variant="contained"
-            startIcon={<Save />}
-            disabled={saving || loading}
-            onClick={onSave}
+            type="button"
+            variant="outlined"
+            startIcon={<ArrowBack />}
+            disabled={isFirst || loading || saving}
+            onClick={onBack}
             sx={{
+              height: 50,
               borderRadius: 3,
               textTransform: "none",
-              fontWeight: 900,
-              px: 4,
+              px: 3,
+              fontWeight: 800,
             }}
           >
-            {saving ? "Saving..." : "Save & Continue"}
+            Back
           </Button>
+
+          <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.96 }}>
+            <AppButton
+              type="submit"
+              loading={loading || saving}
+              color={isLast ? "success" : "primary"}
+              endIcon={!isLast ? <ArrowForward /> : undefined}
+              onClick={onSave}
+            >
+              {isLast ? "Finish & Publish" : "Save & Continue"}
+            </AppButton>
+          </motion.div>
         </Stack>
       </Stack>
     </Card>

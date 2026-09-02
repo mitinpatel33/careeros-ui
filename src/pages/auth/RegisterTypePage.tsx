@@ -4,7 +4,12 @@ import { ArrowForward, CheckCircle } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
-// Entrance Animation Variants
+type RoleType = "Candidate" | "Company";
+
+interface RegisterTypePageProps {
+  onSelectRole?: (role: RoleType) => void;
+}
+
 const containerVariants = {
   hidden: { opacity: 0 },
   visible: {
@@ -22,21 +27,21 @@ const itemVariants = {
   },
 };
 
-const RegisterTypePage = () => {
+const RegisterTypePage: React.FC<RegisterTypePageProps> = ({
+  onSelectRole,
+}) => {
   const navigate = useNavigate();
 
+  const handleSelect = (role: RoleType) => {
+    if (onSelectRole) {
+      onSelectRole(role);
+    } else {
+      navigate(`/register/${role.toLowerCase()}`);
+    }
+  };
+
   return (
-    <Box
-      sx={{
-        // minHeight: "100vh",
-        overflow: "hidden",
-        display: "grid",
-        placeItems: "center",
-        // p: { xs: 2, sm: 3 },
-        // background: "linear-gradient(135deg, #f0f7ff 0%, #eef2ff 100%)",
-        // position: "relative",
-      }}
-    >
+    <Box sx={{ overflow: "hidden", display: "grid", placeItems: "center" }}>
       <Stack
         component={motion.div}
         variants={containerVariants}
@@ -45,7 +50,6 @@ const RegisterTypePage = () => {
         spacing={3.5}
         sx={{ width: "100%", maxWidth: 860, zIndex: 2 }}
       >
-        {/* Title Header */}
         <Box sx={{ textAlign: "center" }}>
           <motion.div variants={itemVariants}>
             <Chip
@@ -82,7 +86,6 @@ const RegisterTypePage = () => {
                 Join Career OS
               </Box>
 
-              {/* Animated Flying Rocket */}
               <Box
                 component={motion.span}
                 animate={{
@@ -120,7 +123,6 @@ const RegisterTypePage = () => {
           </motion.div>
         </Box>
 
-        {/* Account Type Cards Grid */}
         <Stack direction={{ xs: "column", sm: "row" }} spacing={3.5}>
           <CompactAccountCard
             animatedIcon={<CandidateAnimatedIcon />}
@@ -136,7 +138,7 @@ const RegisterTypePage = () => {
             buttonGradient="linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%)"
             glowColor="rgba(37, 99, 235, 0.45)"
             iconBg="#e0edff"
-            onClick={() => navigate("/register/candidate")}
+            onClick={() => handleSelect("Candidate")}
           />
 
           <CompactAccountCard
@@ -153,11 +155,10 @@ const RegisterTypePage = () => {
             buttonGradient="linear-gradient(180deg, #a855f7 0%, #7c3aed 100%)"
             glowColor="rgba(139, 92, 246, 0.45)"
             iconBg="#f3e8ff"
-            onClick={() => navigate("/register/company")}
+            onClick={() => handleSelect("Company")}
           />
         </Stack>
 
-        {/* Footer Navigation */}
         <motion.div variants={itemVariants}>
           <Typography
             sx={{
@@ -211,134 +212,122 @@ const CompactAccountCard: React.FC<CompactCardProps> = ({
   iconBg,
   onClick,
 }) => (
-  <Paper
-    component={motion.div}
-    variants={itemVariants}
-    whileHover={{ y: -4, scale: 1.005 }}
-    transition={{ type: "spring", stiffness: 200, damping: 16 }}
-    onClick={onClick}
-    sx={{
-      flex: 1,
-      p: { xs: 2.5, sm: 3 }, // Reduced vertical padding to prevent scrolling
-      borderRadius: "24px", // Compact border radius
-      cursor: "pointer",
-      color: "#0f172a",
-      position: "relative",
-      bgcolor: "#ffffff",
-      boxShadow:
-        "0 15px 35px -10px rgba(37, 99, 235, 0.18), 0 5px 15px -5px rgba(59, 130, 246, 0.12)",
-      border: "1px solid rgba(191, 219, 254, 0.5)",
-      overflow: "hidden",
-      transition: "all 0.3s ease-in-out",
-      "&:hover": {
-        boxShadow: `0 20px 40px -8px ${glowColor}, 0 8px 20px -8px rgba(37, 99, 235, 0.2)`,
-        borderColor: "rgba(147, 197, 253, 0.8)",
-      },
-    }}
-  >
-    <Stack spacing={2} sx={{ position: "relative", zIndex: 1 }}>
-      {/* Smaller Icon Container */}
-      <Box
-        sx={{
-          width: 46,
-          height: 46,
-          borderRadius: "12px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          bgcolor: iconBg,
-        }}
-      >
-        {animatedIcon}
-      </Box>
-
-      {/* Card Title & Subtitle */}
-      <Box>
-        <Typography
-          variant="h5"
+  <motion.div variants={itemVariants} style={{ flex: 1 }}>
+    <Paper
+      onClick={onClick}
+      sx={{
+        p: { xs: 2.5, sm: 3 },
+        borderRadius: "24px",
+        cursor: "pointer",
+        color: "#0f172a",
+        position: "relative",
+        bgcolor: "#ffffff",
+        boxShadow:
+          "0 15px 35px -10px rgba(37, 99, 235, 0.18), 0 5px 15px -5px rgba(59, 130, 246, 0.12)",
+        border: "1px solid rgba(191, 219, 254, 0.5)",
+        overflow: "hidden",
+        transition:
+          "transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
+        "&:hover": {
+          transform: "translateY(-4px) scale(1.005)",
+          boxShadow: `0 20px 40px -8px ${glowColor}, 0 8px 20px -8px rgba(37, 99, 235, 0.2)`,
+          borderColor: "rgba(147, 197, 253, 0.8)",
+        },
+        "&:active": {
+          transform: "translateY(0px) scale(1)",
+        },
+      }}
+    >
+      <Stack spacing={2} sx={{ position: "relative", zIndex: 1 }}>
+        <Box
           sx={{
-            fontWeight: 800,
-            fontSize: "1.25rem",
-            color: "#1e3a8a",
-            mb: 0.5,
+            width: 46,
+            height: 46,
+            borderRadius: "12px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: iconBg,
           }}
         >
-          {title}
-        </Typography>
-        <Typography
-          sx={{
-            color: "#64748b",
-            fontSize: "0.8rem",
-            lineHeight: 1.4,
-            fontWeight: 500,
-            minHeight: "34px", // Fixes layout shift across different subtitle lengths
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          {subtitle}
-        </Typography>
-      </Box>
+          {animatedIcon}
+        </Box>
 
-      {/* Compact Feature List */}
-      <Stack spacing={1} sx={{ pt: 0.25 }}>
-        {features.map((feature) => (
-          <Stack
-            key={feature}
-            direction="row"
-            spacing={1}
-            sx={{ alignItems: "center" }}
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: 800,
+              fontSize: "1.25rem",
+              color: "#1e3a8a",
+              mb: 0.5,
+            }}
           >
-            <CheckCircle sx={{ fontSize: 16, color: "#16a34a" }} />
-            <Typography
-              sx={{
-                fontSize: "0.8rem",
-                fontWeight: 700,
-                color: "#334155",
-              }}
-            >
-              {feature}
-            </Typography>
-          </Stack>
-        ))}
-      </Stack>
+            {title}
+          </Typography>
+          <Typography
+            sx={{
+              color: "#64748b",
+              fontSize: "0.8rem",
+              lineHeight: 1.4,
+              fontWeight: 500,
+              minHeight: "34px",
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
+              overflow: "hidden",
+            }}
+          >
+            {subtitle}
+          </Typography>
+        </Box>
 
-      {/* Action Button */}
-      <Button
-        className="cta-btn"
-        fullWidth
-        variant="contained"
-        endIcon={<ArrowForward sx={{ fontSize: "16px !important" }} />}
-        sx={{
-          mt: 1,
-          py: 1.1,
-          borderRadius: "50px",
-          fontWeight: 700,
-          fontSize: "0.875rem",
-          textTransform: "none",
-          background: buttonGradient,
-          color: "#ffffff",
-          boxShadow: `0 0 16px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.3)`,
-          transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          "&:hover": {
-            transform: "translateY(-1px)",
+        <Stack spacing={1} sx={{ pt: 0.25 }}>
+          {features.map((feature) => (
+            <Stack
+              key={feature}
+              direction="row"
+              spacing={1}
+              sx={{ alignItems: "center" }}
+            >
+              <CheckCircle sx={{ fontSize: 16, color: "#16a34a" }} />
+              <Typography
+                sx={{
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  color: "#334155",
+                }}
+              >
+                {feature}
+              </Typography>
+            </Stack>
+          ))}
+        </Stack>
+
+        <Button
+          fullWidth
+          variant="contained"
+          endIcon={<ArrowForward sx={{ fontSize: "16px !important" }} />}
+          sx={{
+            mt: 1,
+            py: 1.1,
+            borderRadius: "50px",
+            fontWeight: 700,
+            fontSize: "0.875rem",
+            textTransform: "none",
             background: buttonGradient,
-            boxShadow: `0 0 24px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.5)`,
-          },
-          "&:active": {
-            transform: "translateY(1px)",
-          },
-        }}
-      >
-        {buttonText}
-      </Button>
-    </Stack>
-  </Paper>
+            color: "#ffffff",
+            pointerEvents: "none", // Allows direct clicks to pass directly through to Paper handler
+            boxShadow: `0 0 16px ${glowColor}, inset 0 1px 1px rgba(255, 255, 255, 0.3)`,
+          }}
+        >
+          {buttonText}
+        </Button>
+      </Stack>
+    </Paper>
+  </motion.div>
 );
 
-// Original Candidate Custom Animated Icon
 const CandidateAnimatedIcon = () => (
   <Box
     sx={{
@@ -378,7 +367,6 @@ const CandidateAnimatedIcon = () => (
   </Box>
 );
 
-// Original Company Custom Animated Icon
 const CompanyAnimatedIcon = () => (
   <Box
     sx={{

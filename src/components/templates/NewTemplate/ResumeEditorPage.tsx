@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Alert, Box, Button, Stack, Typography } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Button,
+  MenuItem,
+  Select,
+  Stack,
+  Typography,
+} from "@mui/material";
 import DownloadRoundedIcon from "@mui/icons-material/DownloadRounded";
 
 import { getTemplateById, TEMPLATE_REGISTRY } from "./registry";
@@ -9,27 +17,15 @@ import type { ResumeData } from "../../../types/candidate/resume.types";
 import { SAMPLE_RESUME_DATA } from "../../../utils/sampleResumeData";
 
 interface ResumeEditorPageProps {
-  templateId: string;
+  initialTemplateId?: string;
   data?: ResumeData;
 }
 
-/**
- * Scales the fixed-width A4 template down to fit whatever width its
- * container actually has, instead of letting it overflow and get clipped
- * (the old `overflowX: auto` wrapper only revealed the cut-off content via
- * a scrollbar).
- *
- * The DOM node passed to the download hook (`resumeRef`) stays at its
- * natural, un-scaled 794px size — only the *display* wrapper around it is
- * scaled with CSS transform. That way the PDF export always captures the
- * full-resolution layout regardless of how small the on-screen preview
- * currently renders.
- */
 const ScaledResume = ({
   resumeRef,
   children,
 }: {
-  resumeRef: React.RefObject<HTMLDivElement>;
+  resumeRef: React.RefObject<HTMLDivElement | null>;
   children: React.ReactNode;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -41,8 +37,6 @@ const ScaledResume = ({
       if (!containerRef.current || !resumeRef.current) return;
 
       const containerWidth = containerRef.current.clientWidth;
-      // Never scale up past 1 — a wide container shouldn't blow up the
-      // resume beyond its real A4 size, just center it.
       const nextScale = Math.min(containerWidth / A4_WIDTH_PX, 1);
       setScale(nextScale);
       setContentHeight(resumeRef.current.scrollHeight);
@@ -55,20 +49,10 @@ const ScaledResume = ({
     if (resumeRef.current) resizeObserver.observe(resumeRef.current);
 
     return () => resizeObserver.disconnect();
-    // resumeRef is a stable ref object, safe to omit from deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [children, resumeRef]);
 
   return (
-    // `minWidth: 0` is the key line here — without it, a flex/grid child
-    // defaults to `min-width: auto`, which lets it grow to fit its content
-    // (the 794px-wide resume) instead of shrinking to the space its parent
-    // actually has. That was silently making `clientWidth` report ~794px
-    // regardless of the real panel width, so `scale` always came out ~1
-    // and nothing visually shrank.
     <Box ref={containerRef} sx={{ width: "100%", minWidth: 0 }}>
-      {/* Reserve exactly the scaled height so the page below doesn't jump
-          or leave a gap once the transform shrinks the visual box. */}
       <Box
         sx={{
           height: contentHeight ? contentHeight * scale : "auto",
@@ -90,17 +74,34 @@ const ScaledResume = ({
   );
 };
 
-/**
- * Renders the chosen template full-size and wires up "Download PDF".
- * Drop this in as the step that runs right after template selection —
- * pass the `selectedTemplate` id you already save from
- * TemplateSelectionStep as `templateId`.
- */
-const ResumeEditorPage = ({ templateId, data = SAMPLE_RESUME_DATA }: ResumeEditorPageProps) => {
-  const entry = useMemo(() => getTemplateById(templateId) ?? TEMPLATE_REGISTRY[0], [templateId]);
-  const resumeRef: any = useRef<HTMLDivElement>(null);
-  const fileName = `${data.personal?.firstName} ${data.personal?.lastName}`.trim().replace(/\s+/g, "-").toLowerCase() + "-resume.pdf";
-  const { download, isDownloading, error } = useDownloadResumePdf(resumeRef, fileName);
+const ResumeEditorPage = ({
+  initialTemplateId = "sidebar",
+  data = SAMPLE_RESUME_DATA,
+}: ResumeEditorPageProps) => {
+  const [selectedTemplateId, setSelectedTemplateId] =
+    useState<string>(initialTemplateId);
+
+  const entry = useMemo(
+    () => getTemplateById(selectedTemplateId) ?? TEMPLATE_REGISTRY[0],
+    [selectedTemplateId],
+  );
+
+  // Ref for the visible, scaled preview (display only — never export from this)
+  const resumeRef = useRef<HTMLDivElement | null>(null);
+
+  // Ref for a hidden, full-size, unscaled clone used ONLY for PDF export
+  const exportRef = useRef<HTMLDivElement | null>(null);
+
+  const fileName =
+    `${data.personal?.firstName ?? "resume"}-${data.personal?.lastName ?? ""}`
+      .trim()
+      .replace(/\s+/g, "-")
+      .toLowerCase() + `-${selectedTemplateId}-resume.pdf`;
+
+  const { download, isDownloading, error } = useDownloadResumePdf(
+    exportRef,
+    fileName,
+  );
 
   const TemplateComponent = entry.Component;
 
@@ -109,23 +110,55 @@ const ResumeEditorPage = ({ templateId, data = SAMPLE_RESUME_DATA }: ResumeEdito
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
-        sx={{ mb: 3, justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "center" } }}
+        sx={{
+          mb: 3,
+          justifyContent: "space-between",
+          alignItems: { xs: "flex-start", sm: "center" },
+        }}
       >
         <Box>
-          <Typography sx={{ fontSize: 22, fontWeight: 800 }}>{entry.name} Template</Typography>
+          <Typography sx={{ fontSize: 22, fontWeight: 800 }}>
+            {entry.name} Template
+          </Typography>
           <Typography color="text.secondary" sx={{ fontSize: 13 }}>
-            Review your resume, then download it as a PDF.
+            Review your resume layout, then download it as a PDF.
           </Typography>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<DownloadRoundedIcon />}
-          onClick={download}
-          disabled={isDownloading}
-          sx={{ textTransform: "none", fontWeight: 700, px: 3, borderRadius: 2.5 }}
-        >
-          {isDownloading ? "Preparing PDF..." : "Download Resume"}
-        </Button>
+
+        <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
+          {/* <Select
+            size="small"
+            value={selectedTemplateId}
+            onChange={(e) => setSelectedTemplateId(e.target.value)}
+            sx={{
+              bgcolor: "#fff",
+              borderRadius: 2,
+              fontSize: 14,
+              minWidth: 160,
+            }}
+          >
+            {TEMPLATE_REGISTRY.map((tpl) => (
+              <MenuItem key={tpl.id} value={tpl.id}>
+                {tpl.name}
+              </MenuItem>
+            ))}
+          </Select> */}
+
+          <Button
+            variant="contained"
+            startIcon={<DownloadRoundedIcon />}
+            onClick={download}
+            disabled={isDownloading}
+            sx={{
+              textTransform: "none",
+              fontWeight: 700,
+              px: 3,
+              borderRadius: 2.5,
+            }}
+          >
+            {isDownloading ? "Preparing PDF..." : "Download Resume"}
+          </Button>
+        </Stack>
       </Stack>
 
       {error && (
@@ -134,11 +167,28 @@ const ResumeEditorPage = ({ templateId, data = SAMPLE_RESUME_DATA }: ResumeEdito
         </Alert>
       )}
 
-      {/* Scales the A4 page down to fit the panel instead of clipping it. */}
+      {/* Visible, scaled preview */}
       <Box sx={{ py: 2 }}>
         <ScaledResume resumeRef={resumeRef}>
           <TemplateComponent ref={resumeRef} data={data} />
         </ScaledResume>
+      </Box>
+
+      {/* Hidden, full-size, unscaled clone — export source of truth.
+          Rendered off-screen (not display:none) so layout/columns compute
+          exactly as they would at true A4 width, unaffected by the
+          preview's scale transform or the real browser viewport width. */}
+      <Box
+        aria-hidden
+        sx={{
+          position: "fixed",
+          top: 0,
+          left: "-10000px",
+          width: `${A4_WIDTH_PX}px`,
+          pointerEvents: "none",
+        }}
+      >
+        <TemplateComponent ref={exportRef} data={data} />
       </Box>
     </Box>
   );

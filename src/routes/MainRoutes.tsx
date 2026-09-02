@@ -26,7 +26,6 @@ import AIFeaturesPage from "../pages/company/ai/AIFeaturesPage";
 import InterviewsPage from "../pages/company/interviews/InterviewsPage";
 import CompanySettingsPage from "../pages/company/settings/CompanySettingsPage";
 import RegisterTypePage from "../pages/auth/RegisterTypePage";
-import CompanyRegisterPage from "../pages/auth/CompanyRegisterPage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
@@ -44,8 +43,7 @@ const MainRoutes = () => {
       children: [
         { path: "login", element: <LoginPage /> },
         { path: "register", element: <RegisterTypePage /> },
-        { path: "register/candidate", element: <RegisterPage /> },
-        { path: "register/company", element: <CompanyRegisterPage /> },
+        { path: "register/:roleType", element: <RegisterPage /> },
         { path: "forgot-password", element: <ForgotPasswordPage /> },
         { path: "reset-password", element: <ResetPasswordPage /> },
         { path: "verify-otp", element: <VerifyOtpPage /> },

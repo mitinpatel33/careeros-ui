@@ -7,16 +7,16 @@ import ResetPasswordPage from "../pages/auth/ResetPasswordPage";
 import VerifyOtpPage from "../pages/auth/VerifyOtpPage";
 import { ROUTES } from "../constants/routePaths";
 import RegisterTypePage from "../pages/auth/RegisterTypePage";
-import CompanyRegisterPage from "../pages/auth/CompanyRegisterPage";
 import AuthLayout from "../layouts/AuthLayout";
 
 const AuthRoutes = (
   <Route element={<AuthLayout />}>
     <Route index element={<Navigate to={ROUTES.AUTH.LOGIN} replace />} />
     <Route path="login" element={<LoginPage />} />
+    {/* Register selection page */}
     <Route path="register" element={<RegisterTypePage />} />
-    <Route path="register/candidateregister" element={<RegisterPage />} />
-    <Route path="register/companyregister" element={<CompanyRegisterPage />} />
+    {/* Dynamic registration page handling both candidate & company */}
+    <Route path="register/:roleType" element={<RegisterPage />} />
     <Route path="forgot-password" element={<ForgotPasswordPage />} />
     <Route path="reset-password" element={<ResetPasswordPage />} />
     <Route path="verify-otp" element={<VerifyOtpPage />} />

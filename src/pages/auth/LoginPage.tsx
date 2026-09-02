@@ -48,9 +48,9 @@ const glowButtonSx = {
   boxShadow: `
     0 0 0 1px #ffffff,
     0 0 0 2.5px #7dd3fc,
-    0 0 18px 4px rgba(56, 189, 248, 0.65),
-    0 0 35px 8px rgba(56, 189, 248, 0.35),
-    0 8px 20px rgba(37, 99, 235, 0.3)
+    0 0 12px 2px rgba(56, 189, 248, 0.65),
+    0 0 25px 6px rgba(56, 189, 248, 0.35),
+    0 6px 18px rgba(37, 99, 235, 0.3)
   `,
 
   transition: "all 0.25s ease-in-out",
@@ -61,9 +61,9 @@ const glowButtonSx = {
     boxShadow: `
       0 0 0 1px #ffffff,
       0 0 0 3px #bae6fd,
-      0 0 22px 6px rgba(56, 189, 248, 0.85),
-      0 0 45px 12px rgba(56, 189, 248, 0.5),
-      0 10px 25px rgba(37, 99, 235, 0.4)
+      0 0 16px 4px rgba(56, 189, 248, 0.85),
+      0 0 35px 8px rgba(56, 189, 248, 0.5),
+      0 8px 20px rgba(37, 99, 235, 0.4)
     `,
     transform: "translateY(-1px)",
   },
@@ -203,8 +203,8 @@ const LoginPage = () => {
       {/* Animated Floating Card */}
       <Box
         component={motion.div}
-        // animate={{ y: [0, -8, 0] }}
-        // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      // animate={{ y: [0, -8, 0] }}
+      // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
         <AuthCard
           sx={{
@@ -321,7 +321,7 @@ const LoginPage = () => {
               />
               <ActionIconButton
                 title="Facebook"
-                onClick={() => {}}
+                onClick={() => { }}
                 disabled={isAnyLoading}
                 icon={Facebook}
                 sx={{

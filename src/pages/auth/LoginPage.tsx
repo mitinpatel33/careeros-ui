@@ -208,10 +208,6 @@ const LoginPage = () => {
       }}
     >
       {/* Animated Floating Card */}
-      <Box
-        component={motion.div}
-      // animate={{ y: [0, -8, 0] }}
-      // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       <AuthCard
         sx={{
           p: { xs: 2.5, sm: 4 },
@@ -349,7 +345,7 @@ const LoginPage = () => {
             />
             <ActionIconButton
               title="Facebook"
-              onClick={() => {}}
+              onClick={() => { }}
               disabled={isAnyLoading}
               icon={Facebook}
               sx={{

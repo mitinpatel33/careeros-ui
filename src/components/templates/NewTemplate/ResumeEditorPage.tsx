@@ -3,8 +3,6 @@ import {
   Alert,
   Box,
   Button,
-  MenuItem,
-  Select,
   Stack,
   Typography,
 } from "@mui/material";
@@ -78,8 +76,7 @@ const ResumeEditorPage = ({
   initialTemplateId = "sidebar",
   data = SAMPLE_RESUME_DATA,
 }: ResumeEditorPageProps) => {
-  const [selectedTemplateId, setSelectedTemplateId] =
-    useState<string>(initialTemplateId);
+  const selectedTemplateId = initialTemplateId;
 
   const entry = useMemo(
     () => getTemplateById(selectedTemplateId) ?? TEMPLATE_REGISTRY[0],

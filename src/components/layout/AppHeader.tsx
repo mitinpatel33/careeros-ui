@@ -11,6 +11,8 @@ import { Logout, Menu, Notifications } from "@mui/icons-material";
 import type { PortalType } from "./sidebarMenus";
 import { useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "../../services/authApi";
+import { useAppDispatch, useAppSelector } from "../../hooks/useLogin";
+import { logout as logoutAction } from "../../store/auth/authSlice";
 
 type Props = {
   portal: PortalType;
@@ -29,19 +31,31 @@ const headerSubtitle = {
   admin: "Manage users, companies, billing and platform",
 };
 
-const avatarText = {
-  candidate: "M",
-  company: "HR",
-  admin: "SA",
+const getInitials = (name?: string, fallback = "U") => {
+  if (!name) return fallback;
+  const parts = name.trim().split(" ");
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
 };
 
 const AppHeader = ({ portal, onMenuClick }: Props) => {
   const navigate = useNavigate();
-  const [logout, { isLoading }] = useLogoutMutation();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector((state) => state.auth.user);
+  const [logoutApi, { isLoading }] = useLogoutMutation();
 
   const isCandidate = portal === "candidate";
 
-  // Dynamic Glass Theme styles matching AppSidebar exactly
+  const avatarText = user?.fullName
+    ? getInitials(user.fullName)
+    : portal === "candidate"
+      ? "C"
+      : portal === "company"
+        ? "HR"
+        : "SA";
+
   const themeStyles = {
     headerBg: isCandidate
       ? "rgba(235, 240, 255, 0.4)" // Blue Glass
@@ -75,19 +89,13 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
   const handleLogout = async () => {
     try {
       const refreshToken = localStorage.getItem("refreshToken");
-      if (!refreshToken) {
-        localStorage.removeItem("token");
-        localStorage.removeItem("refreshToken");
-        navigate("/login");
-        return;
+      if (refreshToken) {
+        await logoutApi({ refreshToken }).unwrap();
       }
-
-      await logout({ refreshToken }).unwrap();
-      localStorage.removeItem("token");
-      localStorage.removeItem("refreshToken");
-      navigate("/login");
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Backend logout failed or session expired:", error);
+    } finally {
+      dispatch(logoutAction());
       localStorage.removeItem("token");
       localStorage.removeItem("refreshToken");
       navigate("/login");
@@ -117,7 +125,6 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
             minHeight: "64px !important",
           }}
         >
-          {/* Left Title Section */}
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
             <IconButton
               onClick={onMenuClick}
@@ -160,7 +167,6 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
             </Box>
           </Stack>
 
-          {/* Right Action Icons */}
           <Stack direction="row" spacing={1.5} sx={{ alignItems: "center" }}>
             <IconButton
               sx={{
@@ -179,7 +185,6 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
               <Notifications sx={{ fontSize: 20 }} />
             </IconButton>
 
-            {/* Dynamic Avatar Gradient */}
             <Avatar
               sx={{
                 width: 40,
@@ -192,13 +197,11 @@ const AppHeader = ({ portal, onMenuClick }: Props) => {
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 border: "2px solid #ffffff",
                 transition: "all 0.2s ease-in-out",
-                "&:hover": {
-                  transform: "scale(1.05)",
-                },
+                "&:hover": { transform: "scale(1.05)" },
               }}
               onClick={() => navigate(`/${portal}/profile`)}
             >
-              {avatarText[portal]}
+              {avatarText}
             </Avatar>
 
             <IconButton

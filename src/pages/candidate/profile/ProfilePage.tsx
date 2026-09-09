@@ -213,7 +213,7 @@ const ProfilePage = () => {
   const {
     data: completionData,
     isLoading: isCompletionLoading,
-    refetch: refetchCompletion,
+    // refetch: refetchCompletion,
   } = useGetCompletionQuery();
 
   const {
@@ -221,7 +221,7 @@ const ProfilePage = () => {
     isLoading: isFormLoading,
     isError: isFormError,
     error: formError,
-    refetch: refetchForm,
+    // refetch: refetchForm,
   } = useGetProfileQuery(activeStep, { skip: !isFormStep });
 
   const {
@@ -229,12 +229,14 @@ const ProfilePage = () => {
     isLoading: isListLoading,
     isError: isListError,
     error: listError,
-    refetch: refetchList,
+    // refetch: refetchList,
   } = useGetProfileCollectionQuery(activeStep as ListStepKey, {
     skip: !isListStep,
   });
 
-  const { data: personalData, refetch: refetchPersonal } =
+  const { data: personalData,
+    // refetch: refetchPersonal
+  } =
     useGetProfileQuery("personal");
 
   const [
@@ -300,8 +302,8 @@ const ProfilePage = () => {
   const isStepError = isFormError || isListError;
   const errorMessage = isStepError
     ? (formError as any)?.data?.message ||
-      (listError as any)?.data?.message ||
-      "Failed to load data"
+    (listError as any)?.data?.message ||
+    "Failed to load data"
     : null;
 
   if (isStepError && !isStepLoading) {

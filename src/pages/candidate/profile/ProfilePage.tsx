@@ -7,6 +7,7 @@ import {
   Button,
   Paper,
 } from "@mui/material";
+import { AutoAwesome } from "@mui/icons-material"; // 1. Added AI Icon
 import {
   useMemo,
   useState,
@@ -20,6 +21,7 @@ import { useLocation } from "react-router-dom";
 
 import ProfileStepCards, { type ProfileStepKey } from "./ProfileStepCards";
 import AppSnackbar from "../../../components/common/AppSnackbar";
+import AppButton from "../../../components/common/AppButton";
 import {
   useGetCompletionQuery,
   useGetProfileCollectionQuery,
@@ -28,6 +30,7 @@ import {
 } from "../../../services/candidateprofileApi";
 import { useProfileSaver } from "../../../hooks/useProfileSaver";
 import type { ResumeData } from "../../../types/candidate/resume.types";
+import ResumeUploadModal from "../resumeUpload/ResumeUploadModal";
 
 // Visual style token palette matching Glassmorphism Blue theme
 const themeStyles = {
@@ -188,6 +191,9 @@ const ProfilePage = () => {
     severity: "success" | "error";
   } | null>(null);
 
+  // Modal Open/Close state
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
   const [selectedTemplate, setSelectedTemplate] = useState<string>(
     () => localStorage.getItem("selected_resume_template") || "classic-blue",
   );
@@ -204,14 +210,18 @@ const ProfilePage = () => {
   const isListStep = currentStep.type === "list";
   const isGalleryStep = currentStep.type === "gallery";
 
-  const { data: completionData, isLoading: isCompletionLoading } =
-    useGetCompletionQuery();
+  const {
+    data: completionData,
+    isLoading: isCompletionLoading,
+    refetch: refetchCompletion,
+  } = useGetCompletionQuery();
 
   const {
     data: formData,
     isLoading: isFormLoading,
     isError: isFormError,
     error: formError,
+    refetch: refetchForm,
   } = useGetProfileQuery(activeStep, { skip: !isFormStep });
 
   const {
@@ -219,11 +229,13 @@ const ProfilePage = () => {
     isLoading: isListLoading,
     isError: isListError,
     error: listError,
+    refetch: refetchList,
   } = useGetProfileCollectionQuery(activeStep as ListStepKey, {
     skip: !isListStep,
   });
 
-  const { data: personalData } = useGetProfileQuery("personal");
+  const { data: personalData, refetch: refetchPersonal } =
+    useGetProfileQuery("personal");
 
   const [
     fetchSections,
@@ -274,6 +286,15 @@ const ProfilePage = () => {
     },
     [fetchSections],
   );
+
+  // Triggered when AI Upload completes successfully
+  // Inside ProfilePage component:
+  const handleUploadSuccess = useCallback(() => {
+    setSnackbar({
+      message: "Resume imported and profile filled automatically ✨",
+      severity: "success",
+    });
+  }, []);
 
   const isStepLoading = isFormLoading || isListLoading || isCompletionLoading;
   const isStepError = isFormError || isListError;
@@ -354,7 +375,10 @@ const ProfilePage = () => {
         >
           ← Change Selected Template
         </Button>
-        <ResumeEditorPage initialTemplateId={selectedTemplate} data={resumeData} />
+        <ResumeEditorPage
+          initialTemplateId={selectedTemplate}
+          data={resumeData}
+        />
         <Stack direction="row" sx={{ justifyContent: "flex-end", mt: 3 }}>
           <Button
             variant="contained"
@@ -459,28 +483,52 @@ const ProfilePage = () => {
               boxShadow: "0 10px 30px -5px rgba(37, 99, 235, 0.08)",
             }}
           >
-            <Stack spacing={0.5}>
-              <Typography
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              sx={{
+                justifyContent: "space-between",
+                alignItems: { xs: "flex-start", sm: "center" },
+              }}
+              spacing={2}
+            >
+              <Stack spacing={0.5}>
+                <Typography
+                  sx={{
+                    fontSize: { xs: 24, sm: 28, md: 32 },
+                    fontWeight: 800,
+                    color: themeStyles.titleColor,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    letterSpacing: "-0.02em",
+                  }}
+                >
+                  Profile Setup 🚀
+                </Typography>
+                <Typography
+                  sx={{
+                    color: themeStyles.subtitleColor,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 600,
+                    fontSize: { xs: 13, sm: 14 },
+                  }}
+                >
+                  Save profile sections or auto-fill by importing your resume.
+                </Typography>
+              </Stack>
+
+              {/* Import Resume AI Button */}
+              <AppButton
+                fullWidth={false}
+                variant="contained"
+                startIcon={<AutoAwesome />}
+                onClick={() => setIsUploadModalOpen(true)}
                 sx={{
-                  fontSize: { xs: 24, sm: 28, md: 32 },
-                  fontWeight: 800,
-                  color: themeStyles.titleColor,
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  letterSpacing: "-0.02em",
+                  background: themeStyles.activeGradient,
+                  boxShadow: themeStyles.activeShadow,
+                  whiteSpace: "nowrap",
                 }}
               >
-                Profile Setup 🚀
-              </Typography>
-              <Typography
-                sx={{
-                  color: themeStyles.subtitleColor,
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontWeight: 600,
-                  fontSize: { xs: 13, sm: 14 },
-                }}
-              >
-                Save profile sections and choose your resume style.
-              </Typography>
+                Import Resume
+              </AppButton>
             </Stack>
           </Paper>
         </motion.div>
@@ -530,6 +578,13 @@ const ProfilePage = () => {
           </Grid>
         </Grid>
       </motion.div>
+
+      {/* Resume Upload Modal */}
+      <ResumeUploadModal
+        open={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onSuccess={handleUploadSuccess}
+      />
 
       <AppSnackbar
         successMessage={

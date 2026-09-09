@@ -1,5 +1,19 @@
 import { api } from "./api";
 
+export interface ImportResumeResponse {
+  success: boolean;
+  message: string;
+  jobId?: string;
+  data?: Record<string, unknown>;
+}
+
+export interface ImportJobStatus {
+  success: boolean;
+  status: "processing" | "completed" | "failed";
+  data?: Record<string, unknown>;
+  error?: string;
+}
+
 export const profileApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getProfile: builder.query<any, string>({
@@ -123,6 +137,30 @@ export const profileApi = api.injectEndpoints({
       }),
       invalidatesTags: ["Candidate"],
     }),
+
+    importResume: builder.mutation<ImportResumeResponse, File>({
+      query: (file) => {
+        const formData = new FormData();
+        formData.append("file", file); // Matched with backend multer field 'file'
+        return {
+          url: "/candidate/profile/import-resume",
+          method: "POST",
+          body: formData,
+        };
+      },
+    }),
+
+    bulkSaveProfile: builder.mutation<
+      { success: boolean; message: string },
+      Record<string, unknown>
+    >({
+      query: (data) => ({
+        url: "/candidate/profile/bulk-save",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Candidate"], // Invalidate tags so UI automatically refetches fresh profile details
+    }),
   }),
 });
 
@@ -137,4 +175,6 @@ export const {
   useCheckSlugQuery,
   usePublishProfileMutation,
   useLazyGetProfileSectionsQuery,
+  useImportResumeMutation,
+  useBulkSaveProfileMutation,
 } = profileApi;

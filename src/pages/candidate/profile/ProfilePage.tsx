@@ -288,8 +288,8 @@ const ProfilePage = () => {
   const isStepError = isFormError || isListError;
   const errorMessage = isStepError
     ? (formError as any)?.data?.message ||
-      (listError as any)?.data?.message ||
-      "Failed to load data"
+    (listError as any)?.data?.message ||
+    "Failed to load data"
     : null;
 
   if (isStepError && !isStepLoading && !isHubView) {

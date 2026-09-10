@@ -12,11 +12,13 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-
 import { Close, Logout } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { sidebarMenus, type PortalType } from "./sidebarMenus";
+import { useAppDispatch, useAppSelector } from "../../hooks/useLogin";
+import { logout as logoutAction } from "../../store/auth/authSlice";
+import { useLogoutMutation } from "../../services/authApi";
 
 const drawerWidth = 270;
 
@@ -27,62 +29,77 @@ type Props = {
 };
 
 const portalInfo = {
-  candidate: {
-    title: "Career OS 🚀",
-    subtitle: "Candidate Portal",
-    avatar: "C",
-  },
-  company: {
-    title: "TalentHub 💼",
-    subtitle: "Recruiter Portal",
-    avatar: "HR",
-  },
-  admin: { title: "AdminHub ⚡", subtitle: "Super Admin", avatar: "SA" },
+  candidate: { title: "Career OS 🚀", subtitle: "Candidate Portal" },
+  company: { title: "Talent Hub 💼", subtitle: "Company Portal" },
+  admin: { title: "AdminHub ⚡", subtitle: "Super Admin" },
+};
+
+const getInitials = (name?: string, fallback = "U") => {
+  if (!name) return fallback;
+  const parts = name.trim().split(" ");
+  if (parts.length >= 2) {
+    return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
 };
 
 const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+
+  const user = useAppSelector((state) => state.auth.user);
+  const [logoutApi, { isLoading }] = useLogoutMutation();
 
   const info = portalInfo[portal];
   const menu = sidebarMenus[portal];
 
-  // Dynamic Glass Theme Configuration
+  const displayName = user?.fullName || user?.email || "User";
+  const userAvatar = getInitials(user?.fullName);
+
   const isCandidate = portal === "candidate";
 
   const themeStyles = {
-    // Lavender Blue (Candidate) vs Lavender Purple (Company/Admin)
     sidebarBg: isCandidate
-      ? "rgba(235, 240, 255, 0.25)" // Soft Lavender Blue glass
-      : "rgba(245, 235, 255, 0.25)", // Soft Lavender Purple glass
-
+      ? "rgba(235, 240, 255, 0.25)"
+      : "rgba(245, 235, 255, 0.25)",
     borderRight: isCandidate
       ? "1px solid rgba(147, 197, 253, 0.35)"
       : "1px solid rgba(216, 180, 254, 0.35)",
-
     titleColor: isCandidate ? "#1d4ed8" : "#6b21a8",
     subtitleColor: isCandidate ? "#3b82f6" : "#9333ea",
-
     iconColor: isCandidate ? "#2563eb" : "#9333ea",
     activeTextColor: "#ffffff",
     inactiveTextColor: isCandidate ? "#1e40af" : "#581c87",
-
     activeGradient: isCandidate
-      ? "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)" // Lavender Blue Gradient
-      : "linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)", // Lavender Purple Gradient
-
+      ? "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)"
+      : "linear-gradient(135deg, #a855f7 0%, #7c3aed 100%)",
     activeShadow: isCandidate
       ? "0 8px 20px rgba(37, 99, 235, 0.35)"
       : "0 8px 20px rgba(168, 85, 247, 0.35)",
-
     btnHoverBg: isCandidate
       ? "rgba(239, 246, 255, 0.6)"
       : "rgba(255, 255, 255, 0.4)",
-
     avatarBg: isCandidate ? "#2563eb" : "#9333ea",
     avatarShadow: isCandidate
       ? "0 4px 12px rgba(37, 99, 235, 0.3)"
       : "0 4px 12px rgba(147, 51, 234, 0.3)",
+  };
+
+  const handleLogout = async () => {
+    try {
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (refreshToken) {
+        await logoutApi({ refreshToken }).unwrap();
+      }
+    } catch (error) {
+      console.error("Backend logout failed or session expired:", error);
+    } finally {
+      dispatch(logoutAction());
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      navigate("/login");
+    }
   };
 
   const sidebarContent = (
@@ -101,7 +118,6 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         transition: "all 0.3s ease",
       }}
     >
-      {/* Header / Branding */}
       <Box sx={{ px: 3, py: 2.5, flexShrink: 0 }}>
         <Stack
           direction="row"
@@ -155,7 +171,6 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         }}
       />
 
-      {/* Navigation List */}
       <Box
         sx={{
           flex: 1,
@@ -202,7 +217,6 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                     ? "1px solid rgba(255, 255, 255, 0.5)"
                     : "1px solid rgba(255, 255, 255, 0.35)",
                   transition: "all .2s ease-in-out",
-
                   "&:hover": {
                     background: active
                       ? themeStyles.activeGradient
@@ -244,7 +258,6 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
         </List>
       </Box>
 
-      {/* Profile Box */}
       <Box sx={{ p: 2, flexShrink: 0 }}>
         <Box
           sx={{
@@ -267,7 +280,7 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                 boxShadow: themeStyles.avatarShadow,
               }}
             >
-              {info.avatar}
+              {userAvatar}
             </Avatar>
 
             <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -282,11 +295,7 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
-                {portal === "company"
-                  ? "ABC Technologies"
-                  : portal === "admin"
-                    ? "Super Admin"
-                    : "Mitin Patel"}
+                {displayName}
               </Typography>
 
               <Typography
@@ -296,15 +305,16 @@ const AppSidebar = ({ portal, mobileOpen, onClose }: Props) => {
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
-                {info.subtitle}
+                {user?.role || info.subtitle}
               </Typography>
             </Box>
           </Stack>
 
           <Button
             fullWidth
+            disabled={isLoading}
             startIcon={<Logout sx={{ fontSize: 18 }} />}
-            onClick={() => navigate("/login")}
+            onClick={handleLogout}
             sx={{
               mt: 1.5,
               color: "#ef4444",

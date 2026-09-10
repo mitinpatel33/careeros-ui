@@ -127,7 +127,7 @@ const RegisterPage = () => {
       dispatch(loginSuccess(response.data));
 
       navigate(
-        data.role === "Company" ? "/company/dashboard" : "/candidate/dashboard"
+        data.role === "Company" ? "/company/dashboard" : "/candidate/profile"
       );
     } catch (error) {
       console.error("Signup failed:", error);

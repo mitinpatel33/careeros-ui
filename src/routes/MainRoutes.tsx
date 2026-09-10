@@ -62,7 +62,7 @@ const MainRoutes = () => {
               path: "candidate",
               element: <MainLayout portal="candidate" />,
               children: [
-                { index: true, element: <Navigate to="dashboard" replace /> },
+                { index: true, element: <Navigate to="profile" replace /> },
                 { path: "dashboard", element: <DashboardPage /> },
                 { path: "profile", element: <ProfilePage /> },
                 { path: "profile/view", element: <CandidateProfileView /> },

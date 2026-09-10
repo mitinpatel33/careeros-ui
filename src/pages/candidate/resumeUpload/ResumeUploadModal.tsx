@@ -1,9 +1,4 @@
-import {
-  useState,
-  useRef,
-  type DragEvent,
-  type ChangeEvent,
-} from "react";
+import { useState, useRef, type DragEvent, type ChangeEvent } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -52,11 +47,39 @@ export default function ResumeUploadModal({
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [importResume, { isLoading: isParsing }] = useImportResumeMutation();
-  const [bulkSaveProfile, { isLoading: isSaving }] = useBulkSaveProfileMutation();
+  const [bulkSaveProfile, { isLoading: isSaving }] =
+    useBulkSaveProfileMutation();
 
   const isLoading = isParsing || isSaving;
 
-  const handleFile = (selectedFile: File): void => {
+  const processResumeUpload = async (fileToUpload: File): Promise<void> => {
+    try {
+      // 1. Send file to backend to parse using Gemini AI
+      const importResponse = await importResume(fileToUpload).unwrap();
+      
+      // 2. Persist extracted JSON sections immediately to the database
+      if (importResponse.data) {
+        await bulkSaveProfile(importResponse.data).unwrap();
+      }
+
+      setFile(null);
+      onClose();
+      if (onSuccess) onSuccess();
+    } catch (err: unknown) {
+      const error = err as ApiErrorResponse;
+      setErrorMsg(error?.data?.message || "An error occurred while uploading.");
+      console.error("Failed to import resume:", err);
+    }
+  };
+
+  // Keep handleSubmit as an optional fallback or remove it if auto-upload is preferred
+  const handleSubmit = async (): Promise<void> => {
+    if (file) {
+      await processResumeUpload(file);
+    }
+  };
+
+  const handleFile = async (selectedFile: File): Promise<void> => {
     setErrorMsg(null);
     const validMimes = [
       "application/pdf",
@@ -75,28 +98,31 @@ export default function ResumeUploadModal({
     }
 
     setFile(selectedFile);
+
+    // Automatically trigger parsing and saving right after successful file validation
+    await processResumeUpload(selectedFile);
   };
 
-  const handleSubmit = async (): Promise<void> => {
-    if (!file) return;
-    try {
-      // 1. Send file to backend to parse using Gemini AI
-      const importResponse = await importResume(file).unwrap();
-      
-      // 2. Persist extracted JSON sections immediately to the database
-      if (importResponse.data) {
-        await bulkSaveProfile(importResponse.data).unwrap();
-      }
+  // const handleSubmit = async (): Promise<void> => {
+  //   if (!file) return;
+  //   try {
+  //     // 1. Send file to backend to parse using Gemini AI
+  //     const importResponse = await importResume(file).unwrap();
 
-      setFile(null);
-      onClose();
-      if (onSuccess) onSuccess();
-    } catch (err: unknown) {
-      const error = err as ApiErrorResponse;
-      setErrorMsg(error?.data?.message || "An error occurred while uploading.");
-      console.error("Failed to import resume:", err);
-    }
-  };
+  //     // 2. Persist extracted JSON sections immediately to the database
+  //     if (importResponse.data) {
+  //       await bulkSaveProfile(importResponse.data).unwrap();
+  //     }
+
+  //     setFile(null);
+  //     onClose();
+  //     if (onSuccess) onSuccess();
+  //   } catch (err: unknown) {
+  //     const error = err as ApiErrorResponse;
+  //     setErrorMsg(error?.data?.message || "An error occurred while uploading.");
+  //     console.error("Failed to import resume:", err);
+  //   }
+  // };
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>): void => {
     e.preventDefault();
@@ -217,7 +243,9 @@ export default function ResumeUploadModal({
               color="primary"
               sx={{ fontWeight: 600, mb: 1 }}
             >
-              {isParsing ? "Parsing document with AI..." : "Saving details to your profile..."}
+              {isParsing
+                ? "Parsing document with AI..."
+                : "Saving details to your profile..."}
             </Typography>
             <LinearProgress sx={{ borderRadius: 2, height: 6 }} />
           </Box>

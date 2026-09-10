@@ -17,31 +17,40 @@ export type ProfileExperience = {
 type Props = {
   items: ProfileExperience[];
   loading?: boolean;
+  isFirst?: boolean;
+  isLast?: boolean;
+  onBack?: () => void;
   onSave: (items: ProfileExperience[]) => Promise<void>;
 };
 
-const ExperienceDetails = ({ items, loading, onSave }: Props) => {
+/**
+ * Utility helper to format raw ISO strings or date strings into readable "Month Year" format (e.g., "Jul 2022")
+ */
+const formatDate = (dateString?: string): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString; // Fallback if string is custom format
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+  });
+};
+
+const ExperienceDetails = ({
+  items,
+  loading,
+  isFirst,
+  isLast,
+  onBack,
+  onSave,
+}: Props) => {
   const employmentTypeOptions: any[] = [
-    {
-      label: "Full-time",
-      value: "Full-time"
-    },
-    {
-      label: "Part-time",
-      value: "Part-time"
-    },
-    {
-      label: "Contract",
-      value: "Contract"
-    },
-    {
-      label: "Freelance",
-      value: "Freelance"
-    },
-    {
-      label: "Remote",
-      value: "Remote"
-    }
+    { label: "Full-time", value: "Full-time" },
+    { label: "Part-time", value: "Part-time" },
+    { label: "Contract", value: "Contract" },
+    { label: "Freelance", value: "Freelance" },
+    { label: "Remote", value: "Remote" },
   ];
 
   const fields: any[] = [
@@ -67,6 +76,9 @@ const ExperienceDetails = ({ items, loading, onSave }: Props) => {
       icon={<Work />}
       items={items}
       loading={loading}
+      isFirst={isFirst}
+      isLast={isLast}
+      onBack={onBack}
       defaultItem={{
         companyName: "",
         designation: "",
@@ -80,7 +92,11 @@ const ExperienceDetails = ({ items, loading, onSave }: Props) => {
       fields={fields}
       getTitle={(item) => item.designation}
       getSubtitle={(item) => {
-        return `${item.companyName} • ${item.startDate} - ${item.endDate || "Present"}`;
+        const formattedStart = formatDate(item.startDate);
+        const formattedEnd = item.isCurrentCompany
+          ? "Present"
+          : formatDate(item.endDate);
+        return `${item.companyName} • ${formattedStart}${formattedEnd ? ` - ${formattedEnd}` : ""}`;
       }}
       onSave={onSave}
     />

@@ -140,7 +140,7 @@ const LoginPage = () => {
     localStorage.setItem("user", JSON.stringify(userData));
     dispatch(loginSuccess(userData));
 
-    if (userData.role === "Candidate") navigate("/candidate");
+    if (userData.role === "Candidate") navigate("/candidate/profile");
     else if (userData.role === "Company") navigate("/company");
     else navigate("/admin");
 

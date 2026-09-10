@@ -8,7 +8,6 @@ import {
   Paper,
   alpha,
 } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material";
 import {
   useMemo,
   useState,
@@ -22,7 +21,6 @@ import { useLocation } from "react-router-dom";
 
 import ProfileStepCards, { type ProfileStepKey } from "./ProfileStepCards";
 import AppSnackbar from "../../../components/common/AppSnackbar";
-import AppButton from "../../../components/common/AppButton";
 import {
   useGetCompletionQuery,
   useGetProfileCollectionQuery,
@@ -502,20 +500,6 @@ const ProfilePage = () => {
                   >
                     ← Choice Hub
                   </Button>
-
-                  <AppButton
-                    fullWidth={false}
-                    variant="contained"
-                    startIcon={<AutoAwesome />}
-                    onClick={() => setIsUploadModalOpen(true)}
-                    sx={{
-                      background: themeStyles.activeGradient,
-                      boxShadow: themeStyles.activeShadow,
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    Import Resume
-                  </AppButton>
                 </Stack>
               </Stack>
             </Paper>

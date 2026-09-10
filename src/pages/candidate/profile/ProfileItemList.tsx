@@ -11,7 +11,7 @@ import {
   ArrowBack,
   ArrowForward,
   Delete,
-  Edit
+  Edit,
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import AppButton from "../../../components/common/AppButton";
@@ -57,13 +57,21 @@ const ProfileItemList = <T,>({
         p: { xs: 2, md: 3 },
         borderRadius: 5,
         boxShadow: "0 22px 70px rgba(31,81,255,.12)",
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "80vh", // Constrain card height relative to viewport
       }}
     >
-      <Stack spacing={3}>
+      <Stack spacing={3} sx={{ height: "100%", overflow: "hidden" }}>
+        {/* Header - Fixed */}
         <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={2}
-          sx={{ justifyContent: "space-between", alignItems: { sm: "center" } }}
+          sx={{
+            justifyContent: "space-between",
+            alignItems: { sm: "center" },
+            flexShrink: 0,
+          }}
         >
           <Stack direction="row" spacing={2} sx={{ alignItems: "center" }}>
             <Box
@@ -97,7 +105,17 @@ const ProfileItemList = <T,>({
           </Button>
         </Stack>
 
-        <Stack spacing={1.5}>
+        {/* Scrollable Items Container */}
+        <Box
+          sx={{
+            overflowY: "auto",
+            pr: 1, // Padding for scrollbar
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+            gap: 1.5,
+          }}
+        >
           {loading && items.length === 0 && (
             <Typography color="text.secondary">Loading...</Typography>
           )}
@@ -109,11 +127,11 @@ const ProfileItemList = <T,>({
 
           {items?.map((item, index) => (
             <motion.div
+              key={(item as any).id || (item as any)._id || index}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
             >
               <Box
-                key={(item as any).id || (item as any)._id || index}
                 sx={{
                   p: 2,
                   borderRadius: 3,
@@ -147,11 +165,17 @@ const ProfileItemList = <T,>({
               </Box>
             </motion.div>
           ))}
-        </Stack>
+        </Box>
 
+        {/* Footer - Fixed */}
         <Stack
           direction="row"
-          sx={{ justifyContent: "space-between", alignItems: "center", mt: 2 }}
+          sx={{
+            justifyContent: "space-between",
+            alignItems: "center",
+            pt: 1,
+            flexShrink: 0,
+          }}
         >
           <Button
             type="button"

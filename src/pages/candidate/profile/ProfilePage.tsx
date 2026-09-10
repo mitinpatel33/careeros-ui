@@ -6,8 +6,9 @@ import {
   CircularProgress,
   Button,
   Paper,
+  alpha,
 } from "@mui/material";
-import { AutoAwesome } from "@mui/icons-material"; // 1. Added AI Icon
+import { AutoAwesome } from "@mui/icons-material";
 import {
   useMemo,
   useState,
@@ -31,8 +32,8 @@ import {
 import { useProfileSaver } from "../../../hooks/useProfileSaver";
 import type { ResumeData } from "../../../types/candidate/resume.types";
 import ResumeUploadModal from "../resumeUpload/ResumeUploadModal";
+import { ChoicePage } from "../ChoicePage";
 
-// Visual style token palette matching Glassmorphism Blue theme
 const themeStyles = {
   titleColor: "#1d4ed8",
   subtitleColor: "#3b82f6",
@@ -44,25 +45,17 @@ const themeStyles = {
   glassFilter: "blur(16px)",
 };
 
-// Motion animation variants for step switching & page elements
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      when: "beforeChildren",
-    },
+    transition: { staggerChildren: 0.1, when: "beforeChildren" },
   },
 };
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, ease: "easeOut" },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
 const stepTransitionVariants: Variants = {
@@ -186,14 +179,16 @@ const ProfilePage = () => {
   const [activeStep, setActiveStep] = useState<ProfileStepKey>(
     isProfileStepKey(location.state?.step) ? location.state.step : "personal",
   );
+
+  // Default to true after login/signup so choice screen opens first
+  const [isHubView, setIsHubView] = useState(true);
+
   const [snackbar, setSnackbar] = useState<{
     message: string;
     severity: "success" | "error";
   } | null>(null);
 
-  // Modal Open/Close state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-
   const [selectedTemplate, setSelectedTemplate] = useState<string>(
     () => localStorage.getItem("selected_resume_template") || "classic-blue",
   );
@@ -210,32 +205,26 @@ const ProfilePage = () => {
   const isListStep = currentStep.type === "list";
   const isGalleryStep = currentStep.type === "gallery";
 
-  const {
-    data: completionData,
-    isLoading: isCompletionLoading,
-    refetch: refetchCompletion,
-  } = useGetCompletionQuery();
+  const { data: completionData, isLoading: isCompletionLoading } =
+    useGetCompletionQuery();
 
   const {
     data: formData,
     isLoading: isFormLoading,
     isError: isFormError,
     error: formError,
-    refetch: refetchForm,
-  } = useGetProfileQuery(activeStep, { skip: !isFormStep });
+  } = useGetProfileQuery(activeStep, { skip: !isFormStep || isHubView });
 
   const {
     data: listData,
     isLoading: isListLoading,
     isError: isListError,
     error: listError,
-    refetch: refetchList,
   } = useGetProfileCollectionQuery(activeStep as ListStepKey, {
-    skip: !isListStep,
+    skip: !isListStep || isHubView,
   });
 
-  const { data: personalData, refetch: refetchPersonal } =
-    useGetProfileQuery("personal");
+  const { data: personalData } = useGetProfileQuery("personal");
 
   const [
     fetchSections,
@@ -287,9 +276,8 @@ const ProfilePage = () => {
     [fetchSections],
   );
 
-  // Triggered when AI Upload completes successfully
-  // Inside ProfilePage component:
   const handleUploadSuccess = useCallback(() => {
+    setIsHubView(false); // Transitions user straight to populated profile page steps
     setSnackbar({
       message: "Resume imported and profile filled automatically ✨",
       severity: "success",
@@ -304,7 +292,7 @@ const ProfilePage = () => {
       "Failed to load data"
     : null;
 
-  if (isStepError && !isStepLoading) {
+  if (isStepError && !isStepLoading && !isHubView) {
     return (
       <Box
         sx={{
@@ -320,13 +308,7 @@ const ProfilePage = () => {
           mt: 6,
         }}
       >
-        <Typography
-          color="error"
-          sx={{
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontWeight: 700,
-          }}
-        >
+        <Typography color="error" sx={{ fontWeight: 700 }}>
           {errorMessage}
         </Typography>
         <Button
@@ -335,11 +317,7 @@ const ProfilePage = () => {
           sx={{
             mt: 2,
             background: themeStyles.activeGradient,
-            boxShadow: themeStyles.activeShadow,
             borderRadius: "12px",
-            textTransform: "none",
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontWeight: 600,
           }}
         >
           Retry
@@ -348,89 +326,78 @@ const ProfilePage = () => {
     );
   }
 
-  const renderPreviewPanel = () => {
-    if (isSectionsLoading || isSectionsFetching) return <TabLoader />;
-
-    return (
-      <Box>
-        <Button
-          variant="outlined"
-          onClick={() => setIsPreviewMode(false)}
-          sx={{
-            mb: 2,
-            textTransform: "none",
-            fontFamily: "'Plus Jakarta Sans', sans-serif",
-            fontWeight: 600,
-            color: themeStyles.titleColor,
-            borderColor: "rgba(147, 197, 253, 0.6)",
-            bgcolor: "rgba(255, 255, 255, 0.45)",
-            backdropFilter: themeStyles.glassFilter,
-            WebkitBackdropFilter: themeStyles.glassFilter,
-            borderRadius: "12px",
-            "&:hover": {
-              borderColor: themeStyles.titleColor,
-              bgcolor: "rgba(255, 255, 255, 0.85)",
-            },
-          }}
-        >
-          ← Change Selected Template
-        </Button>
-        <ResumeEditorPage
-          initialTemplateId={selectedTemplate}
-          data={resumeData}
+  const renderActiveStep = () => {
+    if (isGalleryStep) {
+      if (isPreviewMode) {
+        if (isSectionsLoading || isSectionsFetching) return <TabLoader />;
+        return (
+          <Box>
+            <Button
+              variant="outlined"
+              onClick={() => setIsPreviewMode(false)}
+              sx={{
+                mb: 2,
+                textTransform: "none",
+                fontWeight: 600,
+                color: themeStyles.titleColor,
+                borderColor: "rgba(147, 197, 253, 0.6)",
+                bgcolor: "rgba(255, 255, 255, 0.45)",
+                backdropFilter: themeStyles.glassFilter,
+                borderRadius: "12px",
+              }}
+            >
+              ← Change Selected Template
+            </Button>
+            <ResumeEditorPage
+              initialTemplateId={selectedTemplate}
+              data={resumeData}
+            />
+            <Stack direction="row" sx={{ justifyContent: "flex-end", mt: 3 }}>
+              <Button
+                variant="contained"
+                onClick={goNext}
+                sx={{
+                  background: themeStyles.activeGradient,
+                  boxShadow: themeStyles.activeShadow,
+                  borderRadius: "12px",
+                  fontWeight: 700,
+                  px: 3,
+                  py: 1,
+                }}
+              >
+                Next Step →
+              </Button>
+            </Stack>
+          </Box>
+        );
+      }
+      return (
+        <TemplateSelectionStep
+          isFirst={activeIndex === 0}
+          isLast={activeIndex === steps.length - 1}
+          onBack={goBack}
+          loading={false}
+          selectedTemplate={selectedTemplate}
+          onSubmit={handleTemplateSubmit}
         />
-        <Stack direction="row" sx={{ justifyContent: "flex-end", mt: 3 }}>
-          <Button
-            variant="contained"
-            onClick={goNext}
-            sx={{
-              background: themeStyles.activeGradient,
-              boxShadow: themeStyles.activeShadow,
-              borderRadius: "12px",
-              textTransform: "none",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontWeight: 700,
-              px: 3,
-              py: 1,
-            }}
-          >
-            Next Step →
-          </Button>
-        </Stack>
-      </Box>
-    );
-  };
+      );
+    }
 
-  const renderGalleryStep = () => {
-    if (isPreviewMode) return renderPreviewPanel();
-    return (
-      <TemplateSelectionStep
-        isFirst={activeIndex === 0}
-        isLast={activeIndex === steps.length - 1}
-        onBack={goBack}
-        loading={false}
-        selectedTemplate={selectedTemplate}
-        onSubmit={handleTemplateSubmit}
-      />
-    );
-  };
+    if (isFormStep) {
+      const FormComponent = FORM_STEP_COMPONENTS[activeStep];
+      if (!FormComponent) return null;
+      return (
+        <FormComponent
+          loading={isFormLoading}
+          isFirst={activeIndex === 0}
+          isLast={activeIndex === steps.length - 1}
+          onBack={goBack}
+          defaultValues={formData?.data}
+          onSubmit={(values: unknown) => saveStep(activeStep, values)}
+        />
+      );
+    }
 
-  const renderFormStep = () => {
-    const FormComponent = FORM_STEP_COMPONENTS[activeStep];
-    if (!FormComponent) return null;
-    return (
-      <FormComponent
-        loading={isFormLoading}
-        isFirst={activeIndex === 0}
-        isLast={activeIndex === steps.length - 1}
-        onBack={goBack}
-        defaultValues={formData?.data}
-        onSubmit={(values: unknown) => saveStep(activeStep, values)}
-      />
-    );
-  };
-
-  const renderListStep = () => {
     const ListComponent = LIST_STEP_COMPONENTS[activeStep as ListStepKey];
     if (!ListComponent) return null;
     return (
@@ -447,12 +414,6 @@ const ProfilePage = () => {
     );
   };
 
-  const renderActiveStep = () => {
-    if (isGalleryStep) return renderGalleryStep();
-    if (isFormStep) return renderFormStep();
-    return renderListStep();
-  };
-
   return (
     <Box sx={{ width: "100%", minHeight: "100%", overflowX: "hidden" }}>
       <motion.div
@@ -460,123 +421,164 @@ const ProfilePage = () => {
         initial="hidden"
         animate="visible"
       >
-        {/* Page Top Header with Blue Glassmorphism */}
-        <motion.div
-          variants={itemVariants}
-          style={{
-            position: "sticky",
-            top: 16,
-            zIndex: 10,
-            marginBottom: 24,
-          }}
-        >
-          <Paper
-            elevation={0}
-            sx={{
-              p: { xs: 2.5, sm: 3 },
-              mb: { xs: 2.5, md: 3.5 },
-              borderRadius: "24px",
-              bgcolor: "rgba(255, 255, 255, 0.65)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid rgba(255, 255, 255, 0.8)",
-              boxShadow: "0 10px 30px -5px rgba(37, 99, 235, 0.08)",
+        {/* Page Top Header */}
+        {!isHubView && (
+          <motion.div
+            variants={itemVariants}
+            style={{
+              position: "sticky",
+              top: 16,
+              zIndex: 10,
+              marginBottom: 24,
             }}
           >
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
+            <Paper
+              elevation={0}
               sx={{
-                justifyContent: "space-between",
-                alignItems: { xs: "flex-start", sm: "center" },
+                p: { xs: 2.5, sm: 3 },
+                mb: { xs: 2.5, md: 3.5 },
+                borderRadius: "24px",
+                bgcolor: themeStyles.glassBg,
+                backdropFilter: themeStyles.glassFilter,
+                WebkitBackdropFilter: themeStyles.glassFilter,
+                border: themeStyles.glassBorder,
+                boxShadow: "0 10px 30px -5px rgba(37, 99, 235, 0.08)",
               }}
-              spacing={2}
             >
-              <Stack spacing={0.5}>
-                <Typography
-                  sx={{
-                    fontSize: { xs: 24, sm: 28, md: 32 },
-                    fontWeight: 800,
-                    color: themeStyles.titleColor,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    letterSpacing: "-0.02em",
-                  }}
-                >
-                  Profile Setup 🚀
-                </Typography>
-                <Typography
-                  sx={{
-                    color: themeStyles.subtitleColor,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontWeight: 600,
-                    fontSize: { xs: 13, sm: 14 },
-                  }}
-                >
-                  Save profile sections or auto-fill by importing your resume.
-                </Typography>
-              </Stack>
-
-              {/* Import Resume AI Button */}
-              <AppButton
-                fullWidth={false}
-                variant="contained"
-                startIcon={<AutoAwesome />}
-                onClick={() => setIsUploadModalOpen(true)}
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
                 sx={{
-                  background: themeStyles.activeGradient,
-                  boxShadow: themeStyles.activeShadow,
-                  whiteSpace: "nowrap",
+                  justifyContent: "space-between",
+                  alignItems: { xs: "flex-start", sm: "center" },
                 }}
+                spacing={2}
               >
-                Import Resume
-              </AppButton>
-            </Stack>
-          </Paper>
-        </motion.div>
+                <Stack spacing={0.5}>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: 24, sm: 28, md: 32 },
+                      fontWeight: 800,
+                      color: themeStyles.titleColor,
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    }}
+                  >
+                    Profile Setup 🚀
+                  </Typography>
+                  <Typography
+                    sx={{
+                      color: themeStyles.subtitleColor,
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 600,
+                      fontSize: { xs: 13, sm: 14 },
+                    }}
+                  >
+                    Save profile sections or manage your resume and profile
+                    configuration.
+                  </Typography>
+                </Stack>
 
-        {/* Dynamic Sidebar & Step Section Grid */}
-        <Grid container spacing={{ xs: 2, md: 3 }}>
-          <Grid size={{ xs: 12, md: 4, lg: 3.5 }}>
-            <motion.div variants={itemVariants}>
-              <ProfileStepCards
-                activeStep={activeStep}
-                completion={completionData?.data?.completionPercentage ?? 0}
-                fullName={candidate.fullName}
-                jobTitle={personalData?.data?.jobTitle}
-                photoURL={
-                  personalData?.data?.photoUrl ||
-                  personalData?.data?.photoURL ||
-                  ""
-                }
-                onStepChange={(step) => {
-                  setIsPreviewMode(false);
-                  setActiveStep(step);
-                }}
-                completedSteps={[]}
-              />
-            </motion.div>
-          </Grid>
+                <Stack
+                  direction="row"
+                  spacing={1.5}
+                  sx={{ alignItems: "center", flexWrap: "wrap" }}
+                >
+                  <Button
+                    variant="outlined"
+                    onClick={() => setIsHubView(true)}
+                    sx={{
+                      borderRadius: "14px",
+                      textTransform: "none",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 700,
+                      px: 2.5,
+                      py: 1,
+                      color: themeStyles.titleColor,
+                      borderColor: "rgba(59, 130, 246, 0.4)",
+                      "&:hover": {
+                        background: alpha(themeStyles.titleColor, 0.08),
+                        borderColor: themeStyles.titleColor,
+                      },
+                    }}
+                  >
+                    ← Choice Hub
+                  </Button>
 
-          <Grid size={{ xs: 12, md: 8, lg: 8.5 }} sx={{ minWidth: 0 }}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeStep + (isPreviewMode ? "-preview" : "-step")}
-                variants={stepTransitionVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                style={{ width: "100%" }}
-              >
-                <Suspense fallback={<TabLoader />}>
-                  {isStepLoading && !formData && !listData && !isGalleryStep ? (
-                    <TabLoader />
-                  ) : (
-                    renderActiveStep()
-                  )}
-                </Suspense>
+                  <AppButton
+                    fullWidth={false}
+                    variant="contained"
+                    startIcon={<AutoAwesome />}
+                    onClick={() => setIsUploadModalOpen(true)}
+                    sx={{
+                      background: themeStyles.activeGradient,
+                      boxShadow: themeStyles.activeShadow,
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    Import Resume
+                  </AppButton>
+                </Stack>
+              </Stack>
+            </Paper>
+          </motion.div>
+        )}
+
+        {/* Dynamic View: Choice Hub or Profile Step Workflow */}
+        {isHubView ? (
+          <ChoicePage
+            onCreateResume={() => {
+              setIsHubView(false);
+              setActiveStep("personal");
+            }}
+            onImportResume={() => setIsUploadModalOpen(true)}
+          />
+        ) : (
+          <Grid container spacing={{ xs: 2, md: 3 }}>
+            <Grid size={{ xs: 12, md: 4, lg: 3.5 }}>
+              <motion.div variants={itemVariants}>
+                <ProfileStepCards
+                  activeStep={activeStep}
+                  completion={completionData?.data?.completionPercentage ?? 0}
+                  fullName={candidate.fullName}
+                  jobTitle={personalData?.data?.jobTitle}
+                  photoURL={
+                    personalData?.data?.photoUrl ||
+                    personalData?.data?.photoURL ||
+                    ""
+                  }
+                  onStepChange={(step) => {
+                    setIsPreviewMode(false);
+                    setActiveStep(step);
+                  }}
+                  completedSteps={[]}
+                />
               </motion.div>
-            </AnimatePresence>
+            </Grid>
+
+            <Grid size={{ xs: 12, md: 8, lg: 8.5 }} sx={{ minWidth: 0 }}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeStep + (isPreviewMode ? "-preview" : "-step")}
+                  variants={stepTransitionVariants}
+                  initial="initial"
+                  animate="animate"
+                  exit="exit"
+                  style={{ width: "100%" }}
+                >
+                  <Suspense fallback={<TabLoader />}>
+                    {isStepLoading &&
+                    !formData &&
+                    !listData &&
+                    !isGalleryStep ? (
+                      <TabLoader />
+                    ) : (
+                      renderActiveStep()
+                    )}
+                  </Suspense>
+                </motion.div>
+              </AnimatePresence>
+            </Grid>
           </Grid>
-        </Grid>
+        )}
       </motion.div>
 
       {/* Resume Upload Modal */}

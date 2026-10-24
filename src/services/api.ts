@@ -7,7 +7,6 @@ export const api = createApi({
     baseUrl: import.meta.env.VITE_API_BASE_URL,
 
     prepareHeaders: (headers) => {
-
       const token = localStorage.getItem("token");
 
       if (token) {
@@ -15,7 +14,7 @@ export const api = createApi({
       }
 
       return headers;
-    }
+    },
   }),
 
   tagTypes: [
@@ -23,8 +22,10 @@ export const api = createApi({
     "Resume",
     "Candidate",
     "Company",
-    "Job"
+    "Job",
+    "JobTitles",
+    "Activity",
   ],
 
-  endpoints: () => ({})
+  endpoints: () => ({}),
 });

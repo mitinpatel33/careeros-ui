@@ -196,14 +196,14 @@ const LoginPage = () => {
 
   const isAnyLoading = isLoading || socialLoading;
 
-  const handleGoogle = () => {
-    if (!termsAccepted) {
-      setTermsError(true);
-      return;
-    }
-    setTermsError(false);
-    googleLogin();
-  };
+  // const handleGoogle = () => {
+  //   if (!termsAccepted) {
+  //     setTermsError(true);
+  //     return;
+  //   }
+  //   setTermsError(false);
+  //   googleLogin();
+  // };
 
   return (
     <Box

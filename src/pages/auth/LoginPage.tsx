@@ -129,8 +129,8 @@ const LoginPage = () => {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [termsError, setTermsError] = useState(false);
-
+  // const [termsError, setTermsError] = useState(false);
+  const termsError = false;
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Privacy Policy | Career OS</title>
+<meta name="description" content="How Career OS collects, uses and protects your information.">
+<style>
+:root{
+  --blue-900:#1e3a8a; --blue-700:#1d4ed8; --blue-600:#2563eb; --blue-500:#3b82f6;
+  --violet:#a855f7; --ink:#1e293b; --muted:#64748b; --line:#dbe7fb;
+  --card:rgba(255,255,255,.82); --bg1:#e0f2fe; --bg2:#eef2ff; --bg3:#f5f3ff;
+  --danger:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  color:var(--ink); line-height:1.7; min-height:100vh;
+  background:
+    radial-gradient(900px 500px at 8% 10%, rgba(168,85,247,.14), transparent 60%),
+    radial-gradient(800px 500px at 95% 85%, rgba(59,130,246,.16), transparent 60%),
+    linear-gradient(135deg,var(--bg1),var(--bg2) 55%,var(--bg3));
+  background-attachment:fixed;
+}
+/* floating network decoration */
+.net{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+.net circle{animation:pulse 4s ease-in-out infinite}
+.net circle:nth-child(odd){animation-delay:1.3s}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:20px 20px 60px}
+
+/* top bar like Candidate Portal */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 22px;border-radius:20px;background:rgba(224,242,254,.75);
+  border:1px solid #bfdbfe;backdrop-filter:blur(14px);
+  box-shadow:0 8px 30px rgba(59,130,246,.10);position:sticky;top:14px;z-index:10;
+}
+.brand{display:flex;flex-direction:column;text-decoration:none}
+.brand b{font-family:"Arial Black",Impact,sans-serif;font-size:22px;color:var(--blue-700);letter-spacing:.2px}
+.brand small{font-size:12px;font-weight:600;color:var(--blue-500)}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{
+  text-decoration:none;font-weight:700;font-size:14px;color:var(--blue-700);
+  padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.7);border:1px solid var(--line);
+  transition:.2s;
+}
+.nav a:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.15)}
+.nav a.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--blue-500),#1d4ed8);box-shadow:0 8px 20px rgba(37,99,235,.35)}
+
+/* hero */
+.hero{text-align:center;padding:48px 10px 28px}
+.hero .icon{
+  width:64px;height:64px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;
+  font-size:30px;background:linear-gradient(135deg,var(--blue-500),#6366f1);
+  box-shadow:0 12px 28px rgba(79,70,229,.35);
+}
+.hero h1{font-family:"Arial Black",Impact,sans-serif;font-size:clamp(28px,5vw,46px);color:var(--blue-700);line-height:1.15}
+.hero p{margin:12px auto 0;max-width:620px;color:var(--muted);font-size:16px}
+.meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.pill{font-size:13px;font-weight:600;color:var(--blue-700);background:#fff;border:1px solid var(--line);padding:6px 14px;border-radius:999px}
+
+/* layout */
+.layout{display:grid;grid-template-columns:270px 1fr;gap:24px;align-items:start;margin-top:10px}
+.toc{
+  position:sticky;top:104px;padding:18px;border-radius:22px;background:var(--card);
+  border:1px solid var(--line);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(59,130,246,.08);
+  max-height:calc(100vh - 130px);overflow:auto;
+}
+.toc h4{font-family:"Arial Black",Impact,sans-serif;font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:var(--blue-900);margin-bottom:10px}
+.toc a{
+  display:block;text-decoration:none;font-size:14px;font-weight:600;color:#475569;
+  padding:8px 12px;border-radius:12px;margin-bottom:4px;transition:.2s;
+}
+.toc a:hover{background:#eff6ff;color:var(--blue-700)}
+.toc a.on{color:#fff;background:linear-gradient(135deg,var(--blue-500),#1d4ed8);box-shadow:0 6px 16px rgba(37,99,235,.3)}
+
+.doc{display:flex;flex-direction:column;gap:18px}
+.intro,.sec{
+  padding:28px 32px;border-radius:26px;background:var(--card);border:1px solid var(--line);
+  backdrop-filter:blur(14px);box-shadow:0 12px 36px rgba(59,130,246,.10);scroll-margin-top:100px;
+  transition:box-shadow .25s,transform .25s;
+}
+.sec:hover{box-shadow:0 18px 44px rgba(59,130,246,.18);transform:translateY(-2px)}
+.sec h2{
+  font-family:"Arial Black",Impact,sans-serif;font-size:21px;color:var(--blue-700);
+  display:flex;align-items:center;gap:12px;margin-bottom:14px;
+}
+.sec h2 .num{
+  flex:none;min-width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:15px;color:#fff;
+  background:linear-gradient(135deg,var(--blue-500),#6366f1);box-shadow:0 6px 14px rgba(79,70,229,.3);
+}
+.sec h3{font-size:16px;color:var(--blue-900);margin:18px 0 8px;font-weight:800}
+p{margin-bottom:12px;color:#334155}
+ul,ol{margin:6px 0 14px 4px;padding-left:22px}
+li{margin-bottom:8px;color:#334155}
+li::marker{color:var(--blue-500);font-weight:700}
+strong{color:var(--ink)}
+a{color:var(--blue-600);font-weight:600}
+.sec p:last-child,.sec ul:last-child,.sec ol:last-child{margin-bottom:0}
+
+/* contact card */
+.sec.contact{background:linear-gradient(135deg,rgba(219,234,254,.9),rgba(237,233,254,.9))}
+
+/* footer */
+.foot{margin-top:32px;text-align:center;color:var(--muted);font-size:13px}
+.foot a{margin:0 8px}
+.cta{
+  display:inline-block;margin:0 0 18px;padding:13px 34px;border-radius:14px;color:#fff;text-decoration:none;
+  font-weight:800;background:linear-gradient(180deg,#3b8bff,#1d63f0);
+  box-shadow:0 0 0 4px rgba(59,130,246,.15),0 10px 28px rgba(37,99,235,.4);transition:.2s;
+}
+.cta:hover{transform:translateY(-2px)}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .toc{position:static;max-height:none;display:flex;gap:6px;flex-wrap:wrap;padding:14px}
+  .toc h4{width:100%}
+  .toc a{margin:0}
+  .intro,.sec{padding:22px 20px}
+  .topbar{position:static;flex-direction:column;align-items:flex-start}
+}
+@media print{
+  .net,.topbar,.toc,.cta{display:none}
+  body{background:#fff}
+  .intro,.sec{box-shadow:none;border:1px solid #ddd;backdrop-filter:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<svg class="net" viewBox="0 0 1366 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<g stroke="#c084fc" stroke-opacity=".35" fill="none" stroke-width="1.2">
+<polyline points="68,243 192,110 204,96 279,137 355,179 245,307 68,243"/>
+<polyline points="204,96 222,184 245,307 382,435 462,513"/>
+<polyline points="355,179 382,435"/>
+<polyline points="1025,160 1175,76 1284,269 1168,314 1120,333 983,416 900,495"/>
+<polyline points="1025,160 1088,274 1120,333"/><polyline points="1175,76 1284,269"/>
+</g>
+<g fill="#a855f7"><circle cx="68" cy="243" r="5"/><circle cx="245" cy="307" r="6"/><circle cx="222" cy="184" r="5"/>
+<circle cx="1025" cy="160" r="6"/><circle cx="1088" cy="274" r="5"/><circle cx="1168" cy="314" r="5"/></g>
+<g fill="#6366f1"><circle cx="204" cy="96" r="5"/><circle cx="355" cy="179" r="5"/><circle cx="1284" cy="269" r="6"/><circle cx="1120" cy="333" r="5"/><circle cx="1174" cy="76" r="5"/></g>
+<g fill="#fff" stroke="#c084fc"><circle cx="192" cy="110" r="5"/><circle cx="279" cy="137" r="5"/><circle cx="989" cy="381" r="5"/></g>
+</svg>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="/"><b>Career OS 🚀</b><small>Create Professional &amp; Animated Resumes</small></a>
+    <nav class="nav">
+      <a href="privacy-policy.html" class="active">Privacy Policy</a>
+      <a href="terms-and-conditions.html" class="">Terms &amp; Conditions</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div class="icon">🔒</div>
+    <h1>Privacy Policy</h1>
+    <p>How Career OS collects, uses and protects your information.</p>
+    <div class="meta">
+      <span class="pill">Effective: [DD Month YYYY]</span>
+      <span class="pill">Last updated: October 26, 2026</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="toc"><h4>On this page</h4><a href="#s1">1. Information We Collect</a><a href="#s2">2. How We Use Your Information</a><a href="#s3">3. AI Processing</a><a href="#s4">4. Public Profiles &amp; Visibility</a><a href="#s5">5. How We Share Information</a><a href="#s6">6. Data Retention</a><a href="#s7">7. Data Security</a><a href="#s8">8. Your Rights &amp; Choices</a><a href="#s9">9. Cookies &amp; Similar Technologies</a><a href="#s10">10. Children&#x27;s Privacy</a><a href="#s11">11. International Data Transfers</a><a href="#s12">12. Third-Party Links &amp; Services</a><a href="#s13">13. Contact &amp; Grievance Officer</a><a href="#s14">14. Changes to This Policy</a></aside>
+    <main class="doc">
+      <div class="intro"><p>This Privacy Policy explains how <strong>[Company / Owner Name]</strong> ("we", "us", "our") collects, uses, stores and shares your personal information when you use Career OS (the "Service"), including our website, Candidate Portal, resume builder, AI resume import and public profile features.</p>
+<p>By creating an account or using the Service, you agree to this Policy. If you do not agree, please do not use the Service.</p></div>
+      <section class="sec" id="s1"><h2><span class="num">1</span>Information We Collect</h2><h3>1.1 Information you provide</h3>
+<ul>
+<li><strong>Account details:</strong> name, email address and password (stored only in encrypted/hashed form).</li>
+<li><strong>Resume and profile data:</strong> contact details, photograph, headline/summary, work experience, education, skills, projects, certifications, languages, links (e.g. LinkedIn, GitHub, portfolio) and any other details you add.</li>
+<li><strong>Uploaded files:</strong> resumes in PDF or Word format that you upload for AI import.</li>
+<li><strong>Communications:</strong> messages you send to our support team.</li>
+</ul>
+<h3>1.2 Information from third-party sign-in</h3>
+<p>If you log in with <strong>Google</strong> or <strong>Facebook</strong>, we receive basic profile information such as your name, email address and profile picture, as permitted by your settings with those providers. We do not receive your Google or Facebook password.</p>
+<h3>1.3 Information collected automatically</h3>
+<ul>
+<li>Device and browser information, IP address, language and time zone.</li>
+<li>Log data such as pages visited, features used, timestamps and error reports.</li>
+<li>Cookies and similar technologies (see Section 9).</li>
+</ul></section><section class="sec" id="s2"><h2><span class="num">2</span>How We Use Your Information</h2><p>We use your information to:<br />
+1. Create and manage your account and authenticate you.<br />
+2. Build, store, format and export your resume, and apply templates and themes.<br />
+3. <strong>Parse uploaded resumes using AI</strong> and auto-fill your profile sections.<br />
+4. <strong>Publish your live profile</strong> when you choose to make it public.<br />
+5. Send service notifications (e.g. account, security and in-app alerts).<br />
+6. Maintain security, prevent fraud and abuse, and troubleshoot problems.<br />
+7. Analyse usage to improve the Service.<br />
+8. Comply with legal obligations and enforce our Terms &amp; Conditions.</p>
+<p>We do <strong>not</strong> sell your personal information.</p></section><section class="sec" id="s3"><h2><span class="num">3</span>AI Processing</h2><p>When you use "Import Resume with AI", the content of your uploaded file is processed by automated systems, which may include third-party AI service providers acting on our behalf, to extract and structure the information. We share only what is needed for this purpose. Extracted data may be inaccurate, so please review everything before saving or publishing. [State here whether your AI provider may or may not use the data to train its models.]</p></section><section class="sec" id="s4"><h2><span class="num">4</span>Public Profiles and Visibility</h2><p>Information on a profile you <strong>publish</strong> (such as name, photo, contact details, experience and skills) may be visible to anyone with the link and may be indexed by search engines. Please do not include information you do not want made public. You can unpublish your profile or edit your content at any time. Cached copies held by search engines or third parties may remain for some time after removal.</p></section><section class="sec" id="s5"><h2><span class="num">5</span>How We Share Information</h2><p>We may share information with:<br />
+- <strong>Service providers</strong> that help us operate the Service (hosting, storage, email delivery, analytics, AI processing), bound by confidentiality and data protection obligations.<br />
+- <strong>Login providers</strong> (Google, Facebook) when you choose to sign in with them.<br />
+- <strong>Legal and safety authorities</strong> when required by law, court order or government request, or to protect rights, safety and security.<br />
+- <strong>Business transfers</strong> in connection with a merger, acquisition or sale of assets, with notice to you where required.<br />
+- <strong>Anyone you choose</strong>, such as employers or recruiters you share your profile or resume with.</p></section><section class="sec" id="s6"><h2><span class="num">6</span>Data Retention</h2><p>We keep your information for as long as your account is active or as needed to provide the Service. When you delete your account, we will delete or anonymise your personal data within [30] days, except where we must retain it to meet legal, tax, security or dispute-resolution requirements. Backups may take up to [90] days to be overwritten.</p></section><section class="sec" id="s7"><h2><span class="num">7</span>Data Security</h2><p>We use reasonable technical and organisational safeguards, including encryption in transit, hashed passwords and access controls. No system is completely secure, so we cannot guarantee absolute security. Please use a strong, unique password and keep your login credentials confidential. If a data breach affects you, we will notify you and the relevant authorities as required by law.</p></section><section class="sec" id="s8"><h2><span class="num">8</span>Your Rights and Choices</h2><p>Under applicable law (including India's Digital Personal Data Protection Act, 2023), you may:<br />
+- <strong>Access</strong> the personal data we hold about you.<br />
+- <strong>Correct or update</strong> inaccurate or incomplete data (most of this can be done in your Profile).<br />
+- <strong>Erase</strong> your data and delete your account.<br />
+- <strong>Withdraw consent</strong> at any time (this may limit some features).<br />
+- <strong>Nominate</strong> another person to exercise your rights in the event of death or incapacity.<br />
+- <strong>Raise a grievance</strong> with us, and escalate to the Data Protection Board of India if unresolved.</p>
+<p>To exercise these rights, contact us using the details in Section 13.</p></section><section class="sec" id="s9"><h2><span class="num">9</span>Cookies and Similar Technologies</h2><p>We use cookies and local storage to keep you signed in, remember preferences and understand how the Service is used. You can control cookies through your browser settings, but disabling essential cookies may stop parts of the Service from working. [Add details of any analytics or advertising tools you use.]</p></section><section class="sec" id="s10"><h2><span class="num">10</span>Children&#x27;s Privacy</h2><p>The Service is intended for users aged <strong>18 and above</strong>. We do not knowingly collect personal data from children. If you believe a child has provided us data, contact us and we will delete it.</p></section><section class="sec" id="s11"><h2><span class="num">11</span>International Data Transfers</h2><p>Your data may be stored or processed on servers located outside your country, including by our service providers. Where this happens, we take steps to ensure your data remains protected in line with applicable law.</p></section><section class="sec" id="s12"><h2><span class="num">12</span>Third-Party Links and Services</h2><p>The Service may link to third-party sites (e.g. Google, Facebook, your portfolio links). We are not responsible for their privacy practices. Please review their policies.</p></section><section class="sec contact" id="s13"><h2><span class="num">13</span>Contact and Grievance Officer</h2><p>For questions, requests or complaints:</p>
+<p><strong>Grievance Officer:</strong> [Name]<br />
+<strong>Company:</strong> [Company / Owner Name]<br />
+<strong>Address:</strong> [Full Address], [City], Gujarat, India<br />
+<strong>Email:</strong> [privacy@yourdomain.com]<br />
+<strong>Response time:</strong> within [7–15] working days</p></section><section class="sec" id="s14"><h2><span class="num">14</span>Changes to This Policy</h2><p>We may update this Policy from time to time. If we make material changes, we will notify you by email or in-app notice and update the "Last updated" date. Continued use of the Service after changes means you accept the updated Policy.</p></section>
+    </main>
+  </div>
+
+  <footer class="foot">
+    <a class="cta" href="/">Back to Career OS</a><br>
+    <a href="terms-and-conditions.html">Terms &amp; Conditions</a> · &copy; <span id="y"></span> Career OS
+  </footer>
+</div>
+<script>document.getElementById('y').textContent=new Date().getFullYear();
+const links=[...document.querySelectorAll('.toc a')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-20% 0px -70% 0px'});
+secs.forEach(s=>s&&io.observe(s));
+</script>
+</body>
+</html>

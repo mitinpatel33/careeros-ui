@@ -29,6 +29,9 @@ import RegisterTypePage from "../pages/auth/RegisterTypePage";
 
 import ProtectedRoute from "./ProtectedRoute";
 import RoleRoute from "./RoleRoute";
+import PrivacyPolicy from "../pages/privacy-policy/PrivacyPolicy";
+import TermsConditions from "../pages/terms-and-conditions/TermsConditions";
+import CompanyComingSoon from "../pages/company/comingsoon/CompanyComingSoon";
 
 const MainRoutes = () => {
   return useRoutes([
@@ -47,6 +50,9 @@ const MainRoutes = () => {
         { path: "forgot-password", element: <ForgotPasswordPage /> },
         { path: "reset-password", element: <ResetPasswordPage /> },
         { path: "verify-otp", element: <VerifyOtpPage /> },
+        { path: "/privacy-policy", element: <PrivacyPolicy /> },
+        { path: "/terms-and-conditions", element: <TermsConditions /> },
+        { path: "register/company", element: <CompanyComingSoon /> },
       ],
     },
 

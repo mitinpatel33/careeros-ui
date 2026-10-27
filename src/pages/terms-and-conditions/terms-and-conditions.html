@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Terms &amp; Conditions | Career OS</title>
+<meta name="description" content="The rules for using Career OS to build and publish your resume.">
+<style>
+:root{
+  --blue-900:#1e3a8a; --blue-700:#1d4ed8; --blue-600:#2563eb; --blue-500:#3b82f6;
+  --violet:#a855f7; --ink:#1e293b; --muted:#64748b; --line:#dbe7fb;
+  --card:rgba(255,255,255,.82); --bg1:#e0f2fe; --bg2:#eef2ff; --bg3:#f5f3ff;
+  --danger:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  color:var(--ink); line-height:1.7; min-height:100vh;
+  background:
+    radial-gradient(900px 500px at 8% 10%, rgba(168,85,247,.14), transparent 60%),
+    radial-gradient(800px 500px at 95% 85%, rgba(59,130,246,.16), transparent 60%),
+    linear-gradient(135deg,var(--bg1),var(--bg2) 55%,var(--bg3));
+  background-attachment:fixed;
+}
+/* floating network decoration */
+.net{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
+.net circle{animation:pulse 4s ease-in-out infinite}
+.net circle:nth-child(odd){animation-delay:1.3s}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:20px 20px 60px}
+
+/* top bar like Candidate Portal */
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:14px 22px;border-radius:20px;background:rgba(224,242,254,.75);
+  border:1px solid #bfdbfe;backdrop-filter:blur(14px);
+  box-shadow:0 8px 30px rgba(59,130,246,.10);position:sticky;top:14px;z-index:10;
+}
+.brand{display:flex;flex-direction:column;text-decoration:none}
+.brand b{font-family:"Arial Black",Impact,sans-serif;font-size:22px;color:var(--blue-700);letter-spacing:.2px}
+.brand small{font-size:12px;font-weight:600;color:var(--blue-500)}
+.nav{display:flex;gap:8px;flex-wrap:wrap}
+.nav a{
+  text-decoration:none;font-weight:700;font-size:14px;color:var(--blue-700);
+  padding:9px 16px;border-radius:12px;background:rgba(255,255,255,.7);border:1px solid var(--line);
+  transition:.2s;
+}
+.nav a:hover{background:#fff;transform:translateY(-1px);box-shadow:0 6px 16px rgba(37,99,235,.15)}
+.nav a.active{color:#fff;border-color:transparent;background:linear-gradient(135deg,var(--blue-500),#1d4ed8);box-shadow:0 8px 20px rgba(37,99,235,.35)}
+
+/* hero */
+.hero{text-align:center;padding:48px 10px 28px}
+.hero .icon{
+  width:64px;height:64px;margin:0 auto 18px;border-radius:20px;display:grid;place-items:center;
+  font-size:30px;background:linear-gradient(135deg,var(--blue-500),#6366f1);
+  box-shadow:0 12px 28px rgba(79,70,229,.35);
+}
+.hero h1{font-family:"Arial Black",Impact,sans-serif;font-size:clamp(28px,5vw,46px);color:var(--blue-700);line-height:1.15}
+.hero p{margin:12px auto 0;max-width:620px;color:var(--muted);font-size:16px}
+.meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.pill{font-size:13px;font-weight:600;color:var(--blue-700);background:#fff;border:1px solid var(--line);padding:6px 14px;border-radius:999px}
+
+/* layout */
+.layout{display:grid;grid-template-columns:270px 1fr;gap:24px;align-items:start;margin-top:10px}
+.toc{
+  position:sticky;top:104px;padding:18px;border-radius:22px;background:var(--card);
+  border:1px solid var(--line);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(59,130,246,.08);
+  max-height:calc(100vh - 130px);overflow:auto;
+}
+.toc h4{font-family:"Arial Black",Impact,sans-serif;font-size:13px;letter-spacing:.8px;text-transform:uppercase;color:var(--blue-900);margin-bottom:10px}
+.toc a{
+  display:block;text-decoration:none;font-size:14px;font-weight:600;color:#475569;
+  padding:8px 12px;border-radius:12px;margin-bottom:4px;transition:.2s;
+}
+.toc a:hover{background:#eff6ff;color:var(--blue-700)}
+.toc a.on{color:#fff;background:linear-gradient(135deg,var(--blue-500),#1d4ed8);box-shadow:0 6px 16px rgba(37,99,235,.3)}
+
+.doc{display:flex;flex-direction:column;gap:18px}
+.intro,.sec{
+  padding:28px 32px;border-radius:26px;background:var(--card);border:1px solid var(--line);
+  backdrop-filter:blur(14px);box-shadow:0 12px 36px rgba(59,130,246,.10);scroll-margin-top:100px;
+  transition:box-shadow .25s,transform .25s;
+}
+.sec:hover{box-shadow:0 18px 44px rgba(59,130,246,.18);transform:translateY(-2px)}
+.sec h2{
+  font-family:"Arial Black",Impact,sans-serif;font-size:21px;color:var(--blue-700);
+  display:flex;align-items:center;gap:12px;margin-bottom:14px;
+}
+.sec h2 .num{
+  flex:none;min-width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:15px;color:#fff;
+  background:linear-gradient(135deg,var(--blue-500),#6366f1);box-shadow:0 6px 14px rgba(79,70,229,.3);
+}
+.sec h3{font-size:16px;color:var(--blue-900);margin:18px 0 8px;font-weight:800}
+p{margin-bottom:12px;color:#334155}
+ul,ol{margin:6px 0 14px 4px;padding-left:22px}
+li{margin-bottom:8px;color:#334155}
+li::marker{color:var(--blue-500);font-weight:700}
+strong{color:var(--ink)}
+a{color:var(--blue-600);font-weight:600}
+.sec p:last-child,.sec ul:last-child,.sec ol:last-child{margin-bottom:0}
+
+/* contact card */
+.sec.contact{background:linear-gradient(135deg,rgba(219,234,254,.9),rgba(237,233,254,.9))}
+
+/* footer */
+.foot{margin-top:32px;text-align:center;color:var(--muted);font-size:13px}
+.foot a{margin:0 8px}
+.cta{
+  display:inline-block;margin:0 0 18px;padding:13px 34px;border-radius:14px;color:#fff;text-decoration:none;
+  font-weight:800;background:linear-gradient(180deg,#3b8bff,#1d63f0);
+  box-shadow:0 0 0 4px rgba(59,130,246,.15),0 10px 28px rgba(37,99,235,.4);transition:.2s;
+}
+.cta:hover{transform:translateY(-2px)}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .toc{position:static;max-height:none;display:flex;gap:6px;flex-wrap:wrap;padding:14px}
+  .toc h4{width:100%}
+  .toc a{margin:0}
+  .intro,.sec{padding:22px 20px}
+  .topbar{position:static;flex-direction:column;align-items:flex-start}
+}
+@media print{
+  .net,.topbar,.toc,.cta{display:none}
+  body{background:#fff}
+  .intro,.sec{box-shadow:none;border:1px solid #ddd;backdrop-filter:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<svg class="net" viewBox="0 0 1366 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<g stroke="#c084fc" stroke-opacity=".35" fill="none" stroke-width="1.2">
+<polyline points="68,243 192,110 204,96 279,137 355,179 245,307 68,243"/>
+<polyline points="204,96 222,184 245,307 382,435 462,513"/>
+<polyline points="355,179 382,435"/>
+<polyline points="1025,160 1175,76 1284,269 1168,314 1120,333 983,416 900,495"/>
+<polyline points="1025,160 1088,274 1120,333"/><polyline points="1175,76 1284,269"/>
+</g>
+<g fill="#a855f7"><circle cx="68" cy="243" r="5"/><circle cx="245" cy="307" r="6"/><circle cx="222" cy="184" r="5"/>
+<circle cx="1025" cy="160" r="6"/><circle cx="1088" cy="274" r="5"/><circle cx="1168" cy="314" r="5"/></g>
+<g fill="#6366f1"><circle cx="204" cy="96" r="5"/><circle cx="355" cy="179" r="5"/><circle cx="1284" cy="269" r="6"/><circle cx="1120" cy="333" r="5"/><circle cx="1174" cy="76" r="5"/></g>
+<g fill="#fff" stroke="#c084fc"><circle cx="192" cy="110" r="5"/><circle cx="279" cy="137" r="5"/><circle cx="989" cy="381" r="5"/></g>
+</svg>
+<div class="wrap">
+  <header class="topbar">
+    <a class="brand" href="/"><b>Career OS 🚀</b><small>Create Professional &amp; Animated Resumes</small></a>
+    <nav class="nav">
+      <a href="privacy-policy.html" class="">Privacy Policy</a>
+      <a href="terms-and-conditions.html" class="active">Terms &amp; Conditions</a>
+    </nav>
+  </header>
+
+  <div class="hero">
+    <div class="icon">📄</div>
+    <h1>Terms &amp; Conditions</h1>
+    <p>The rules for using Career OS to build and publish your resume.</p>
+    <div class="meta">
+      <span class="pill">Effective: [DD Month YYYY]</span>
+      <span class="pill">Last updated: October 26, 2026</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="toc"><h4>On this page</h4><a href="#s1">1. Eligibility</a><a href="#s2">2. Your Account</a><a href="#s3">3. The Service</a><a href="#s4">4. Your Content</a><a href="#s5">5. AI Features</a><a href="#s6">6. Acceptable Use</a><a href="#s7">7. Intellectual Property</a><a href="#s8">8. Third-Party Services</a><a href="#s9">9. Privacy</a><a href="#s10">10. Suspension &amp; Termination</a><a href="#s11">11. Disclaimers</a><a href="#s12">12. Limitation of Liability</a><a href="#s13">13. Indemnity</a><a href="#s14">14. Governing Law &amp; Disputes</a><a href="#s15">15. Changes to These Terms</a><a href="#s16">16. General</a><a href="#s17">17. Contact Us</a></aside>
+    <main class="doc">
+      <div class="intro"><p>These Terms and Conditions ("Terms") form a binding agreement between you and <strong>[Company / Owner Name]</strong> ("we", "us", "our") governing your use of Career OS (the "Service"), including the website, Candidate Portal, resume builder, AI resume import, templates, themes and public profile features. Please read them with our [Privacy Policy]privacy-policy.html.</p>
+<p>By creating an account or using the Service, you agree to these Terms. If you do not agree, do not use the Service.</p></div>
+      <section class="sec" id="s1"><h2><span class="num">1</span>Eligibility</h2><p>You must be at least <strong>18 years old</strong> and legally capable of entering into a contract under Indian law. You must provide accurate information when registering.</p></section><section class="sec" id="s2"><h2><span class="num">2</span>Your Account</h2><ul>
+<li>You are responsible for all activity under your account and for keeping your password confidential.</li>
+<li>Notify us immediately at [support@yourdomain.com] if you suspect unauthorised access.</li>
+<li>You may sign in with email and password or through Google or Facebook. Your use of those providers is also subject to their terms.</li>
+<li>One person may not maintain multiple accounts to abuse the Service, and accounts may not be shared or sold.</li>
+</ul></section><section class="sec" id="s3"><h2><span class="num">3</span>The Service</h2><p>Career OS lets you create, format, store and export resumes, choose templates and themes, import existing resumes with AI, and publish a live profile. We may change, add or remove features at any time. Some features may be paid in future; if so, we will tell you the price before you are charged.</p></section><section class="sec" id="s4"><h2><span class="num">4</span>Your Content</h2><p>"Your Content" means all information, text, images and files you upload or create on the Service.</p>
+<ul>
+<li><strong>Ownership:</strong> You retain ownership of Your Content.</li>
+<li><strong>License to us:</strong> You grant us a non-exclusive, worldwide, royalty-free licence to host, store, process, display and reproduce Your Content solely to operate, provide and improve the Service for you, including AI parsing and displaying your published profile.</li>
+<li><strong>Your responsibility:</strong> You confirm that Your Content is accurate, that you have the right to use it, and that it does not infringe anyone's rights or break the law.</li>
+<li><strong>Public profiles:</strong> If you publish your profile, you understand it may be seen by anyone and indexed by search engines.</li>
+</ul></section><section class="sec" id="s5"><h2><span class="num">5</span>AI Features</h2><ul>
+<li>AI-generated or auto-filled content may be incomplete or inaccurate. <strong>You are responsible for reviewing and correcting it</strong> before saving, publishing or sending it to anyone.</li>
+<li>We do not guarantee that using the Service will lead to interviews, job offers or employment.</li>
+<li>Do not upload files containing other people's sensitive data without their permission.</li>
+</ul></section><section class="sec" id="s6"><h2><span class="num">6</span>Acceptable Use</h2><p>You agree <strong>not</strong> to:<br />
+- Provide false, misleading or fraudulent information, or impersonate any person.<br />
+- Upload unlawful, defamatory, obscene, hateful or infringing content.<br />
+- Upload malware, or attempt to hack, probe, overload or disrupt the Service.<br />
+- Scrape, copy, resell or reverse-engineer the Service, templates or code, except as allowed by law.<br />
+- Use bots or automated means to create accounts or access the Service without our permission.<br />
+- Use the Service to spam or harass others, or to harvest other users' data.</p></section><section class="sec" id="s7"><h2><span class="num">7</span>Intellectual Property</h2><p>The Service, including its design, software, templates, themes, animations, logos and the "Career OS" name, belongs to us or our licensors and is protected by intellectual property laws. We grant you a limited, personal, non-exclusive, non-transferable, revocable licence to use the Service as intended. Resumes you create using our templates may be used by you for your personal job-seeking purposes.</p></section><section class="sec" id="s8"><h2><span class="num">8</span>Third-Party Services</h2><p>The Service relies on third parties (such as Google, Facebook, hosting and AI providers). We are not responsible for their services, availability or policies.</p></section><section class="sec" id="s9"><h2><span class="num">9</span>Privacy</h2><p>Your use of the Service is also governed by our Privacy Policy, which explains how we handle your personal data.</p></section><section class="sec" id="s10"><h2><span class="num">10</span>Suspension and Termination</h2><ul>
+<li>You may stop using the Service and delete your account at any time.</li>
+<li>We may suspend or terminate your access, with or without notice, if you breach these Terms, misuse the Service, or where required by law.</li>
+<li>On termination, your right to use the Service ends. Sections that by nature should survive (ownership, disclaimers, liability, indemnity, governing law) will continue.</li>
+</ul></section><section class="sec" id="s11"><h2><span class="num">11</span>Disclaimers</h2><p>The Service is provided <strong>"as is" and "as available"</strong>, without warranties of any kind, express or implied, including merchantability, fitness for a particular purpose, accuracy and non-infringement. We do not warrant that the Service will be uninterrupted, error-free or secure, or that content will never be lost. Please keep your own backup of your resume.</p></section><section class="sec" id="s12"><h2><span class="num">12</span>Limitation of Liability</h2><p>To the maximum extent permitted by law, we are not liable for any indirect, incidental, special, consequential or punitive damages, or for loss of data, profits, employment opportunities or goodwill, arising from your use of the Service. Our total liability for any claim shall not exceed the amount you paid us in the <strong>[12] months</strong> before the claim, or ₹[1,000] if you paid nothing.</p></section><section class="sec" id="s13"><h2><span class="num">13</span>Indemnity</h2><p>You agree to indemnify and hold us harmless from claims, losses and expenses (including reasonable legal fees) arising from Your Content, your breach of these Terms, or your violation of any law or third-party right.</p></section><section class="sec" id="s14"><h2><span class="num">14</span>Governing Law and Disputes</h2><p>These Terms are governed by the laws of <strong>India</strong>. Disputes shall first be attempted to be resolved amicably by written notice. Failing that, the courts at <strong>Ahmedabad, Gujarat</strong> shall have exclusive jurisdiction. [Optionally: disputes may be referred to arbitration under the Arbitration and Conciliation Act, 1996, seated in Ahmedabad.]</p></section><section class="sec" id="s15"><h2><span class="num">15</span>Changes to These Terms</h2><p>We may update these Terms from time to time. We will notify you of material changes by email or in-app notice and update the "Last updated" date. Continued use after the changes take effect means you accept them.</p></section><section class="sec" id="s16"><h2><span class="num">16</span>General</h2><ul>
+<li><strong>Entire agreement:</strong> These Terms and the Privacy Policy are the entire agreement between you and us.</li>
+<li><strong>Severability:</strong> If any provision is unenforceable, the rest remains in effect.</li>
+<li><strong>No waiver:</strong> Failure to enforce a right is not a waiver of it.</li>
+<li><strong>Assignment:</strong> You may not transfer your rights under these Terms; we may assign ours in connection with a business transfer.</li>
+</ul></section><section class="sec contact" id="s17"><h2><span class="num">17</span>Contact Us</h2><p><strong>[Company / Owner Name]</strong><br />
+[Full Address], [City], Gujarat, India<br />
+Email: [support@yourdomain.com]</p></section>
+    </main>
+  </div>
+
+  <footer class="foot">
+    <a class="cta" href="/">Back to Career OS</a><br>
+    <a href="privacy-policy.html">Privacy Policy</a> · &copy; <span id="y"></span> Career OS
+  </footer>
+</div>
+<script>document.getElementById('y').textContent=new Date().getFullYear();
+const links=[...document.querySelectorAll('.toc a')];
+const secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting){
+    links.forEach(l=>l.classList.toggle('on',l.getAttribute('href')==='#'+e.target.id));
+  }});
+},{rootMargin:'-20% 0px -70% 0px'});
+secs.forEach(s=>s&&io.observe(s));
+</script>
+</body>
+</html>

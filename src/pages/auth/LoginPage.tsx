@@ -30,6 +30,7 @@ import { loginSuccess } from "../../store/auth/authSlice";
 import { useLoginMutation } from "../../services/authApi";
 import { useAppDispatch } from "../../hooks/useLogin";
 import { appToast } from "../../common/toast/appToast";
+import { TermsCheckbox } from "../../components/common/TermsCheckbox";
 
 const glowButtonSx = {
   height: { xs: 46, sm: 50 },
@@ -127,6 +128,9 @@ const LoginPage = () => {
   const [socialLoading, setSocialLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError, setTermsError] = useState(false);
+
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -192,6 +196,15 @@ const LoginPage = () => {
 
   const isAnyLoading = isLoading || socialLoading;
 
+  const handleGoogle = () => {
+    if (!termsAccepted) {
+      setTermsError(true);
+      return;
+    }
+    setTermsError(false);
+    googleLogin();
+  };
+
   return (
     <Box
       component={motion.div}
@@ -213,183 +226,192 @@ const LoginPage = () => {
         // animate={{ y: [0, -8, 0] }}
         // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
-      <AuthCard
-        sx={{
-          p: { xs: 2.5, sm: 4 },
-          borderRadius: { xs: 6, sm: 8 },
-          background: "rgba(255, 255, 255, 0.95)",
-          backdropFilter: "blur(20px)",
-          border: "1px solid rgba(255, 255, 255, 0.9)",
-          boxShadow: `
+        <AuthCard
+          sx={{
+            p: { xs: 2.5, sm: 4 },
+            borderRadius: { xs: 6, sm: 8 },
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.9)",
+            boxShadow: `
             0 20px 50px -10px rgba(37, 99, 235, 0.2),
             0 10px 30px -15px rgba(56, 189, 248, 0.25)
           `,
-        }}
-      >
-        <Stack spacing={2.5}>
-          {/* Top Header */}
-          <Box sx={{ textAlign: "center" }}>
-            <Typography
-              sx={{
-                fontWeight: 800,
-                fontSize: { xs: "1.6rem", sm: "2.1rem" },
-                color: "#2563eb",
-                letterSpacing: "-0.5px",
-              }}
+          }}
+        >
+          <Stack spacing={2.5}>
+            {/* Top Header */}
+            <Box sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  fontWeight: 800,
+                  fontSize: { xs: "1.6rem", sm: "2.1rem" },
+                  color: "#2563eb",
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                Career OS <AnimatedRocket />
+              </Typography>
+              <Typography
+                sx={{
+                  color: "#64748b",
+                  mt: 0.5,
+                  fontSize: { xs: "0.8rem", sm: "0.85rem" },
+                  fontWeight: 500,
+                }}
+              >
+                Create Professional & Animated Resumes
+              </Typography>
+            </Box>
+
+            {/* Dynamic Card Error Display */}
+            <Collapse in={Boolean(serverError)} sx={{ mt: 1 }}>
+              {serverError && (
+                <Alert
+                  severity="error"
+                  icon={<ErrorOutlineOutlined fontSize="inherit" />}
+                  onClose={() => setServerError(null)}
+                  sx={{
+                    borderRadius: "12px",
+                    fontSize: "0.825rem",
+                    fontWeight: 600,
+                    bgcolor: "rgba(254, 242, 242, 0.9)",
+                    color: "#991b1b",
+                    border: "1px solid rgba(252, 165, 165, 0.6)",
+                    "& .MuiAlert-icon": { color: "#dc2626" },
+                  }}
+                >
+                  {serverError}
+                </Alert>
+              )}
+            </Collapse>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <Stack spacing={2}>
+                <AppTextField<LoginSchemaType>
+                  name="email"
+                  autoComplete="email"
+                  control={control}
+                  label="Email Address"
+                  fullWidth
+                  sx={lightTextFieldSx}
+                />
+
+                <PasswordField<LoginSchemaType>
+                  name="password"
+                  control={control}
+                  label="Password"
+                  fullWidth
+                  sx={lightTextFieldSx}
+                  autoComplete="current-password"
+                />
+
+                <Box sx={{ textAlign: "right", pt: 0.2 }}>
+                  <Typography
+                    sx={{
+                      cursor: "pointer",
+                      color: "#3b82f6",
+                      fontSize: "0.825rem",
+                      fontWeight: 600,
+                      "&:hover": { textDecoration: "underline" },
+                    }}
+                  >
+                    Forgot Password?
+                  </Typography>
+                </Box>
+
+                <AppButton type="submit" loading={isLoading} sx={glowButtonSx}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </AppButton>
+              </Stack>
+            </form>
+
+            {/* Divider */}
+            <Box sx={{ display: "flex", alignItems: "center", my: 0.5 }}>
+              <Divider sx={{ flex: 1, borderColor: "#e2e8f0" }} />
+              <Typography
+                sx={{
+                  mx: 1.5,
+                  fontSize: "0.68rem",
+                  color: "#94a3b8",
+                  fontWeight: 700,
+                  letterSpacing: "0.5px",
+                }}
+              >
+                OR CONTINUE WITH
+              </Typography>
+              <Divider sx={{ flex: 1, borderColor: "#e2e8f0" }} />
+            </Box>
+
+            {/* Social Icons */}
+            <Stack
+              direction="row"
+              spacing={2}
+              sx={{ justifyContent: "center" }}
             >
-              Career OS <AnimatedRocket />
-            </Typography>
+              <ActionIconButton
+                title="Google"
+                onClick={() => googleLogin()}
+                disabled={isAnyLoading}
+                icon={GoogleIcon}
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: "50%",
+                  bgcolor: "#ffffff",
+                  border: "1px solid #e2e8f0",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                  "&:hover": { bgcolor: "#f8fafc", borderColor: "#cbd5e1" },
+                }}
+              />
+              <ActionIconButton
+                title="Facebook"
+                onClick={() => {}}
+                disabled={isAnyLoading}
+                icon={Facebook}
+                sx={{
+                  width: 46,
+                  height: 46,
+                  borderRadius: "50%",
+                  bgcolor: "#1877F2",
+                  color: "#ffffff",
+                  boxShadow: "0 4px 12px rgba(24, 119, 242, 0.3)",
+                  "&:hover": { bgcolor: "#166FE5" },
+                }}
+              />
+            </Stack>
+
+            {/* Footer Link */}
             <Typography
               sx={{
                 color: "#64748b",
-                mt: 0.5,
-                fontSize: { xs: "0.8rem", sm: "0.85rem" },
+                fontSize: "0.85rem",
+                textAlign: "center",
                 fontWeight: 500,
               }}
             >
-              Create Professional & Animated Resumes
-            </Typography>
-          </Box>
-
-          {/* Dynamic Card Error Display */}
-          <Collapse in={Boolean(serverError)}>
-            {serverError && (
-              <Alert
-                severity="error"
-                icon={<ErrorOutlineOutlined fontSize="inherit" />}
-                onClose={() => setServerError(null)}
+              Don't have an account?{" "}
+              <Box
+                component="span"
+                onClick={() => navigate("/register")}
                 sx={{
-                  borderRadius: "12px",
-                  fontSize: "0.825rem",
-                  fontWeight: 600,
-                  bgcolor: "rgba(254, 242, 242, 0.9)",
-                  color: "#991b1b",
-                  border: "1px solid rgba(252, 165, 165, 0.6)",
-                  "& .MuiAlert-icon": { color: "#dc2626" },
+                  color: "#2563eb",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  "&:hover": { textDecoration: "underline" },
                 }}
               >
-                {serverError}
-              </Alert>
-            )}
-          </Collapse>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={2}>
-              <AppTextField<LoginSchemaType>
-                name="email"
-                autoComplete="email"
-                control={control}
-                label="Email Address"
-                fullWidth
-                sx={lightTextFieldSx}
-              />
-
-              <PasswordField<LoginSchemaType>
-                name="password"
-                control={control}
-                label="Password"
-                fullWidth
-                sx={lightTextFieldSx}
-                autoComplete="current-password"
-              />
-
-              <Box sx={{ textAlign: "right", pt: 0.2 }}>
-                <Typography
-                  sx={{
-                    cursor: "pointer",
-                    color: "#3b82f6",
-                    fontSize: "0.825rem",
-                    fontWeight: 600,
-                    "&:hover": { textDecoration: "underline" },
-                  }}
-                >
-                  Forgot Password?
-                </Typography>
+                Sign Up
               </Box>
-
-              <AppButton type="submit" loading={isLoading} sx={glowButtonSx}>
-                {isLoading ? "Logging in..." : "Login"}
-              </AppButton>
-            </Stack>
-          </form>
-
-          {/* Divider */}
-          <Box sx={{ display: "flex", alignItems: "center", my: 0.5 }}>
-            <Divider sx={{ flex: 1, borderColor: "#e2e8f0" }} />
-            <Typography
-              sx={{
-                mx: 1.5,
-                fontSize: "0.68rem",
-                color: "#94a3b8",
-                fontWeight: 700,
-                letterSpacing: "0.5px",
-              }}
-            >
-              OR CONTINUE WITH
+              <TermsCheckbox
+                checked={termsAccepted}
+                onChange={setTermsAccepted}
+                error={termsError}
+              />
             </Typography>
-            <Divider sx={{ flex: 1, borderColor: "#e2e8f0" }} />
-          </Box>
-
-          {/* Social Icons */}
-          <Stack direction="row" spacing={2} sx={{ justifyContent: "center" }}>
-            <ActionIconButton
-              title="Google"
-              onClick={() => googleLogin()}
-              disabled={isAnyLoading}
-              icon={GoogleIcon}
-              sx={{
-                width: 46,
-                height: 46,
-                borderRadius: "50%",
-                bgcolor: "#ffffff",
-                border: "1px solid #e2e8f0",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                "&:hover": { bgcolor: "#f8fafc", borderColor: "#cbd5e1" },
-              }}
-            />
-            <ActionIconButton
-              title="Facebook"
-              onClick={() => { }}
-              disabled={isAnyLoading}
-              icon={Facebook}
-              sx={{
-                width: 46,
-                height: 46,
-                borderRadius: "50%",
-                bgcolor: "#1877F2",
-                color: "#ffffff",
-                boxShadow: "0 4px 12px rgba(24, 119, 242, 0.3)",
-                "&:hover": { bgcolor: "#166FE5" },
-              }}
-            />
           </Stack>
-
-          {/* Footer Link */}
-          <Typography
-            sx={{
-              color: "#64748b",
-              fontSize: "0.85rem",
-              textAlign: "center",
-              fontWeight: 500,
-            }}
-          >
-            Don't have an account?{" "}
-            <Box
-              component="span"
-              onClick={() => navigate("/register")}
-              sx={{
-                color: "#2563eb",
-                fontWeight: 700,
-                cursor: "pointer",
-                "&:hover": { textDecoration: "underline" },
-              }}
-            >
-              Sign Up
-            </Box>
-          </Typography>
-        </Stack>
-      </AuthCard>
+        </AuthCard>
       </Box>
     </Box>
   );

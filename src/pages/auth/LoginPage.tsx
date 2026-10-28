@@ -9,7 +9,7 @@ import {
   Collapse,
   type SvgIconProps,
 } from "@mui/material";
-import { ErrorOutlineOutlined, Facebook } from "@mui/icons-material";
+import { ErrorOutlineOutlined } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -21,6 +21,8 @@ import AppButton from "../../components/common/AppButton";
 import AppTextField from "../../components/common/AppTextField";
 import PasswordField from "../../components/common/PasswordField";
 import ActionIconButton from "../../components/common/ActionIconButton";
+
+// import { FacebookLoginClient } from "@greatsumini/react-facebook-login";
 
 import {
   loginSchema,
@@ -129,8 +131,7 @@ const LoginPage = () => {
   const [serverError, setServerError] = useState<string | null>(null);
 
   const [termsAccepted, setTermsAccepted] = useState(false);
-  // const [termsError, setTermsError] = useState(false);
-  const termsError = false;
+  const [termsError, setTermsError] = useState(false);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -138,6 +139,61 @@ const LoginPage = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "" },
   });
+
+  const requireTerms = () => {
+    if (!termsAccepted) {
+      setTermsError(true);
+      return false;
+    }
+    setTermsError(false);
+    return true;
+  };
+
+  // useEffect(() => {
+  //   FacebookLoginClient.loadSdk("en_US").then(() => {
+  //     FacebookLoginClient.init({
+  //       appId: import.meta.env.VITE_FACEBOOK_APP_ID,
+  //       version: "v19.0",
+  //       cookie: true,
+  //       xfbml: false,
+  //     });
+  //   });
+  // }, []);
+
+  // const handleFacebook = () => {
+  //   if (!requireTerms()) return;
+  //   FacebookLoginClient.login(
+  //     (res) => {
+  //       if (res.authResponse?.accessToken) {
+  //         handleFacebookLogin(res.authResponse.accessToken);
+  //       } else {
+  //         setServerError("Facebook sign-in was canceled or failed.");
+  //         appToast.error("Facebook login failed");
+  //       }
+  //     },
+  //     { scope: "public_profile,email" },
+  //   );
+  // };
+
+  // const handleFacebookLogin = async (accessToken: string) => {
+  //   setSocialLoading(true);
+  //   setServerError(null);
+  //   try {
+  //     const response = await login({
+  //       token: accessToken,
+  //       provider: "facebook",
+  //       email: "",
+  //       password: "",
+  //     }).unwrap();
+  //     handleLoginSuccess(response.data, response.message);
+  //   } catch (error: any) {
+  //     const errMsg = error.data?.message || "Facebook authentication failed";
+  //     setServerError(errMsg);
+  //     appToast.error(errMsg);
+  //   } finally {
+  //     setSocialLoading(false);
+  //   }
+  // };
 
   const handleLoginSuccess = (userData: any, message: string) => {
     localStorage.setItem("token", userData.token ?? userData);
@@ -152,6 +208,7 @@ const LoginPage = () => {
   };
 
   const onSubmit = async (data: LoginSchemaType) => {
+    requireTerms();
     setServerError(null);
     try {
       const response = await login({
@@ -196,14 +253,15 @@ const LoginPage = () => {
 
   const isAnyLoading = isLoading || socialLoading;
 
-  // const handleGoogle = () => {
-  //   if (!termsAccepted) {
-  //     setTermsError(true);
-  //     return;
-  //   }
-  //   setTermsError(false);
-  //   googleLogin();
-  // };
+  const handleGoogle = () => {
+
+    if (!termsAccepted) {
+      setTermsError(true);
+      return;
+    }
+    setTermsError(false);
+    googleLogin();
+  };
 
   return (
     <Box
@@ -223,8 +281,8 @@ const LoginPage = () => {
       {/* Animated Floating Card */}
       <Box
         component={motion.div}
-        // animate={{ y: [0, -8, 0] }}
-        // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      // animate={{ y: [0, -8, 0] }}
+      // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
         <AuthCard
           sx={{
@@ -352,7 +410,10 @@ const LoginPage = () => {
             >
               <ActionIconButton
                 title="Google"
-                onClick={() => googleLogin()}
+                onClick={() => {
+                  if (!requireTerms()) return;
+                  handleGoogle();
+                }}
                 disabled={isAnyLoading}
                 icon={GoogleIcon}
                 sx={{
@@ -365,9 +426,9 @@ const LoginPage = () => {
                   "&:hover": { bgcolor: "#f8fafc", borderColor: "#cbd5e1" },
                 }}
               />
-              <ActionIconButton
+              {/* <ActionIconButton
                 title="Facebook"
-                onClick={() => {}}
+                onClick={() => requireTerms() && handleFacebook()}
                 disabled={isAnyLoading}
                 icon={Facebook}
                 sx={{
@@ -379,7 +440,8 @@ const LoginPage = () => {
                   boxShadow: "0 4px 12px rgba(24, 119, 242, 0.3)",
                   "&:hover": { bgcolor: "#166FE5" },
                 }}
-              />
+              /> */}
+
             </Stack>
 
             {/* Footer Link */}
@@ -404,12 +466,13 @@ const LoginPage = () => {
               >
                 Sign Up
               </Box>
-              <TermsCheckbox
-                checked={termsAccepted}
-                onChange={setTermsAccepted}
-                error={termsError}
-              />
+
             </Typography>
+            <TermsCheckbox
+              checked={termsAccepted}
+              onChange={(v) => { setTermsAccepted(v); if (v) setTermsError(false); }}
+              error={termsError}
+            />
           </Stack>
         </AuthCard>
       </Box>

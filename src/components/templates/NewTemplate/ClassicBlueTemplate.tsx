@@ -46,7 +46,6 @@ const ClassicBlueTemplate = forwardRef<HTMLDivElement, { data?: any }>(
         .join(", ") ||
       data.contact?.address ||
       "";
-    console.log('data =========================>', data)
     return (
       <ResumePage ref={ref}>
         <Box

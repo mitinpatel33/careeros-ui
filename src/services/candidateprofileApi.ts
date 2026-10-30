@@ -14,6 +14,13 @@ export interface ImportJobStatus {
   error?: string;
 }
 
+export interface PublishStatus {
+  profileSlug: string | null;
+  publishedUrl: string | null;
+  isPublished: boolean;
+  publishedAt: string | null;
+}
+
 export const profileApi = api.injectEndpoints({
   endpoints: (builder) => ({
     getProfile: builder.query<any, string>({
@@ -127,12 +134,13 @@ export const profileApi = api.injectEndpoints({
       },
       void
     >({
-      query: () => "/published-url",
+      query: () => "/candidate/profile/published-url",
       providesTags: ["Candidate"],
     }),
+
     unpublishProfile: builder.mutation<{ success: boolean }, void>({
       query: () => ({
-        url: "/unpublish",
+        url: "/candidate/profile/unpublish",
         method: "POST",
       }),
       invalidatesTags: ["Candidate"],
@@ -177,4 +185,6 @@ export const {
   useLazyGetProfileSectionsQuery,
   useImportResumeMutation,
   useBulkSaveProfileMutation,
+  useGetPublishedUrlQuery,
+  useUnpublishProfileMutation,
 } = profileApi;

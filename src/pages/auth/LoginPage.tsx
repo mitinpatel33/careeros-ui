@@ -208,7 +208,8 @@ const LoginPage = () => {
   };
 
   const onSubmit = async (data: LoginSchemaType) => {
-    requireTerms();
+    if (!requireTerms()) return;
+
     setServerError(null);
     try {
       const response = await login({
@@ -254,7 +255,6 @@ const LoginPage = () => {
   const isAnyLoading = isLoading || socialLoading;
 
   const handleGoogle = () => {
-
     if (!termsAccepted) {
       setTermsError(true);
       return;
@@ -281,8 +281,8 @@ const LoginPage = () => {
       {/* Animated Floating Card */}
       <Box
         component={motion.div}
-      // animate={{ y: [0, -8, 0] }}
-      // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        // animate={{ y: [0, -8, 0] }}
+        // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
         <AuthCard
           sx={{
@@ -441,7 +441,6 @@ const LoginPage = () => {
                   "&:hover": { bgcolor: "#166FE5" },
                 }}
               /> */}
-
             </Stack>
 
             {/* Footer Link */}
@@ -466,11 +465,13 @@ const LoginPage = () => {
               >
                 Sign Up
               </Box>
-
             </Typography>
             <TermsCheckbox
               checked={termsAccepted}
-              onChange={(v) => { setTermsAccepted(v); if (v) setTermsError(false); }}
+              onChange={(v) => {
+                setTermsAccepted(v);
+                if (v) setTermsError(false);
+              }}
               error={termsError}
             />
           </Stack>

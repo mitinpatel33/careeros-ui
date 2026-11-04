@@ -23,6 +23,21 @@ import NavyClassicTemplate from "./NavyClassicTemplate";
 import GoldBlockTemplate from "./GoldBlockTemplate";
 import MaroonLabelsTemplate from "./MaroonLabelsTemplate";
 import CocoaMinimalTemplate from "./CocoaMinimalTemplate";
+import IndigoRibbonTemplate from "../IndigoTemplates/IndigoRibbonTemplate";
+import CyanTabsTemplate from "../IndigoTemplates/CyanTabsTemplate";
+import SlateSplitTemplate from "../IndigoTemplates/SlateSplitTemplate";
+import OliveJournalTemplate from "../IndigoTemplates/OliveJournalTemplate";
+import CoralWaveTemplate from "../IndigoTemplates/CoralWaveTemplate";
+import MagentaDuoTemplate from "../IndigoTemplates/MagentaDuoTemplate";
+import SkyTripleTemplate from "../IndigoTemplates/SkyTripleTemplate";
+import CharcoalTerminalTemplate from "../IndigoTemplates/CharcoalTerminalTemplate";
+import AmberStatsTemplate from "../IndigoTemplates/AmberStatsTemplate";
+import MintLedgerTemplate from "../IndigoTemplates/MintLedgerTemplate";
+import PlumOverlapTemplate from "../IndigoTemplates/PlumOverlapTemplate";
+import SteelCompactTemplate from "../IndigoTemplates/SteelCompactTemplate";
+import RubyMonogramTemplate from "../IndigoTemplates/RubyMonogramTemplate";
+import AzureStepperTemplate from "../IndigoTemplates/AzureStepperTemplate";
+import ForestFrameTemplate from "../IndigoTemplates/ForestFrameTemplate";
 
 export type TemplateCategory =
   | "classic"
@@ -257,6 +272,145 @@ export const TEMPLATE_REGISTRY: TemplateRegistryEntry[] = [
     hidden: true,
     tagline: "A high-contrast coral header for standout personal branding.",
     Component: CoralHeaderTemplate,
+  },
+
+  // ── Indigo templates ──
+  {
+    id: "indigo-ribbon",
+    name: "Indigo Ribbon",
+    category: "modern",
+    accent: "#4f46e5",
+    theme: "Purple",
+    tagline:
+      "Gradient ribbon edge, tinted contact strip and a dashed side column.",
+    Component: IndigoRibbonTemplate,
+  },
+  {
+    id: "cyan-tabs",
+    name: "Cyan Tabs",
+    category: "modern",
+    accent: "#0891b2",
+    theme: "Teal",
+    tagline:
+      "Flag-shaped section tabs with a tri-colour stripe and 3-up footer.",
+    Component: CyanTabsTemplate,
+  },
+  {
+    id: "slate-split",
+    name: "Slate Split",
+    category: "classic",
+    accent: "#334155",
+    theme: "Black",
+    tagline: "Two-tone split header, quote summary and numbered sections.",
+    Component: SlateSplitTemplate,
+  },
+  {
+    id: "coral-wave",
+    name: "Coral Wave",
+    category: "photo",
+    accent: "#f2634f",
+    theme: "Orange",
+    tagline: "Wavy coral header with the avatar resting on the wave.",
+    Component: CoralWaveTemplate,
+  },
+  {
+    id: "olive-journal",
+    name: "Olive Journal",
+    category: "classic",
+    accent: "#4d6b2f",
+    theme: "Green",
+    tagline: "Editorial serif layout with a dates gutter beside each entry.",
+    Component: OliveJournalTemplate,
+  },
+  {
+    id: "magenta-duo",
+    name: "Magenta Duo",
+    category: "creative",
+    accent: "#d61f7c",
+    theme: "Pink",
+    tagline: "Right-hand gradient sidebar with skill bars and contacts.",
+    Component: MagentaDuoTemplate,
+  },
+  {
+    id: "sky-triple",
+    name: "Sky Triple",
+    category: "modern",
+    accent: "#0284c7",
+    theme: "Blue",
+    tagline: "Airy sky header, full-width timeline and a three-column footer.",
+    Component: SkyTripleTemplate,
+  },
+  {
+    id: "charcoal-terminal",
+    name: "Charcoal Terminal",
+    category: "creative",
+    accent: "#111827",
+    theme: "Black",
+    tagline: "Developer style with a terminal bar and code-comment headings.",
+    Component: CharcoalTerminalTemplate,
+  },
+  {
+    id: "amber-stats",
+    name: "Amber Stats",
+    category: "modern",
+    accent: "#d97706",
+    theme: "Gold",
+    tagline: "Auto-counted highlight strip with an offset-shadow avatar.",
+    Component: AmberStatsTemplate,
+  },
+  {
+    id: "mint-ledger",
+    name: "Mint Ledger",
+    category: "creative",
+    accent: "#059669",
+    theme: "Green",
+    tagline: "Soft mint page with every entry in an accent-edged card.",
+    Component: MintLedgerTemplate,
+  },
+  {
+    id: "plum-overlap",
+    name: "Plum Overlap",
+    category: "creative",
+    accent: "#86198f",
+    theme: "Purple",
+    tagline: "Slanted gradient header with a floating summary card.",
+    Component: PlumOverlapTemplate,
+  },
+  {
+    id: "steel-compact",
+    name: "Steel Compact",
+    category: "minimal",
+    accent: "#475569",
+    theme: "Navy",
+    tagline: "Dense, ATS-friendly one-pager with no icons.",
+    Component: SteelCompactTemplate,
+  },
+  {
+    id: "ruby-monogram",
+    name: "Ruby Monogram",
+    category: "classic",
+    accent: "#be123c",
+    theme: "Red",
+    tagline: "Giant watermark initials, centred masthead and flanked headings.",
+    Component: RubyMonogramTemplate,
+  },
+  {
+    id: "azure-stepper",
+    name: "Azure Stepper",
+    category: "modern",
+    accent: "#0369a1",
+    theme: "Blue",
+    tagline: "Sections hang off a vertical rail of icon circles.",
+    Component: AzureStepperTemplate,
+  },
+  {
+    id: "forest-frame",
+    name: "Forest Frame",
+    category: "minimal",
+    accent: "#166534",
+    theme: "Green",
+    tagline: "Certificate-style double border with an arrow-bullet skill grid.",
+    Component: ForestFrameTemplate,
   },
 ];
 

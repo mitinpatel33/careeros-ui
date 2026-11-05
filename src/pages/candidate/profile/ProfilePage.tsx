@@ -31,6 +31,8 @@ import { useProfileSaver } from "../../../hooks/useProfileSaver";
 import type { ResumeData } from "../../../types/candidate/resume.types";
 import ResumeUploadModal from "../resumeUpload/ResumeUploadModal";
 import { ChoicePage } from "../ChoicePage";
+import { useSubscription } from "../../../hooks/useSubscription";
+import type { PlanId } from "../../../types/plans";
 
 const themeStyles = {
   titleColor: "#1d4ed8",
@@ -90,6 +92,7 @@ const PublishSettings = lazy(() => import("./tabs/PublishSettings"));
 const ResumeEditorPage = lazy(
   () => import("../../../components/templates/NewTemplate/ResumeEditorPage"),
 );
+const PricingStep = lazy(() => import("../../../pages/payment/PricingStep"));
 
 const steps = [
   { key: "personal", title: "Personal", type: "form" },
@@ -254,6 +257,9 @@ const ProfilePage = () => {
     },
   });
 
+  const { plan } = useSubscription();
+  const [pricingFor, setPricingFor] = useState<PlanId | null>(null);
+
   const goNext = useCallback(() => {
     const next = steps[activeIndex + 1];
     if (next) setActiveStep(next.key as ProfileStepKey);
@@ -286,8 +292,8 @@ const ProfilePage = () => {
   const isStepError = isFormError || isListError;
   const errorMessage = isStepError
     ? (formError as any)?.data?.message ||
-    (listError as any)?.data?.message ||
-    "Failed to load data"
+      (listError as any)?.data?.message ||
+      "Failed to load data"
     : null;
 
   if (isStepError && !isStepLoading && !isHubView) {
@@ -325,6 +331,21 @@ const ProfilePage = () => {
   }
 
   const renderActiveStep = () => {
+    if (pricingFor) {
+      return (
+        <PricingStep
+          user={{
+            name: candidate.fullName || "",
+            email: candidate.email || "",
+            phone: candidate.mobile || candidate.phone || "",
+          }}
+          highlight={pricingFor}
+          onBack={() => setPricingFor(null)}
+          onDone={() => setPricingFor(null)}
+        />
+      );
+    }
+
     if (isGalleryStep) {
       if (isPreviewMode) {
         if (isSectionsLoading || isSectionsFetching) return <TabLoader />;
@@ -371,6 +392,8 @@ const ProfilePage = () => {
       }
       return (
         <TemplateSelectionStep
+          userPlan={plan}
+          onUpgrade={(tier) => setPricingFor(tier)}
           isFirst={activeIndex === 0}
           isLast={activeIndex === steps.length - 1}
           onBack={goBack}
@@ -530,6 +553,7 @@ const ProfilePage = () => {
                     ""
                   }
                   onStepChange={(step) => {
+                    setPricingFor(null);
                     setIsPreviewMode(false);
                     setActiveStep(step);
                   }}
@@ -541,7 +565,14 @@ const ProfilePage = () => {
             <Grid size={{ xs: 12, md: 8, lg: 8.5 }} sx={{ minWidth: 0 }}>
               <AnimatePresence mode="wait">
                 <motion.div
-                  key={activeStep + (isPreviewMode ? "-preview" : "-step")}
+                  key={
+                    activeStep +
+                    (pricingFor
+                      ? "-pricing"
+                      : isPreviewMode
+                        ? "-preview"
+                        : "-step")
+                  }
                   variants={stepTransitionVariants}
                   initial="initial"
                   animate="animate"

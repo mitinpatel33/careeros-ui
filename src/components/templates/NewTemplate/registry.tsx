@@ -423,9 +423,11 @@ export const getTemplateById = (
 export const VISIBLE_TEMPLATES = TEMPLATE_REGISTRY.filter((t) => !t.hidden);
 
 /** Theme chips in display order, with the colour dot. */
-export const TEMPLATE_THEMES: { theme: TemplateTheme; accent: string }[] =
-  VISIBLE_TEMPLATES.flatMap((t) =>
-    t.theme ? [{ theme: t.theme, accent: t.accent }] : [],
-  );
+export const TEMPLATE_THEMES: { theme: TemplateTheme; accent: string }[] = Array.from(
+  VISIBLE_TEMPLATES.reduce((map, t) => {
+    if (t.theme && !map.has(t.theme)) map.set(t.theme, t.accent);
+    return map;
+  }, new Map<TemplateTheme, string>()),
+).map(([theme, accent]) => ({ theme, accent }));
 
 export const DEFAULT_TEMPLATE_ID = VISIBLE_TEMPLATES[0].id;

@@ -32,6 +32,8 @@ import RoleRoute from "./RoleRoute";
 import PrivacyPolicy from "../pages/privacy-policy/PrivacyPolicy";
 import TermsConditions from "../pages/terms-and-conditions/TermsConditions";
 import CompanyComingSoon from "../pages/company/comingsoon/CompanyComingSoon";
+import ProfessionGuard from "../pages/Profession/ProfessionGuard";
+import ProfessionSelectPage from "../pages/Profession/ProfessionSelectPage";
 
 const MainRoutes = () => {
   return useRoutes([
@@ -69,9 +71,15 @@ const MainRoutes = () => {
               element: <MainLayout portal="candidate" />,
               children: [
                 { index: true, element: <Navigate to="profile" replace /> },
-                { path: "dashboard", element: <DashboardPage /> },
-                { path: "profile", element: <ProfilePage /> },
-                { path: "profile/view", element: <CandidateProfileView /> },
+                { path: "profession", element: <ProfessionSelectPage /> },   // ← must exist here
+                {
+                  element: <ProfessionGuard />,
+                  children: [
+                    { path: "dashboard", element: <DashboardPage /> },
+                    { path: "profile", element: <ProfilePage /> },
+                    { path: "profile/view", element: <CandidateProfileView /> },
+                  ],
+                },
               ],
             },
           ],

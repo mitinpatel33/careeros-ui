@@ -7,8 +7,6 @@ import AppHeader from "../components/layout/AppHeader";
 import type { PortalType } from "../components/layout/sidebarMenus";
 import ConnectedConstellationBg from "./ConnectedConstellationBg";
 
-// const drawerWidth = 270;
-
 type Props = {
   portal: PortalType;
 };
@@ -18,27 +16,19 @@ const MainLayout = ({ portal }: Props) => {
 
   const isCandidate = portal === "candidate";
 
-  // Dynamic Background and Scrollbar palette matching AppSidebar and AppHeader
   const layoutStyles = {
-    // Soft Blue-tinted canvas for Candidate vs Soft Purple-tinted canvas for Company/Admin
     bgGradient: isCandidate
       ? "linear-gradient(135deg, #eff6ff 0%, #e0f2fe 40%, #eef2ff 100%)"
       : "linear-gradient(135deg, #f5f3ff 0%, #fae8ff 40%, #f3eefd 100%)",
-
-    scrollbarThumb: isCandidate
-      ? "rgba(59, 130, 246, 0.3)"
-      : "rgba(168, 85, 247, 0.3)",
-
-    scrollbarThumbHover: isCandidate
-      ? "rgba(37, 99, 235, 0.5)"
-      : "rgba(147, 51, 234, 0.5)",
+    scrollbarThumb: isCandidate ? "rgba(59, 130, 246, 0.3)" : "rgba(168, 85, 247, 0.3)",
+    scrollbarThumbHover: isCandidate ? "rgba(37, 99, 235, 0.5)" : "rgba(147, 51, 234, 0.5)",
   };
 
   return (
     <Box
       sx={{
-        width: "100vw",
-        height: "100vh",
+        width: "100%",
+        height: "100dvh", // dvh: correct height on mobile browsers with collapsing address bar
         overflow: "hidden",
         display: "flex",
         position: "relative",
@@ -46,21 +36,15 @@ const MainLayout = ({ portal }: Props) => {
         transition: "background 0.3s ease",
       }}
     >
-      {/* Dynamic Animated Constellation Canvas */}
       <ConnectedConstellationBg />
 
-      {/* Glass Navigation Sidebar */}
-      <AppSidebar
-        portal={portal}
-        mobileOpen={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-      />
+      <AppSidebar portal={portal} mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} />
 
-      {/* Main Content Area Container */}
       <Box
         sx={{
           flex: 1,
-          height: "100vh",
+          minWidth: 0, // lets content shrink instead of overflowing on small screens
+          height: "100dvh",
           display: "flex",
           flexDirection: "column",
           overflow: "hidden",
@@ -70,7 +54,6 @@ const MainLayout = ({ portal }: Props) => {
       >
         <AppHeader portal={portal} onMenuClick={() => setMobileOpen(true)} />
 
-        {/* Scrollable Main Viewport */}
         <Box
           component="main"
           sx={{
@@ -78,30 +61,20 @@ const MainLayout = ({ portal }: Props) => {
             minHeight: 0,
             overflowY: "auto",
             overflowX: "hidden",
-            p: { xs: 2, md: 3 },
-            // Styled dynamic scrollbars matching sidebar scrollbar aesthetics
-            "&::-webkit-scrollbar": {
-              width: 6,
-            },
+            // tighter spacing under the header
+            px: { xs: 1.25, sm: 2, md: 2.5 },
+            pt: { xs: 0.5, sm: 1, md: 1 },
+            pb: { xs: 1.5, sm: 2, md: 2.5 },
+            "&::-webkit-scrollbar": { width: 6 },
             "&::-webkit-scrollbar-thumb": {
               bgcolor: layoutStyles.scrollbarThumb,
               borderRadius: 10,
-              "&:hover": {
-                bgcolor: layoutStyles.scrollbarThumbHover,
-              },
+              "&:hover": { bgcolor: layoutStyles.scrollbarThumbHover },
             },
-            "&::-webkit-scrollbar-track": {
-              bgcolor: "transparent",
-            },
+            "&::-webkit-scrollbar-track": { bgcolor: "transparent" },
           }}
         >
-          <Box
-            sx={{
-              width: "100%",
-              maxWidth: "1440px",
-              mx: "auto",
-            }}
-          >
+          <Box sx={{ width: "100%", maxWidth: "1440px", mx: "auto" }}>
             <Outlet />
           </Box>
         </Box>

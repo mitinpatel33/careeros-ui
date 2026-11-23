@@ -11,6 +11,7 @@ export const ROUTES = {
     ROOT: "/candidate",
     DASHBOARD: "/candidate/dashboard",
     PROFILE: "/candidate/profile",
+    PROFESSION: "/candidate/profession",
     RESUME_BUILDER: "/candidate/resume-builder",
     RESUME_UPLOAD: "/candidate/resume-upload",
     RESUME_THEMES: "/candidate/resume-themes",

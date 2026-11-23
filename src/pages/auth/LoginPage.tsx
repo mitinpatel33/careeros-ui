@@ -33,6 +33,7 @@ import { useLoginMutation } from "../../services/authApi";
 import { useAppDispatch } from "../../hooks/useLogin";
 import { appToast } from "../../common/toast/appToast";
 import { TermsCheckbox } from "../../components/common/TermsCheckbox";
+import { syncProfessionFromUser } from "../Profession/UseProfession";
 
 const glowButtonSx = {
   height: { xs: 46, sm: 50 },
@@ -200,7 +201,11 @@ const LoginPage = () => {
     localStorage.setItem("user", JSON.stringify(userData));
     dispatch(loginSuccess(userData));
 
-    if (userData.role === "Candidate") navigate("/candidate/profile");
+    if (userData.role === "Candidate") {
+      // Returning candidate with a profession -> profile; otherwise choose one first
+      const hasProfession = syncProfessionFromUser(userData);
+      navigate(hasProfession ? "/candidate/profile" : "/candidate/profession");
+    }
     else if (userData.role === "Company") navigate("/company");
     else navigate("/admin");
 
@@ -281,8 +286,8 @@ const LoginPage = () => {
       {/* Animated Floating Card */}
       <Box
         component={motion.div}
-        // animate={{ y: [0, -8, 0] }}
-        // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+      // animate={{ y: [0, -8, 0] }}
+      // transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       >
         <AuthCard
           sx={{

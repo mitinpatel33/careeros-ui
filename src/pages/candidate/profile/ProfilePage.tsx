@@ -3,7 +3,6 @@ import {
   Grid,
   Stack,
   Typography,
-  CircularProgress,
   Button,
   Paper,
   alpha,
@@ -21,6 +20,7 @@ import { useLocation } from "react-router-dom";
 
 import ProfileStepCards, { type ProfileStepKey } from "./ProfileStepCards";
 import AppSnackbar from "../../../components/common/AppSnackbar";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import {
   useGetCompletionQuery,
   useGetProfileCollectionQuery,
@@ -33,6 +33,7 @@ import ResumeUploadModal from "../resumeUpload/ResumeUploadModal";
 import { ChoicePage } from "../ChoicePage";
 import { useSubscription } from "../../../hooks/useSubscription";
 import type { PlanId } from "../../../types/plans";
+import Loader from "../../../components/common/Loader";
 
 const themeStyles = {
   titleColor: "#1d4ed8",
@@ -40,9 +41,12 @@ const themeStyles = {
   iconColor: "#2563eb",
   activeGradient: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
   activeShadow: "0 8px 20px rgba(37, 99, 235, 0.35)",
-  glassBg: "rgba(255, 255, 255, 0.65)",
-  glassBorder: "1px solid rgba(255, 255, 255, 0.8)",
-  glassFilter: "blur(16px)",
+  // medium-white mirror glass
+  glassBg: "linear-gradient(135deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.38) 100%)",
+  glassBorder: "1px solid rgba(255, 255, 255, 0.75)",
+  glassFilter: "blur(18px) saturate(160%)",
+  glassShadow:
+    "0 8px 24px -6px rgba(37, 99, 235, 0.12), inset 0 1px 0 rgba(255,255,255,0.85)",
 };
 
 const containerVariants: Variants = {
@@ -145,17 +149,10 @@ const LIST_STEP_COMPONENTS: Record<ListStepKey, ComponentType<any>> = {
 };
 
 const TabLoader = () => (
-  <Box
-    sx={{
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      minHeight: 300,
-      py: 6,
-    }}
-  >
-    <CircularProgress sx={{ color: themeStyles.iconColor }} size={36} />
-  </Box>
+  <Loader
+    messages={["Loading your profile…", "Reviewing your details…", "Almost there…"]}
+    minHeight={{ xs: 240, sm: 320 }}
+  />
 );
 
 const mapSectionsToResumeData = (sections: any): ResumeData | undefined => {
@@ -227,6 +224,26 @@ const ProfilePage = () => {
 
   const { data: personalData } = useGetProfileQuery("personal");
 
+  const isSummaryStep = activeStep === "summary" && !isHubView;
+  const { data: skillsData } = useGetProfileCollectionQuery("skills", {
+    skip: !isSummaryStep,
+  });
+  const { data: experiencesData } = useGetProfileCollectionQuery(
+    "experiences",
+    {
+      skip: !isSummaryStep,
+    },
+  );
+
+  const aiContext = useMemo(() => {
+    const unwrap = (d: any) => (Array.isArray(d) ? d : d?.data || []);
+    return {
+      jobTitle: personalData?.data?.jobTitle?.trim() || "",
+      skills: unwrap(skillsData),
+      experience: unwrap(experiencesData),
+    };
+  }, [personalData, skillsData, experiencesData]);
+
   const [
     fetchSections,
     {
@@ -292,8 +309,8 @@ const ProfilePage = () => {
   const isStepError = isFormError || isListError;
   const errorMessage = isStepError
     ? (formError as any)?.data?.message ||
-      (listError as any)?.data?.message ||
-      "Failed to load data"
+    (listError as any)?.data?.message ||
+    "Failed to load data"
     : null;
 
   if (isStepError && !isStepLoading && !isHubView) {
@@ -415,6 +432,7 @@ const ProfilePage = () => {
           onBack={goBack}
           defaultValues={formData?.data}
           onSubmit={(values: unknown) => saveStep(activeStep, values)}
+          {...(activeStep === "summary" ? { aiContext } : {})}
         />
       );
     }
@@ -444,86 +462,75 @@ const ProfilePage = () => {
       >
         {/* Page Top Header */}
         {!isHubView && (
-          <motion.div
-            variants={itemVariants}
-            style={{
-              position: "sticky",
-              top: 16,
-              zIndex: 10,
-              marginBottom: 24,
-            }}
-          >
+          <motion.div variants={itemVariants}>
             <Paper
               elevation={0}
               sx={{
-                p: { xs: 2.5, sm: 3 },
-                mb: { xs: 2.5, md: 3.5 },
-                borderRadius: "24px",
-                bgcolor: themeStyles.glassBg,
+                px: { xs: 1.5, sm: 2, md: 2.5 },
+                py: { xs: 1, sm: 1.25, md: 1.5 },
+                mb: { xs: 1, sm: 1.25, md: 1.5 },
+                borderRadius: { xs: "14px", md: "18px" },
+                background: themeStyles.glassBg,
                 backdropFilter: themeStyles.glassFilter,
                 WebkitBackdropFilter: themeStyles.glassFilter,
                 border: themeStyles.glassBorder,
-                boxShadow: "0 10px 30px -5px rgba(37, 99, 235, 0.08)",
+                boxShadow: themeStyles.glassShadow,
               }}
             >
-              <Stack
-                direction={{ xs: "column", sm: "row" }}
-                sx={{
-                  justifyContent: "space-between",
-                  alignItems: { xs: "flex-start", sm: "center" },
-                }}
-                spacing={2}
-              >
-                <Stack spacing={0.5}>
+              <Stack direction="row" sx={{ justifyContent: "space-between", alignItems: "center", gap: 1 }}>
+                <Stack spacing={0} sx={{ minWidth: 0 }}>
                   <Typography
+                    component="h1"
+                    noWrap
                     sx={{
-                      fontSize: { xs: 24, sm: 28, md: 32 },
+                      fontSize: { xs: 20, sm: 21, md: 24 },
+                      lineHeight: 1.2,
                       fontWeight: 800,
                       color: themeStyles.titleColor,
                       fontFamily: "'Plus Jakarta Sans', sans-serif",
                     }}
                   >
-                    Profile Setup 🚀
+                    Profile Setup
                   </Typography>
                   <Typography
                     sx={{
                       color: themeStyles.subtitleColor,
                       fontFamily: "'Plus Jakarta Sans', sans-serif",
                       fontWeight: 600,
-                      fontSize: { xs: 13, sm: 14 },
+                      fontSize: { xs: 11, sm: 13 },
+                      lineHeight: 1.35,
+                      display: { xs: "none", sm: "block" }, // hidden on phones to save height
                     }}
                   >
-                    Save profile sections or manage your resume and profile
-                    configuration.
+                    Save profile sections or manage your resume and profile configuration.
                   </Typography>
                 </Stack>
 
-                <Stack
-                  direction="row"
-                  spacing={1.5}
-                  sx={{ alignItems: "center", flexWrap: "wrap" }}
+                <Button
+                  variant="outlined"
+                  size="small"
+                  onClick={() => setIsHubView(true)}
+                  startIcon={<ArrowBackRoundedIcon />}
+                  sx={{
+                    flexShrink: 0,
+                    whiteSpace: "nowrap",
+                    borderRadius: "12px",
+                    textTransform: "none",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 700,
+                    px: { xs: 1.25, sm: 2 },
+                    py: { xs: 0.4, sm: 0.6 },
+                    fontSize: { xs: 12.5, sm: 13.5 },
+                    color: themeStyles.titleColor,
+                    borderColor: "rgba(59, 130, 246, 0.4)",
+                    "&:hover": {
+                      background: alpha(themeStyles.titleColor, 0.08),
+                      borderColor: themeStyles.titleColor,
+                    },
+                  }}
                 >
-                  <Button
-                    variant="outlined"
-                    onClick={() => setIsHubView(true)}
-                    sx={{
-                      borderRadius: "14px",
-                      textTransform: "none",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontWeight: 700,
-                      px: 2.5,
-                      py: 1,
-                      color: themeStyles.titleColor,
-                      borderColor: "rgba(59, 130, 246, 0.4)",
-                      "&:hover": {
-                        background: alpha(themeStyles.titleColor, 0.08),
-                        borderColor: themeStyles.titleColor,
-                      },
-                    }}
-                  >
-                    ← Choice Hub
-                  </Button>
-                </Stack>
+                  Hub
+                </Button>
               </Stack>
             </Paper>
           </motion.div>
@@ -539,8 +546,10 @@ const ProfilePage = () => {
             onImportResume={() => setIsUploadModalOpen(true)}
           />
         ) : (
-          <Grid container spacing={{ xs: 2, md: 3 }}>
-            <Grid size={{ xs: 12, md: 4, lg: 3.5 }}>
+          // Sidebar is a vertical rail only from lg up; below that it becomes a compact
+          // header + swipeable step strip on top of the form (phones & tablets).
+          <Grid container spacing={{ xs: 1.5, sm: 2, lg: 3 }}>
+            <Grid size={{ xs: 12, lg: 3.5 }} sx={{ minWidth: 0 }}>
               <motion.div variants={itemVariants}>
                 <ProfileStepCards
                   activeStep={activeStep}
@@ -562,7 +571,7 @@ const ProfilePage = () => {
               </motion.div>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 8, lg: 8.5 }} sx={{ minWidth: 0 }}>
+            <Grid size={{ xs: 12, lg: 8.5 }} sx={{ minWidth: 0 }}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={
@@ -581,9 +590,9 @@ const ProfilePage = () => {
                 >
                   <Suspense fallback={<TabLoader />}>
                     {isStepLoading &&
-                    !formData &&
-                    !listData &&
-                    !isGalleryStep ? (
+                      !formData &&
+                      !listData &&
+                      !isGalleryStep ? (
                       <TabLoader />
                     ) : (
                       renderActiveStep()

@@ -63,9 +63,9 @@ const SummaryDetails = memo(
     const generatePayload = () => {
       const { jobTitle, skills, experience } = aiContext || {};
       return {
-        jobTitle: jobTitle || "Software Developer",
-        skills: skills || [],
-        experience: experience || [],
+        jobTitle: (jobTitle as string) || "",
+        skills: (skills as unknown[]) || [],
+        experience: (experience as unknown[]) || [],
       };
     };
 

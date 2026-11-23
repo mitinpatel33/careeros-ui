@@ -15,13 +15,19 @@ import {
 } from "@mui/icons-material";
 import { motion } from "framer-motion";
 
+const FONT = "'Plus Jakarta Sans', sans-serif";
+
 const themeStyles = {
   titleColor: "#1d4ed8",
   activeGradient: "linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)",
   activeShadow: "0 8px 20px rgba(37, 99, 235, 0.35)",
-  glassBg: "rgba(255, 255, 255, 0.75)",
-  glassFilter: "blur(16px)",
-  glassBorder: "1px solid rgba(255, 255, 255, 0.9)",
+  // medium-white mirror glass (same as the profile page)
+  glassBg:
+    "linear-gradient(135deg, rgba(255,255,255,0.62) 0%, rgba(255,255,255,0.38) 100%)",
+  glassFilter: "blur(18px) saturate(160%)",
+  glassBorder: "1px solid rgba(255, 255, 255, 0.75)",
+  glassShadow:
+    "0 12px 32px -8px rgba(37, 99, 235, 0.14), inset 0 1px 0 rgba(255,255,255,0.85)",
 };
 
 interface ChoicePageProps {
@@ -29,63 +35,116 @@ interface ChoicePageProps {
   onImportResume: () => void;
 }
 
-export const ChoicePage: React.FC<ChoicePageProps> = ({
+interface Option {
+  key: string;
+  title: string;
+  description: string;
+  cta: string;
+  onClick: () => void;
+  Icon: React.ElementType;
+  accent: string; // text / border accent
+  titleColor: string;
+  iconGradient: string;
+  iconShadow: string;
+  cardBg: string;
+  hoverBorder: string;
+  idleBorder: string;
+  idleShadow: string;
+  hoverShadow: string;
+  iconMotion: Record<string, number[]>;
+}
+
+const ChoicePage: React.FC<ChoicePageProps> = ({
   onCreateResume,
   onImportResume,
 }) => {
+  const options: Option[] = [
+    {
+      key: "create",
+      title: "Create Resume",
+      description:
+        "Build your professional resume manually step-by-step with structured guidance, custom templates, and real-time formatting controls.",
+      cta: "Get Started",
+      onClick: onCreateResume,
+      Icon: EditNoteRounded,
+      accent: "#2563eb",
+      titleColor: themeStyles.titleColor,
+      iconGradient: themeStyles.activeGradient,
+      iconShadow: themeStyles.activeShadow,
+      cardBg:
+        "linear-gradient(145deg, rgba(255,255,255,0.88) 0%, rgba(219,234,254,0.55) 100%)",
+      idleBorder: "1px solid rgba(59,130,246,0.28)",
+      hoverBorder: "rgba(59,130,246,0.6)",
+      idleShadow: "0 6px 18px rgba(37,99,235,0.07)",
+      hoverShadow: "0 16px 32px rgba(37,99,235,0.18)",
+      iconMotion: { y: [0, -3, 0], rotate: [0, -5, 5, 0] },
+    },
+    {
+      key: "import",
+      title: "Import Resume with AI",
+      description:
+        "Upload your existing resume (PDF or Word) and let our intelligent engine auto-fill all your profile sections instantly.",
+      cta: "Upload & Auto-fill",
+      onClick: onImportResume,
+      Icon: AutoAwesome,
+      accent: "#4338ca",
+      titleColor: "#3730a3",
+      iconGradient: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
+      iconShadow: "0 8px 20px rgba(99,102,241,0.35)",
+      cardBg:
+        "linear-gradient(145deg, rgba(255,255,255,0.88) 0%, rgba(224,231,255,0.6) 100%)",
+      idleBorder: "1px solid rgba(99,102,241,0.28)",
+      hoverBorder: "rgba(99,102,241,0.6)",
+      idleShadow: "0 6px 18px rgba(99,102,241,0.07)",
+      hoverShadow: "0 16px 32px rgba(99,102,241,0.2)",
+      iconMotion: { scale: [1, 1.12, 1], rotate: [0, 12, -12, 0] },
+    },
+  ];
+
   return (
     <Box
       sx={{
         width: "100%",
-        flex: 1,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        p: { xs: 2, sm: 3 },
         boxSizing: "border-box",
+        // no extra vertical centring / padding → sits right under the header
+        display: "block",
       }}
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 15 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        style={{ width: "100%"}}
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        style={{ width: "100%" }}
       >
         <Box
           sx={{
-            p: { xs: 3, sm: 4, md: 5 },
-            bgcolor: themeStyles.glassBg,
+            px: { xs: 2, sm: 3, md: 4 },
+            py: { xs: 2.5, sm: 3, md: 3.5 },
+            background: themeStyles.glassBg,
             backdropFilter: themeStyles.glassFilter,
             WebkitBackdropFilter: themeStyles.glassFilter,
-            borderRadius: "28px",
+            borderRadius: { xs: "20px", md: "26px" },
             border: themeStyles.glassBorder,
-            boxShadow: "0 20px 40px rgba(37, 99, 235, 0.08)",
+            boxShadow: themeStyles.glassShadow,
             textAlign: "center",
           }}
         >
-          {/* Animated Header Icon properly spaced inside container flow */}
+          {/* header icon */}
           <Box
             sx={{
               display: "flex",
               justifyContent: "center",
-              mb: 2,
+              mb: { xs: 1.25, md: 1.5 },
             }}
           >
             <motion.div
-              animate={{
-                rotate: [0, 8, -8, 8, 0],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
+              animate={{ rotate: [0, 8, -8, 8, 0], scale: [1, 1.08, 1] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
             >
               <Box
                 sx={{
-                  width: 52,
-                  height: 52,
+                  width: { xs: 44, md: 52 },
+                  height: { xs: 44, md: 52 },
                   borderRadius: "16px",
                   background:
                     "linear-gradient(135deg, #3b82f6 0%, #6366f1 100%)",
@@ -93,37 +152,38 @@ export const ChoicePage: React.FC<ChoicePageProps> = ({
                   alignItems: "center",
                   justifyContent: "center",
                   color: "#fff",
-                  boxShadow: "0 8px 20px rgba(59, 130, 246, 0.3)",
+                  boxShadow: "0 8px 20px rgba(59,130,246,0.3)",
                 }}
               >
-                <PsychologyAltRounded sx={{ fontSize: 28 }} />
+                <PsychologyAltRounded sx={{ fontSize: { xs: 24, md: 28 } }} />
               </Box>
             </motion.div>
           </Box>
 
           <Typography
-            variant="h3"
+            component="h2"
             sx={{
               fontWeight: 800,
               color: themeStyles.titleColor,
-              mb: 1,
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: { xs: "1.6rem", sm: "2.2rem" },
+              mb: 0.75,
+              fontFamily: FONT,
+              lineHeight: 1.2,
+              fontSize: { xs: "1.3rem", sm: "1.8rem", md: "2.1rem" },
+              textWrap: "balance",
             }}
           >
             How would you like to build your profile?
           </Typography>
 
           <Typography
-            variant="body1"
             sx={{
               color: "#475569",
-              mb: { xs: 3, md: 4 },
-              maxWidth: 580,
+              mb: { xs: 2.5, md: 3 },
+              maxWidth: 560,
               mx: "auto",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontSize: { xs: "0.9rem", sm: "1rem" },
-              lineHeight: 1.5,
+              fontFamily: FONT,
+              fontSize: { xs: "0.85rem", sm: "0.95rem" },
+              lineHeight: 1.55,
             }}
           >
             Choose an option below to get started instantly. Import an existing
@@ -131,238 +191,157 @@ export const ChoicePage: React.FC<ChoicePageProps> = ({
             step-by-step.
           </Typography>
 
-          <Grid container spacing={3} sx={{ justifyContent: "center" }}>
-            {/* Create Resume Choice Card */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <motion.div
-                whileHover={{ y: -6, scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 350, damping: 22 }}
+          {/* equal-height cards */}
+          <Grid
+            container
+            spacing={{ xs: 1.5, sm: 2, md: 2.5 }}
+            sx={{ alignItems: "stretch" }}
+          >
+            {options.map((o) => (
+              <Grid
+                key={o.key}
+                size={{ xs: 12, md: 6 }}
+                sx={{ display: "flex" }}
               >
-                <Card
-                  elevation={0}
-                  sx={{
-                    height: "100%",
-                    borderRadius: "20px",
-                    background:
-                      "linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(239, 246, 255, 0.9) 100%)",
-                    border: "2px solid rgba(59, 130, 246, 0.25)",
-                    boxShadow: "0 10px 25px rgba(37, 99, 235, 0.06)",
-                    textAlign: "left",
-                  }}
+                <motion.div
+                  whileHover={{ y: -4 }}
+                  whileTap={{ scale: 0.985 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 24 }}
+                  style={{ width: "100%", display: "flex" }}
                 >
-                  <CardActionArea
-                    onClick={onCreateResume}
-                    sx={{ p: { xs: 2.5, sm: 3.5 }, height: "100%" }}
+                  <Card
+                    elevation={0}
+                    sx={{
+                      flex: 1,
+                      display: "flex",
+                      borderRadius: "20px",
+                      background: o.cardBg,
+                      backdropFilter: "blur(10px)",
+                      WebkitBackdropFilter: "blur(10px)",
+                      border: o.idleBorder,
+                      boxShadow: o.idleShadow,
+                      textAlign: "left",
+                      transition: "border-color .2s, box-shadow .2s",
+                      "&:hover": {
+                        borderColor: o.hoverBorder,
+                        boxShadow: o.hoverShadow,
+                      },
+                      "&:hover .cta-arrow": { transform: "translateX(3px)" },
+                    }}
                   >
-                    <Stack spacing={2}>
-                      <Box
+                    <CardActionArea
+                      onClick={o.onClick}
+                      sx={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "stretch",
+                        justifyContent: "flex-start",
+                        // icon left + text on tablets/desktop keeps cards compact
+                        p: { xs: 2, sm: 2.5, md: 3 },
+                      }}
+                    >
+                      <Stack
+                        direction={{ xs: "row", sm: "column" }}
+                        spacing={{ xs: 1.5, sm: 1.75 }}
                         sx={{
-                          width: 52,
-                          height: 52,
-                          borderRadius: "16px",
-                          background: themeStyles.activeGradient,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          boxShadow: themeStyles.activeShadow,
+                          alignItems: { xs: "flex-start", sm: "stretch" },
+                          flex: 1,
                         }}
                       >
-                        <motion.div
-                          animate={{
-                            y: [0, -3, 0],
-                            rotate: [0, -5, 5, 0],
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                          style={{
+                        <Box
+                          sx={{
+                            flexShrink: 0,
+                            width: { xs: 44, md: 50 },
+                            height: { xs: 44, md: 50 },
+                            borderRadius: "15px",
+                            background: o.iconGradient,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
+                            color: "#fff",
+                            boxShadow: o.iconShadow,
                           }}
                         >
-                          <EditNoteRounded sx={{ fontSize: 28 }} />
-                        </motion.div>
-                      </Box>
+                          <motion.div
+                            animate={o.iconMotion}
+                            transition={{
+                              duration: 3,
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                            }}
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <o.Icon sx={{ fontSize: { xs: 24, md: 27 } }} />
+                          </motion.div>
+                        </Box>
 
-                      <Stack spacing={0.75}>
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 800,
-                            color: themeStyles.titleColor,
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            fontSize: { xs: "1.15rem", sm: "1.3rem" },
-                          }}
-                        >
-                          Create Resume
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "#64748b",
-                            lineHeight: 1.5,
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            fontSize: { xs: "0.85rem", sm: "0.92rem" },
-                          }}
-                        >
-                          Build your professional resume manually step-by-step
-                          with structured guidance, custom templates, and
-                          real-time formatting controls.
-                        </Typography>
+                        <Stack sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography
+                            component="h3"
+                            sx={{
+                              fontWeight: 800,
+                              color: o.titleColor,
+                              fontFamily: FONT,
+                              lineHeight: 1.25,
+                              fontSize: {
+                                xs: "1.05rem",
+                                sm: "1.2rem",
+                                md: "1.3rem",
+                              },
+                              mb: 0.5,
+                            }}
+                          >
+                            {o.title}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              color: "#64748b",
+                              lineHeight: 1.55,
+                              fontFamily: FONT,
+                              fontSize: { xs: "0.82rem", sm: "0.9rem" },
+                            }}
+                          >
+                            {o.description}
+                          </Typography>
+
+                          {/* CTA pinned to the bottom so both cards line up */}
+                          <Stack
+                            direction="row"
+                            spacing={0.75}
+                            sx={{
+                              alignItems: "center",
+                              color: o.accent,
+                              mt: "auto",
+                              pt: { xs: 1.5, sm: 2 },
+                              fontFamily: FONT,
+                              fontWeight: 700,
+                              fontSize: { xs: "0.85rem", sm: "0.9rem" },
+                            }}
+                          >
+                            <span>{o.cta}</span>
+                            <ArrowForwardRounded
+                              className="cta-arrow"
+                              sx={{ fontSize: 18, transition: "transform .2s" }}
+                            />
+                          </Stack>
+                        </Stack>
                       </Stack>
-
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{
-                          alignItems: "center",
-                          color: "#2563eb",
-                          pt: 0.5,
-                          fontWeight: 700,
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        <span>Get Started</span>
-                        <motion.div
-                          animate={{ x: [0, 5, 0] }}
-                          transition={{
-                            duration: 1.2,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                          style={{ display: "flex", alignItems: "center" }}
-                        >
-                          <ArrowForwardRounded fontSize="small" />
-                        </motion.div>
-                      </Stack>
-                    </Stack>
-                  </CardActionArea>
-                </Card>
-              </motion.div>
-            </Grid>
-
-            {/* Import Resume with AI Choice Card */}
-            <Grid size={{ xs: 12, md: 6 }}>
-              <motion.div
-                whileHover={{ y: -6, scale: 1.01 }}
-                whileTap={{ scale: 0.98 }}
-                transition={{ type: "spring", stiffness: 350, damping: 22 }}
-              >
-                <Card
-                  elevation={0}
-                  sx={{
-                    height: "100%",
-                    borderRadius: "20px",
-                    background:
-                      "linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(238, 242, 255, 0.9) 100%)",
-                    border: "2px solid rgba(99, 102, 241, 0.25)",
-                    boxShadow: "0 10px 25px rgba(99, 102, 241, 0.06)",
-                    textAlign: "left",
-                  }}
-                >
-                  <CardActionArea
-                    onClick={onImportResume}
-                    sx={{ p: { xs: 2.5, sm: 3.5 }, height: "100%" }}
-                  >
-                    <Stack spacing={2}>
-                      <Box
-                        sx={{
-                          width: 52,
-                          height: 52,
-                          borderRadius: "16px",
-                          background:
-                            "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          color: "#fff",
-                          boxShadow: "0 8px 20px rgba(99, 102, 241, 0.35)",
-                        }}
-                      >
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.15, 1],
-                            rotate: [0, 15, -15, 0],
-                          }}
-                          transition={{
-                            duration: 3,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <AutoAwesome sx={{ fontSize: 28 }} />
-                        </motion.div>
-                      </Box>
-
-                      <Stack spacing={0.75}>
-                        <Typography
-                          variant="h5"
-                          sx={{
-                            fontWeight: 1000,
-                            color: "#3730a3",
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            fontSize: { xs: "1.15rem", sm: "1.3rem" },
-                          }}
-                        >
-                          Import Resume with AI
-                        </Typography>
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "#64748b",
-                            lineHeight: 1.5,
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
-                            fontSize: { xs: "0.85rem", sm: "0.92rem" },
-                          }}
-                        >
-                          Upload your existing resume (PDF or Word) and let our
-                          intelligent engine auto-fill all your profile sections
-                          instantly.
-                        </Typography>
-                      </Stack>
-
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{
-                          alignItems: "center",
-                          color: "#4338ca",
-                          pt: 0.5,
-                          fontWeight: 700,
-                          fontSize: "0.9rem",
-                        }}
-                      >
-                        <span>Upload & Auto-fill</span>
-                        <motion.div
-                          animate={{ x: [0, 5, 0] }}
-                          transition={{
-                            duration: 1.2,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          }}
-                          style={{ display: "flex", alignItems: "center" }}
-                        >
-                          <ArrowForwardRounded fontSize="small" />
-                        </motion.div>
-                      </Stack>
-                    </Stack>
-                  </CardActionArea>
-                </Card>
-              </motion.div>
-            </Grid>
+                    </CardActionArea>
+                  </Card>
+                </motion.div>
+              </Grid>
+            ))}
           </Grid>
         </Box>
       </motion.div>
     </Box>
   );
 };
+
+export { ChoicePage };
+export default ChoicePage;

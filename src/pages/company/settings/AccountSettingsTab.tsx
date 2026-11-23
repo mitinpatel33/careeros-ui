@@ -35,7 +35,6 @@ const AccountSettingsTab = () => {
   });
 
   const onSubmit = (data: AccountSettingsType) => {
-    console.log("Account Settings:", data);
     setMessage("Account settings saved.");
   };
 

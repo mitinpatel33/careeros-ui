@@ -40,7 +40,6 @@ const NotificationSettingsTab = () => {
   });
 
   const onSubmit = (data: NotificationSettingsType) => {
-    console.log("Notification Settings:", data);
     setMessage("Notification settings saved.");
   };
 

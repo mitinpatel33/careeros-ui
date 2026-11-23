@@ -53,9 +53,7 @@ const candidates = [
 const CompanyDashboard = () => {
   const [openJobDialog, setOpenJobDialog] = useState(false);
 
-  const handleCreateJob = (job: JobItem) => {
-    console.log("Created Job:", job);
-  };
+  const handleCreateJob = (_job: JobItem) => {};
 
   return (
     <>

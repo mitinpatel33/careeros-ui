@@ -39,7 +39,6 @@ const SecuritySettingsTab = () => {
   });
 
   const onSubmit = (data: SecuritySettingsType) => {
-    console.log("Security Settings:", data);
     setMessage("Security settings saved.");
 
     resetField("currentPassword");

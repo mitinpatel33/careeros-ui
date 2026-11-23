@@ -46,15 +46,6 @@ const ResetPasswordPage =
     const onSubmit = (
       data: ResetPasswordSchemaType
     ) => {
-      console.log({
-        email:
-          location.state.email,
-        otp:
-          location.state.otp,
-        password:
-          data.password,
-      });
-
       navigate("/login");
     };
 

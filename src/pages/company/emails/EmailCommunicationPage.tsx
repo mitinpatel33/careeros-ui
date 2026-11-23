@@ -136,8 +136,6 @@ const EmailCommunicationPage = () => {
   };
 
   const handleSendEmail = (data: SendEmailFormType) => {
-    console.log("Send email payload:", data);
-
     setSentCount((prev) => prev + 1);
     setMessage(`Email sent to ${data.to}`);
   };

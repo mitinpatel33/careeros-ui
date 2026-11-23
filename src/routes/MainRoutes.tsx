@@ -103,20 +103,6 @@ const MainRoutes = () => {
           ],
         },
 
-        // Admin Portal (Optional)
-        {
-          element: <RoleRoute allowedRoles={["Admin"]} />,
-          children: [
-            {
-              path: "admin",
-              element: <MainLayout portal="admin" />,
-              children: [
-                { index: true, element: <Navigate to="dashboard" replace /> },
-                // { path: "dashboard", element: <AdminDashboardPage /> },
-              ],
-            },
-          ],
-        },
       ],
     },
 

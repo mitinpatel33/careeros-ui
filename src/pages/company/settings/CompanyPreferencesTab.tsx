@@ -38,7 +38,6 @@ const CompanyPreferencesTab = () => {
   });
 
   const onSubmit = (data: CompanyPreferencesType) => {
-    console.log("Company Preferences:", data);
     setMessage("Company preferences saved.");
   };
 
